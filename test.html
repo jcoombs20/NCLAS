@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>@Media Test</title>
+  <link rel="stylesheet" href="test.css" type="text/css">
+
+  <style>
+    @media print {
+      body {
+        background: lime;
+      }
+      .header {
+        background: orange;
+        color: purple;
+        font-weight: bold;
+      }
+   </style>
+</head>
+<body>
+<div class="header">
+  <p>Hello World</p>
+</div>
+<button onclick="window.print()">Print</button>
+<script type='text/javascript'>
+
+</script>
+</body>
+</html>

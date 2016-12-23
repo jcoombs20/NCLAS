@@ -1,0 +1,579 @@
+body, html {
+  width: 100%;
+  height: 100%;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+}
+
+.state, .eco, .eco2, .eco3, .fs, .class1 {
+  stroke-width: 4px;
+  fill-opacity: 0;
+  stroke-opacity: 0.6;
+}
+
+.state:hover, .eco:hover, .eco2:hover, .eco3:hover, .fs:hover, .class1:hover {
+  fill-opacity: 0.6;
+  stroke-opacity: 0.99;
+  cursor: crosshair;
+}
+
+.fs {
+  stroke: lime;
+  fill: lime;
+}
+
+.class1 {
+  stroke: red;
+  fill: red;
+}
+
+.state {
+  stroke: navy;
+  fill: navy;
+}
+
+#loadingDiv {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  background: rgba(40,40,40,0.6);
+  text-align: center;
+  color: black;
+  font-size: 4em;
+}
+
+#loading {
+  margin-top: 200px;
+}
+
+#helpDiv {
+  display: flex;
+  justify-content: center;
+}
+
+#infoDiv {
+  width: 500px;
+  height: 400px;
+  background: rgba(255,255,255,1);
+  border-style: solid;
+  border-color: black;
+  border-width: 2px;
+  border-radius: 4px;
+  font-size: 2em;
+  align-self: center;
+  text-align: center;
+}
+
+.helpHeader {
+  font-size: 0.7em;
+  text-align: left;
+  background: rgba(0,0,255,0.2);
+  padding: 4px;
+}
+
+.brand {
+  font-size: 22pt;
+}
+
+.tooltip-inner {
+  max-width: 200px;
+  width: 200px;
+  text-shadow: none;
+}
+
+.d3Tooltip {
+  background: rgba(0,0,0,0.7);
+  border-style: solid;
+  border-color: white;
+  border-width: 2px;
+  border-radius: 4px;
+  color: yellow;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1em;
+  font-weight: bold;
+  padding: 7px;
+  position: absolute;
+  z-index: 10;
+  visibility: hidden;
+}
+
+.leaflet-container {
+  background-color: white;
+}
+
+.leaflet-google-layer {
+  padding-top: 0px !important;;
+}
+
+.leaflet-top {
+  padding-top: 50px;
+}
+
+.leaflet-touch .leaflet-control-layers, .leaflet-touch .leaflet-bar {
+  border: 0px;
+}
+
+.leaflet-touch .leaflet-control-layers-toggle, .leaflet-touch .leaflet-bar a {
+  width: 36px;
+  height: 36px;
+}
+
+.leaflet-control-zoom {
+  font-size: 2.5em;
+}
+
+.leaflet-touch, .leaflet-bar a {
+  opacity: 1;
+  box-shadow: 0 1px 7px #999;
+  border-radius: 4px;
+  width: 36px;
+  height: 36px;
+  font-size: 1em;
+  font-weight: bold;
+  padding-top: 5px;
+}
+
+.leaflet-bar a:hover {
+  width: 36px;
+  height: 36px;
+  opacity: 1;
+}
+
+.leaflet-bottom .leaflet-control-scale {
+  margin-bottom: 0px;
+}
+
+.leaflet-control-scale-line, .leaflet-control-scale-line:not(:first-child) {
+  background: rgba(255,255,0,0.6);
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 4px;
+  border-color: black;
+  margin: 5px;
+  margin-left: 0px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.5em;
+  font-weight: bold;
+  color: black;
+  text-align: center;
+}
+
+.leaflet-control-scale-line:hover, .leaflet-control-scale-line:not(:first-child):hover {
+  background: rgba(255,255,0,1);
+}
+
+.hr {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.legend {
+  width: 100%;
+  background: rgba(255,255,255,0.8);
+  border: solid;
+  border-color: black;
+  border-width: 1px;
+  border-radius: 0px 0px 4px 4px;
+  margin: 0px;
+}
+
+#leftSideToolsDiv {
+  position: absolute;
+  top: 50px;
+  left: 60px;
+  width: 375px;
+  max-width: 375px;
+  margin: 0px;
+  z-index: 2000;
+  max-height: 85%;
+  overflow-y: auto;
+  overflow-x: visible;
+}
+
+#polFilterDiv {
+  display: none;
+  margin: 0px;
+}
+
+#polFilterSelectDiv {
+  text-align: center;
+  padding-bottom: 5px;
+  border-bottom: 1px solid black; 
+}
+
+#polFilterConditions {
+  max-height: 125px;
+  overflow-y: auto;
+  overflow-x: visible;
+}
+
+.polFilterCond {
+  padding: 5px;
+  margin: 0px;
+  //border-top: 1px solid gray; 
+  border-bottom: 1px solid gray; 
+}
+
+.polFilterCond:hover {
+  background: rgba(255,255,255,1);
+}
+
+#attValuesDiv {
+  max-height: 250px;
+  overflow-y: auto;
+  overflow-x: visible;  
+}
+
+.attTRHead {
+  background: rgba(0,0,255,0.2)
+}
+
+.attTR:hover {
+  background: rgba(255,255,255,1);
+}
+
+.attTD, .attTH {
+  border-top: 1px solid gray;
+  border-collapse: collapse;
+  padding: 5px;
+}
+
+.leaflet-control-layers-list {
+  width: 275px;
+  //overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 660px;
+}
+
+#gsLegendDiv {
+  display: none;
+  position: fixed;
+  margin: 0px;
+  z-index: 10000;
+  border-radius: 6px;
+  background: white;
+  border: 1px solid black;
+}
+
+#gsLegendImg {
+  border-radius: 0px 0px 6px 6px;
+}
+
+.label-glyph {
+  margin-left: 5px;
+}
+
+#gsOpacityDiv {
+  display: none;
+  position: fixed;
+  margin: 0px;
+  z-index: 10000;
+  border-radius: 6px;
+  background: white;
+  border: 1px solid black;
+}
+
+#gsOpacityRange {
+  margin: 0px 1px 13px 1px;
+  width: auto;
+  height: auto;
+  position: relative;
+}
+
+.popupHeader {
+  text-align: center;
+  weight: bold;
+  border-bottom: 1px solid black;
+  padding: 0px 4px 0px 4px;
+}
+
+.layerHeading {
+  //background: rgba(0,0,255,0.2);
+}
+
+#abioticLayersDiv, #baseLayersDiv, #commLayersDiv, #areaLayersDiv {
+  overflow-y: auto;
+  max-height: 90px;
+}
+
+#speciesLayersDiv {
+  overflow-y: auto;
+  max-height: 140px;
+}
+
+#graphImg {
+  position: relative;
+  display: none;
+  background: white;
+  border: 1px solid black;
+  border-radius: 6px;
+  max-height: 80%;
+  max-width: 80%;
+  margin: auto;
+  top: 50px;
+}
+
+#filtersDiv {
+  position: absolute;
+  top: 50px;
+  right: 60px;
+  max-width: 420px;
+  margin: 0px;
+  max-height: 85%;
+  overflow-y: auto;
+  overflow-x: visible;
+}
+
+table {
+  width: 100%;
+  margin-bottom: 5px;
+}
+
+.cellDiv {
+  text-align: center;
+}
+
+.filterTitle {
+  font-weight: bold;
+  margin: 2px;
+  text-align: center;
+  display: block;
+}
+
+.filterAttrList {
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 4px;
+  border-color: black;
+  margin-right: 2px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1em;
+  font-weight: bold;
+  text-align: center;
+  opacity: 0.7;
+  width: 108px;
+}
+
+.filterAttrList:hover {
+  opacity: 1;
+}
+
+input[type="checkbox"]  {
+  margin: 0px 2px 0px 2px;
+}
+
+.horBorder {
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  background: rgba(0,0,255,0.2);
+}
+
+.horBorder:hover {
+  background: rgba(0,0,255,0.5);
+}
+
+.linkLabel {
+  margin: 0px 2px 0px 2px;
+  font-weight: normal;
+}
+
+#totals {
+  border-bottom: 1px solid black;
+  text-align: left;
+}
+
+.hoverDiv {
+  padding-left: 85px;
+}
+
+.hoverDiv:hover {
+  background: rgba(255,255,255,1);
+}
+
+#charts {
+  background: rgba(255,255,255,1);
+  padding: 0px;
+  max-height: 510px;
+}
+
+.chart {
+  margin: 5px;
+  width: 380px;
+}
+
+.title {
+  margin: 0px 2px 0px 2px;
+}
+
+.stats {
+  margin: 0px, 2px, 0px, 2px;
+}
+
+
+.extent-input {
+  width: 80px;
+  text-align: center;
+  border-radius: 4px;
+}
+
+.extent-input-p {
+  display: inline-block;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.legTitle {
+  font-weight: bold;
+  text-align: center;
+  margin: 2px;
+  //background: rgba(0,0,255,0.2)
+}
+
+.legTitle:hover {
+  //background: rgba(0,0,255,0.5)
+}
+
+.layerTitle {
+  margin: 0px 2px 7px 2px;
+  font-weight: bold;
+  display: inline-block;
+  font-size: 1em;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 75px;
+  height: 5px;
+  position: absolute;
+  display: inline-block;
+  margin: 8px;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+  background: navy;
+  height: 5px;
+  border: none;
+  border-radius: 3px;
+}
+
+input[type=range]:focus::-webkit-slider-runnable-track {
+  background: orange;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  height: 7px;
+  margin-top: -7px;
+  cursor: pointer;
+}
+
+.legAttrList {
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 4px;
+  border-color: black;
+  margin-right: 2px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1em;
+  font-weight: bold;
+  text-align: center;
+  opacity: 0.7;
+  position: absolute;
+  right: 0px;
+
+}
+
+.legAttrList:hover {
+  opacity: 1;
+}
+
+.legend-colors {
+  padding: 0px;
+  margin: 2px;
+  display: flex;
+  flex-direction: row;
+}  
+
+li.key {
+  background: rgba(255,255,255,0.75);
+  border-top-width: 15px;
+  border-top-style: solid;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.75em;
+  font-weight: bold;
+  text-align: left;
+  padding-left: 0px;
+  padding-right: 0px;
+  display: inline-block;
+  float: left;
+  flex-grow: 1;
+  flex-basis: 0;
+}
+
+li.key:hover {
+  background: rgba(255,255,255,1);
+     }
+
+#addWeightContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 2000;
+  background: rgba(0,0,0,0.5);
+  position: relative;
+}
+
+#addWeight {
+  padding: 10px;
+  width: 350px;
+  height: auto;
+  background: lightgray;
+  border-style: solid;
+  border-color: black;
+  border-width: 2px;
+  border-radius: 4px;
+  font-size: 1em;
+  align-self: center;
+  text-align: center;
+  //z-index: 2001;
+}
+
+@media print {
+  #leftSideToolsDiv {
+    top: 5px;
+    left: 5px;
+    background: rgba(255,255,255,0.8) !important
+  }
+
+  #filtersDiv {
+    top: 5px;
+    right: 5px;
+    background: rgba(255,255,255,0.8) !important
+  }
+
+  .leaflet-control-scale-line {
+    background: rgba(255,255,0,0.6) !important
+  }
+
+  .leaflet-container .leaflet-control-mouseposition {
+    background: rgba(255, 255, 255, 0.7) !important
+  } 
+
+  .horBorder {
+    background: rgba(0,0,255,0.2) !important
+  }
+
+  #charts {
+    background: rgba(255,255,255,1) !important
+  }
+
+  .header, .leaflet-control-zoom, .leaflet-control-navbar {
+    display: none; 
+  }   
+   
+}

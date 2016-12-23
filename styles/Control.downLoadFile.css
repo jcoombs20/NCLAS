@@ -1,0 +1,107 @@
+.leaflet-control-downLoadFile a {
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	display: block;
+}
+
+.leaflet-control-downLoadFile {
+	box-shadow: 0 1px 7px #999;
+	background: white;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
+.leaflet-control-downLoadFile a {
+        background-color: white; 
+	background-image: url(../images/graph_2_small.png);
+	width: 36px;
+	height: 36px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
+.leaflet-touch .leaflet-control-downLoadFile a {
+	width: 36px;
+	height: 36px;
+}
+
+.leaflet-control-downLoadFile .leaflet-control-downLoadFile-div,
+.leaflet-control-downLoadFile-expanded .leaflet-control-downLoadFile-toggle {
+	display: none;
+}
+
+.leaflet-control-downLoadFile-expanded .leaflet-control-downLoadFile-div {
+	display: block;
+	position: relative;
+}
+
+.leaflet-control-downLoadFile-expanded .leaflet-control-downLoadFile-div {
+	padding: 5px;
+}
+
+.leaflet-control-downLoadFile-button {
+	display: block;
+	text-align: center;
+	margin: auto;
+}
+
+.leaflet-control-downLoadFile-h5 {
+	margin: 4px;
+	text-align: center;
+       font-weight: bold;
+}
+
+.leaflet-control-downLoadFile-input[type=radio] {
+       margin: 2px 2px 2px 50px;
+}
+
+.leaflet-control-downLoadFile-label {
+	display: inline-block;
+       margin: 2px;
+}
+
+.leaflet-control-downLoadFile-hr {
+	margin: 4px 0px 4px 0px;
+}
+
+#dlButton {
+  font-size: 14px;
+  font-weight: bold;
+  background: none; 
+  display: block;
+  width: 87px;
+  height: 27px;
+  border-style: solid;
+  border-width: 2px;
+  background-color: rgba(221, 221, 221, 1);
+  border-radius: 1px;
+  padding: 2px;
+  margin: auto;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: none;
+  border: 1px solid darkgray;
+  color: black;
+  margin-bottom: 10px;
+}
+
+#dlButton:hover {
+  border-color: black;
+}
+
+#dlSelectDiv {
+  text-align: center;
+  margin: 10px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+#download {
+  background: rgba(255, 255, 255, 0.9);
+  position: relative;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+}

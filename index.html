@@ -1,0 +1,2203 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>N-CLAS Interactive Web Tool</title>
+    <link rel="icon" type="image/png" href="images/tree_nwk_icon.ico">
+
+    <!--link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/-->
+    <link rel="stylesheet" href="styles/bootstrap.min.css"/>
+    <!--link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css"/-->
+    <link rel="stylesheet" href="leaflet.css"/>
+    <!--link rel="stylesheet" href="http://colorbrewer2.org/export/colorbrewer.css"/-->
+    <link rel="stylesheet" href="colorbrewer.css"/>
+    <link rel="stylesheet" href="styles/Control.BingGeocoder.css"/>
+    <link rel="stylesheet" href="styles/Control.extentHistory.css"/>
+    <link rel="stylesheet" href="styles/Control.mousePosition.css"/>
+    <link rel="stylesheet" href="styles/Control.legend.css"/>
+    <link rel="stylesheet" href="styles/Control.political.css"/>
+    <link rel="stylesheet" href="styles/Control.attributes.css"/>
+    <link rel="stylesheet" href="styles/Control.graph.css"/>
+    <link rel="stylesheet" href="styles/Control.customWeight.css"/>
+    <link rel="stylesheet" href="styles/Control.downLoadFile.css"/>
+    <link rel="stylesheet" href="styles/Control.print.css"/>
+    <link rel="stylesheet" href="styles/app.css" />
+    <link rel="stylesheet" href="styles/NCLAS.css"/>
+
+    <!--script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script-->
+    <script src="leaflet.js"></script>
+    <!--script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script-->
+    <script src="jquery.min.js"></script>
+    <!--script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script-->
+    <script src="bootstrap.min.js"></script>
+    <script src="http://maps.google.com/maps/api/js?v=3"></script>
+    <script src="bundle.js"></script>
+    <script src="Bing_tile.js"></script>
+    <script src="Google_tile.js"></script>
+    <script src="Control.BingGeocoder.js"></script>
+    <script src="Control.extentHistory.js"></script>
+    <script src="Control.mousePosition.js"></script>
+    <script src="Control.legend.js"></script>
+    <script src="Control.political.js"></script>
+    <script src="Control.attributes.js"></script>
+    <script src="Control.graph.js"></script>
+    <script src="Control.customWeight.js"></script>
+    <script src="Control.downLoadFile.js"></script>
+    <script src="Control.print.js"></script>
+
+    <!--script src="http://d3js.org/d3.v3.min.js"></script-->
+    <script src="d3.v3.min.js"></script>
+    <!--script src="http://d3js.org/topojson.v1.min.js"></script-->
+    <script src="topojson.v1.min.js"></script>
+    <!--script src="http://colorbrewer2.org/export/colorbrewer.js"></script-->
+    <script src="colorbrewer.js"></script>
+    <!--script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script-->
+    <script src="queue.min.js"></script>
+    <script src="crossfilter.min.js"></script>
+    <!--script src="esri-leaflet.js"></script-->
+
+  </head>
+
+  <body>
+    <div id="map"></div>
+
+    <script type='text/javascript'>
+      //******Initialize bootstrap tooltip
+      $(document).ready(function(){
+        $('[data-toggle="tooltip"]').tooltip();   
+      });
+
+      //******Add Map
+      var map = new L.Map('map', {center: new L.LatLng(45, -81.5), zoomControl: false, zoom: 6, minZoom: 2, maxZoom: 20, inertiaDeceleration: 1000});
+
+      //******Add map controls
+      L.control.mousePosition().addTo(map);
+      L.control.scale({ maxWidth: 200 }).addTo(map);
+      L.control.zoom({ position: 'topleft', zoomInTitle: "Zoom in (can also be done with mouse wheel, double-click, '+' key, or by pressing the 'shift' key while clicking and dragging a rectangle)", zoomOutTitle: "Zoom out (can also be done with the mouse wheel or the '-' key)" }).addTo(map);
+      L.control.navbar().addTo(map);
+      //L.control.legend().addTo(map);
+      //L.control.political().addTo(map);
+      //L.control.attributes().addTo(map);
+
+      //******Bing geocoder control
+      var tmpPoint = new L.marker;
+      var bingGeocoder = new L.Control.BingGeocoder('At3gymJqaoGjGje-JJ-R5tJOuilUk-gd7SQ0DBZlTXTsRoMfVWU08ZWF1X7QKRRn', { callback: function (results) {
+                     var bbox = results.resourceSets[0].resources[0].bbox,
+                            first = new L.LatLng(bbox[0], bbox[1]),
+                            second = new L.LatLng(bbox[2], bbox[3]),
+                            tmpBounds = new L.LatLngBounds([first, second]);
+                     this._map.fitBounds(tmpBounds);
+                     this._map.removeLayer(tmpPoint);
+                     tmpPoint = new L.marker(results.resourceSets[0].resources[0].point.coordinates).bindPopup(results.resourceSets[0].resources[0].address.formattedAddress);
+                     this._map.addLayer(tmpPoint);
+                   }
+      });
+
+      map.addControl(bingGeocoder);
+
+      //******Add basemaps
+      var googleHybrid = new L.Google('HYBRID');
+      var googleSatellite = new L.Google('SATELLITE');
+      var googleStreet = new L.Google('ROADMAP');
+      var googleTerrain = new L.Google('TERRAIN');
+      var bingHybrid = new L.BingLayer("At3gymJqaoGjGje-JJ-R5tJOuilUk-gd7SQ0DBZlTXTsRoMfVWU08ZWF1X7QKRRn", {type: 'AerialWithLabels'});
+      var bingSatellite = new L.BingLayer("At3gymJqaoGjGje-JJ-R5tJOuilUk-gd7SQ0DBZlTXTsRoMfVWU08ZWF1X7QKRRn", {type: 'Aerial'});
+      var bingStreet = new L.BingLayer("At3gymJqaoGjGje-JJ-R5tJOuilUk-gd7SQ0DBZlTXTsRoMfVWU08ZWF1X7QKRRn", {type: 'Road'});
+      var usgsTopo = new L.tileLayer('http://basemap.nationalmap.gov/ArcGIS/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 15,
+            zIndex: 0,
+            attribution: '<a href="http://www.doi.gov">U.S. Department of the Interior</a> | <a href="http://www.usgs.gov">U.S. Geological Survey</a> | <a href="http://www.usgs.gov/laws/policies_notices.html">Policies</a>'
+            });
+      var states = new L.tileLayer.wms("http://felek.cns.umass.edu:8080/geoserver/CL/wms", {
+          layers: 'us_states',
+          format: 'image/png',
+          transparent: true,
+          version: '1.1.0',
+          maxZoom: 20,
+        });
+      var blank = new L.tileLayer('');
+
+    
+
+      //******Add Geoserver Layers
+      //******Abiotic Layers
+      var abioticID = ["n", "aspect", "bedrock", "clay", "coarse", "elevation", "permeability", "ph", "slope", "precip_annual", "precip_may_sept", "temp_jan", "temp_jul", "temp_may_sept"];
+      var abioticTitles = ["N Deposition", "Aspect", "Bedrock Depth", "Clay", "Coarse", "Elevation", "Permeability", "pH", "Slope", "Precipitation (Annual)", "Precipitation (May-Sept)", "Temperature (Jan)", "Temperature (July)", "Temperature (May-Sept)"];
+      var abioticLayers = [];
+
+      abioticID.forEach(function(tmpID, i) {
+        abioticLayers[i] = L.tileLayer.wms("http://felek.cns.umass.edu:8080/geoserver/CL/wms", {
+          layers: "CL:" + tmpID,
+          format: 'image/png',
+          transparent: true,
+          version: '1.1.0',
+          maxZoom: 20,
+          zIndex: 1
+        });
+      });
+
+      //******Species Layers
+      var speciesID = ["ab_ba", "ac_ru", "ac_sa", "be_al", "be_pa", "ca_de", "fa_gr", "fr_am", "fr_pe", "ju_ci", "pi_ma", "pi_ru", "pi_re", "pi_ri", "pi_st", "po_gr", "po_tr", "qu_al", "qu_pr", "qu_ru", "th_oc", "ts_ca", "ul_am"];
+      var speciesTitles = ["Balsam Fir", "Red Maple", "Sugar Maple", "Yellow Birch", "Paper Birch", "American Chestnut", "Beech", "White Ash", "Green Ash", "Butternut", "Black Spruce", "Red Spruce", "Red Pine", "Pitch Pine", "White Pine", "Big-tooth Aspen", "Quaking Aspen", "White Oak", "Chestnut Oak", "Red Oak", "Northern White Cedar", "Eastern Hemlock", "American Elm"];
+      var speciesNames = ["Abies balsamea", "Acer rubrum", "Acer saccharum", "Betula alleghaniensis", "Betula papyrifera", "Castanea dentata", "Fagus Grandifolia", "Fraxinus americana", "Fraxinus pennsylvanica", "Juglans cinerea", "Picea mariana", "Picea rubens", "Pinus resinosa", "Pinus rigida", "Pinus strobus", "Populus grandidentata", "Populus tremuloides", "Quercus alba", "Quercus prinus", "Quercus rubra", "Thuja occidentalis", "Tsuga canadensis", "Ulmus americana"];
+      var speciesLayers = [];
+
+      var layerExt = ["_cl_mins", "_exc_mins", "_exc_maxs", "_range"];
+      var layerExtTitles = ["Critical Load", "Exceedance Min", "Exceedance Max", "Extent"];
+
+      speciesID.forEach(function(tmpID, i) {
+        speciesLayers[i] = [];
+        layerExt.forEach(function(tmpExt, j) {
+          speciesLayers[i][j] = L.tileLayer.wms("http://felek.cns.umass.edu:8080/geoserver/CL/wms", {
+            layers: "CL:" + tmpID + tmpExt,
+            format: 'image/png',
+            transparent: true,
+            version: '1.1.0',
+            maxZoom: 20,
+            zIndex: 1
+          });
+        });
+      });
+
+      //******Add Community Layers
+      var commID = ["cl_mins_min", "cl_mins_max", "cl_maxs_min", "cl_maxs_max", "exc_cl_mins_min", "exc_cl_mins_max", "exc_cl_maxs_min", "exc_cl_maxs_max"]
+      var commTitles = ["Min CL (lower range)", "Max CL (lower range)", "Min CL (upper range)", "Max CL (upper range)", "Exceedance A (min min)", "Exceedance B (max min)", "Exceedance D (min max)", "Exceedance C (max max)"];
+      var commLayers = [];
+
+      commID.forEach(function(tmpID, i) {
+        commLayers[i] = L.tileLayer.wms("http://felek.cns.umass.edu:8080/geoserver/CL/wms", {
+          layers: "CL:" + tmpID,
+          format: 'image/png',
+          transparent: true,
+          version: '1.1.0',
+          maxZoom: 20,
+          zIndex: 1
+        });
+      });
+
+
+      //******Add SVG Layers
+      //******Area Select Layers
+      var areaID = ["state", "eco", "eco2", "eco3", "fs", "class1"];
+      var areaTitles = [ "States", "Ecoregions Combined", "Ecoregions Level 2", "Ecoregions Level 3", "Forest Service Admin Areas", "Class I Areas"];
+      var areaLayers = [];
+
+      var topoSVG = d3.select(map.getPanes().overlayPane).append("svg");
+
+      areaID.forEach(function(tmpID, i) {
+        topoSVG.append("g").attr("class", "leaflet-zoom-hide").attr("id", tmpID + "G");
+      });
+
+      areaID.forEach(function(tmpID, i) {
+        areaLayers[i] = d3.select("#" + tmpID + "G");
+        areaLayers[i].onAdd = function(map) { addTopo(topos[tmpID]); };
+        areaLayers[i].onRemove = function(map) { removeTopo(topos[tmpID]); };
+      });
+
+
+      //******Add topo layer to map
+      function addTopo(topo) {
+        var tmpFeats = topo.g.selectAll("." + topo.class)
+            .data(topo.features)
+          .enter().append("path")
+            .attr("d", path)
+            .attr("class", topo.class)
+            .on("mouseover", function(data) { if(d3.select(this).style("opacity") > 0) {showIt(this.id);} })
+            .on("mousemove", function() { return tooltip.style("top", (d3.event.pageY-40) + "px").style("left", (d3.event.pageX+15) + "px"); })
+            .on("mouseout", function() { return tooltip.style("visibility", "hidden"); })
+            .on("click", function(data) { if (d3.select(this).style("stroke-opacity") == "1") {d3.select(this).style({"fill-opacity": "", "stroke-opacity": ""});} else {d3.select(this).style({"fill-opacity": "0.9", "stroke-opacity": "1"});}; });
+        changeStyle("id", topo);
+        //filterMap("featureid", topo, true);
+        //d3.select("#" + topo.class + "Legend").style("display", "block");
+      }
+
+
+      //******Remove topo layer from map
+      function removeTopo(topo) {
+        var tmpFeats = topo.g.selectAll("." + topo.class);
+        tmpFeats.remove();
+        //d3.select("#" + topo.class + "Legend").style("display", "none");
+      }
+
+      //******Make layer controller
+      var baseLayers = {}; 
+      var overlays = {}; 
+      var controlID = L.control.layers(baseLayers, overlays).addTo(map);
+
+
+      //******Turn on base and ovelay separator
+      d3.select(".leaflet-control-layers-separator").style("display", "block");
+
+      //******Remove layer control listeners
+      $('.leaflet-control-layers.leaflet-control').replaceWith($('.leaflet-control-layers.leaflet-control').clone());
+      $('.leaflet-control-layers-list').replaceWith($('.leaflet-control-layers-list').clone());
+      d3.select(".leaflet-control-layers-toggle")
+        .attr("id", "layerToggle")
+        .property("title", "Click to display layers window")
+        .on("click", function() { d3.select(".leaflet-control-layers.leaflet-control").classed("leaflet-control-layers-expanded", true); });
+      d3.select(".leaflet-control-layers.leaflet-control").on("wheel", function() { event.stopPropagation(); });
+
+
+      //******Create custom legend
+      var legendParts = ["base", "abiotic", "area", "comm", "species"];
+      d3.select(".leaflet-control-layers-list").attr("id", "legendForm");
+
+      //******Add in custom base layers
+      var baseLayers = [states, googleHybrid, googleSatellite, googleStreet, googleTerrain, bingHybrid, bingSatellite, bingStreet, usgsTopo, blank];
+      var baseLayerTitles = ["State Borders", "Google Hybrid", "Google Satellite", "Google Street", "Google Terrain", "Bing Hybrid", "Bing Satellite", "Bing Street", "USGS Topo", "None"]
+
+      map.addLayer(states);
+      var baseLayerNow = states;
+
+      d3.select(".leaflet-control-layers-base")
+        .insert("label", ":first-child")
+        .attr("id", "baseLayersLabel")
+        .attr("class", "layerHeading")
+        .property("title", "Click to show layers")
+        .html('<span> Basemap Layers </span>');
+
+      d3.select("#baseLayersLabel")
+        .insert("span", ":first-child")
+        .attr("id", "baseLayersGlyph")
+        .attr("class", "glyphicon glyphicon-plus-sign")
+        .attr("data-toggle", "collapse")
+        .attr("data-target", "#baseLayersDiv")
+        .on("click", function() { resize(this); changeGlyph(this); });
+
+      d3.select("#baseLayersLabel")
+        .append("span")
+        .attr("class", "glyphicon glyphicon-remove-sign pull-right")
+        .property("title", "Click to hide layers window")
+        .on("click", function() { d3.select(".leaflet-control-layers.leaflet-control").classed("leaflet-control-layers-expanded", false); });
+
+      d3.select(".leaflet-control-layers-base")
+        .append("div")
+        .attr("class", "layerDiv")
+        .property("id", "baseLayersDiv")
+        .style("margin-left", "15px")
+        .attr("class", "collapse");
+
+      baseLayers.forEach(function(data, i) {
+        d3.select("#baseLayersDiv")
+          .append("label")
+          .html('<input id="baseLayer-' + i + '" type="radio" name="baseLayer"></input><span> ' + baseLayerTitles[i] + ' </span>');
+
+        d3.select("#baseLayer-" + i)
+          .on("click", function() {baseLayerSwitch(data); });
+      });
+      
+      d3.select("#baseLayer-0").property("checked", true);
+
+      //******Switch out basemap layers
+      function baseLayerSwitch(layer) {
+        map.removeLayer(baseLayerNow);
+        baseLayerNow = layer;
+        map.addLayer(layer);
+      }
+
+      //******Add in legend div for geoserver layers
+      d3.select("body")
+        .append("div")
+        .attr("id", "gsLegendDiv")
+        .html('<h4 id="gsLegendHeader" class="popupHeader"></h4><img id="gsLegendImg">');
+
+      //******Add in opacity div for geoserver layers
+      d3.select("body")
+        .append("div")
+        .attr("id", "gsOpacityDiv")
+        .on("mouseleave", function() { d3.select(this).style("display", "none"); })
+        .html('<h4 id="gsOpacityHeader" class="popupHeader"></h4><input id="gsOpacityRange" type="range" min="0" max="1" step="0.01" title="1" data-layer="0"></input>');
+
+      //******Add in custom abiotic overlays
+      d3.select(".leaflet-control-layers-overlays")
+        .insert("label", ":first-child")
+        .attr("id", "abioticLayersLabel")
+        .attr("class", "layerHeading")
+        .property("title", "Click to show layers")
+        .html('<span> Abiotic Layers </span>');
+
+      d3.select("#abioticLayersLabel")
+        .insert("span", ":first-child")
+        .attr("id", "abioticLayersGlyph")
+        .attr("class", "glyphicon glyphicon-plus-sign")
+        .attr("data-toggle", "collapse")
+        .attr("data-target", "#abioticLayersDiv")
+        .on("click", function() {resize(this); changeGlyph(this);});
+
+      d3.select(".leaflet-control-layers-overlays")
+        .append("div")
+        .attr("class", "layerDiv")
+        .property("id", "abioticLayersDiv")
+        .style("margin-left", "15px")
+        .attr("class", "collapse");
+
+      abioticLayers.forEach(function(data, i) {
+        d3.select("#abioticLayersDiv")
+          .append("label")
+          .html('<input id="abioticLayer-' + i + '" type="checkbox"></input><span> ' + abioticTitles[i] + ' </span><span id="abioticLegend-' + i + '" class="glyphicon glyphicon-modal-window label-glyph" data-title="' + abioticTitles[i] + '" data-src="http://ecosheds.org:8080/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&LAYER=CL:' + abioticID[i] + '"></span><span id="abioticOpacity-' + i + '" class="glyphicon glyphicon-certificate label-glyph" data-layer="' + i + '"></span><a href="zips/' + abioticID[i] + '.zip"><span id="abioticDownload-' + i + '" class="glyphicon glyphicon-save label-glyph" title="Click to download ' + abioticTitles[i] + ' layer"></span></a>');
+
+        d3.select("#abioticLayer-" + i)
+          .property("checked", false)
+          .on("click", function() {layerToggle(this.checked, data); });
+
+        d3.select("#abioticLegend-" + i)
+          .property("title", "Hover to display layer legend")
+          .datum(function() {return this.dataset; })
+          .on("mouseover", function(d) { d3.select("#gsLegendHeader").text(d.title); d3.select("#gsLegendImg").attr("src", d.src); d3.select("#gsLegendDiv").style({"top": d3.event.pageY + "px", "right": "292px", "display": "inline-block"}); })
+          .on("mouseout", function(d) { d3.select("#gsLegendDiv").style("display", "none"); });
+
+        d3.select("#abioticOpacity-" + i)
+          .property("title", "Hover to display layer opacity control when layer is checked")
+          .datum(function() {return this.dataset; })
+          .on("mouseover", function(d) {
+            if (d3.select("#abioticLayer-" + d.layer).property("checked") == true) {
+              d3.select("#gsOpacityRange")
+                .property("value", abioticLayers[d.layer].valueOf().options.opacity)
+                .property("title", abioticLayers[d.layer].valueOf().options.opacity)
+                .on("input", function() {
+                  abioticLayers[d.layer].setOpacity(this.value); 
+                  d3.select(this).property("title", this.value);
+                }); 
+              d3.select("#gsOpacityHeader").text(abioticTitles[i]); 
+              d3.select("#gsOpacityDiv").style({"top": d3.event.pageY + "px", "right": "292px", "display": "inline-block"}); 
+            }
+          })
+      });
+
+
+      //******Add in divider bar
+      d3.select(".leaflet-control-layers-overlays")
+        .append("hr")
+        .attr("class", "leaflet-control-layers-separator");
+
+
+      //******Add in area select SVGs
+      d3.select(".leaflet-control-layers-overlays")
+        .append("label")
+        .attr("id", "areaLayersLabel")
+        .attr("class", "layerHeading")
+        .property("title", "Click to show layers")
+        .html('<span> Area Layers </span>');
+
+      d3.select("#areaLayersLabel")
+        .insert("span", ":first-child")
+        .attr("id", "areaLayersGlyph")
+        .attr("class", "glyphicon glyphicon-plus-sign")
+        .attr("data-toggle", "collapse")
+        .attr("data-target", "#areaLayersDiv")
+        .on("click", function() {resize(this); changeGlyph(this);});
+
+      d3.select(".leaflet-control-layers-overlays")
+        .append("div")
+        .attr("class", "layerDiv")
+        .property("id", "areaLayersDiv")
+        .style("margin-left", "15px")
+        .attr("class", "collapse");
+
+      areaLayers.forEach(function(data, i) {
+        d3.select("#areaLayersDiv")
+          .append("label")
+          .html('<input id="areaLayer-' + i + '" type="checkbox"></input><span> ' + areaTitles[i] + ' </span><a href="zips/' + areaID[i] + '.zip"><span id="areaDownload-' + i + '" class="glyphicon glyphicon-save label-glyph" title="Click to download ' + areaTitles[i] + ' layer"></span></a>');
+
+        d3.select("#areaLayer-" + i)
+          .property("checked", false)
+          .on("click", function() {layerToggle(this.checked, data); });
+      });
+
+
+      //******Add in divider bar
+      d3.select(".leaflet-control-layers-overlays")
+        .append("hr")
+        .attr("class", "leaflet-control-layers-separator");
+
+      //******Add in community layers
+      d3.select(".leaflet-control-layers-overlays")
+        .append("label")
+        .attr("id", "commLayersLabel")
+        .property("title", "Click to show layers")
+        .html('<span> Community Outputs </span>');
+
+      d3.select("#commLayersLabel")
+        .insert("span", ":first-child")
+        .attr("id", "commLayersGlyph")
+        .attr("class", "glyphicon glyphicon-plus-sign")
+        .attr("data-toggle", "collapse")
+        .attr("data-target", "#" + "commLayersDiv")
+        .on("click", function() {resize(this); changeGlyph(this);});
+
+      d3.select(".leaflet-control-layers-overlays")
+        .append("div")
+        .attr("class", "layerDiv")
+        .property("id", "commLayersDiv")
+        .style("margin-left", "30px")
+        .attr("class", "collapse");
+
+      commLayers.forEach(function(data, i) {
+        d3.select("#commLayersDiv")
+          .append("label")
+          .html('<input id="commLayer-' + i + '" type="checkbox"></input><span> ' + commTitles[i] + ' </span><span id="commLegend-' + i + '" class="glyphicon glyphicon-modal-window label-glyph" data-title="' + commTitles[i] + '" data-src="http://ecosheds.org:8080/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&LAYER=CL:' + commID[i] + '"></span><span id="commOpacity-' + i + '" class="glyphicon glyphicon-certificate label-glyph" data-layer="' + i + '"></span><a href="zips/' + commID[i] + '.zip"><span id="commDownload-' + i + '" class="glyphicon glyphicon-save label-glyph" title="Click to download ' + commTitles[i] + ' layer"></span></a>');
+
+        d3.select("#commLayer-" + i)
+          .property("checked", false)
+          .on("click", function() {layerToggle(this.checked, data); });
+
+        d3.select("#commLegend-" + i)
+          .property("title", "Hover to display layer legend")
+          .datum(function() {return this.dataset; })
+          .on("mouseover", function(d) { d3.select("#gsLegendHeader").text(d.title); d3.select("#gsLegendImg").attr("src", d.src); d3.select("#gsLegendDiv").style({"top": d3.event.pageY + "px", "right": "292px", "display": "inline-block"}); })
+          .on("mouseout", function(d) { d3.select("#gsLegendDiv").style("display", "none"); });
+
+        d3.select("#commOpacity-" + i)
+          .property("title", "Hover to display layer opacity control when layer is added")
+          .datum(function() {return this.dataset; })
+          .on("mouseover", function(d) {
+            if (d3.select("#commLayer-" + d.layer).property("checked") == true) {
+              d3.select("#gsOpacityRange")
+                .property("value", commLayers[d.layer].valueOf().options.opacity)
+                .property("title", commLayers[d.layer].valueOf().options.opacity)
+                .on("input", function() {
+                  commLayers[d.layer].setOpacity(this.value); 
+                  d3.select(this).property("title", this.value);
+                }); 
+              d3.select("#gsOpacityHeader").text(commTitles[i]); 
+              d3.select("#gsOpacityDiv").style({"top": d3.event.pageY + "px", "right": "292px", "display": "inline-block"}); 
+            }
+          })
+      });
+
+      //******Add in divider bar
+      d3.select(".leaflet-control-layers-overlays")
+        .append("hr")
+        .attr("class", "leaflet-control-layers-separator");
+
+
+      //******Add in custom species overlays
+      d3.select(".leaflet-control-layers-overlays")
+        .append("label")
+        .attr("id", "speciesLayersLabel")
+        .attr("class", "layerHeading")
+        .property("title", "Click to show layers")
+        .html('<span> Species Outputs </span>');
+
+      d3.select("#speciesLayersLabel")
+        .insert("span", ":first-child")
+        .attr("id", "speciesLayersGlyph")
+        .attr("class", "glyphicon glyphicon-plus-sign")
+        .attr("data-toggle", "collapse")
+        .attr("data-target", "#speciesLayersDiv")
+        .on("click", function() {resize(this); changeGlyph(this);});
+
+      d3.select(".leaflet-control-layers-overlays")
+        .append("div")
+        .attr("class", "layerDiv")
+        .property("id", "speciesLayersDiv")
+        .style("margin-left", "15px")
+        .attr("class", "collapse");
+
+      speciesLayers.forEach(function(spp, i) {
+        d3.select("#speciesLayersDiv")
+          .append("label")
+          .attr("id", speciesID[i] + "LayersLabel")
+          .property("title", speciesTitles[i] + " (" + speciesNames[i] + ")")
+          .html('<span> ' + speciesTitles[i] + ' </span>');
+
+        d3.select("#" + speciesID[i] + "LayersLabel")
+          .insert("span", ":first-child")
+          .attr("id", speciesID[i]+ "LayersGlyph")
+          .attr("class", "glyphicon glyphicon-plus-sign")
+          .attr("data-toggle", "collapse")
+          .attr("data-target", "#" + speciesID[i]+ "LayersDiv")
+          .on("click", function() {changeGlyph(this);});
+
+        d3.select("#speciesLayersDiv")
+          .append("div")
+          .attr("class", "layerDiv")
+          .property("id", speciesID[i] + "LayersDiv")
+          .style("margin-left", "30px")
+          .attr("class", "collapse");
+
+        spp.forEach(function(data, j) {
+          d3.select("#" + speciesID[i]+ "LayersDiv")
+            .append("label")
+            .html('<input id="' + speciesID[i] + 'Layer-' + j + '" type="checkbox"></input><span> ' + layerExtTitles[j] + ' </span><span id="' + speciesID[i] + 'Legend-' + j + '" class="glyphicon glyphicon-modal-window label-glyph" data-title="' + speciesTitles[i] + '-' + layerExtTitles[j] + '" data-src="http://ecosheds.org:8080/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&LAYER=CL:' + speciesID[i] + layerExt[j] + '"></span><span id="' + speciesID[i] + 'Opacity-' + j + '" class="glyphicon glyphicon-certificate label-glyph" data-layer="' + j + '" data-species="' + i + '"></span>');
+
+          d3.select("#" + speciesID[i]+ "Layer-" + j)
+            .property("checked", false)
+            .on("click", function() {layerToggle(this.checked, data); });
+
+          d3.select("#" + speciesID[i] + "Legend-" + j)
+            .property("title", "Hover to display layer legend")
+            .datum(function() {return this.dataset; })
+            .on("mouseover", function(d) { d3.select("#gsLegendHeader").text(d.title); d3.select("#gsLegendImg").attr("src", d.src); d3.select("#gsLegendDiv").style({"top": d3.event.pageY + "px", "right": "292px", "display": "inline-block"}); })
+            .on("mouseout", function(d) { d3.select("#gsLegendDiv").style("display", "none"); 2});
+
+          d3.select("#" + speciesID[i] + "Opacity-" + j)
+            .property("title", "Hover to display layer opacity control when layer is added")
+            .datum(function() {return this.dataset; })
+            .on("mouseover", function(d) {
+              if (d3.select("#" + speciesID[i]+ "Layer-" + d.layer).property("checked") == true) {
+                d3.select("#gsOpacityRange")
+                  .property("value", speciesLayers[d.species][d.layer].valueOf().options.opacity)
+                  .property("title", speciesLayers[d.species][d.layer].valueOf().options.opacity)
+                  .on("input", function() {
+                    speciesLayers[d.species][d.layer].setOpacity(this.value); 
+                    d3.select(this).property("title", this.value);
+                  }); 
+                d3.select("#gsOpacityHeader").text(speciesTitles[i] + "-" + layerExtTitles[j]); 
+                d3.select("#gsOpacityDiv").style({"top": d3.event.pageY + "px", "right": "292px", "display": "inline-block"}); 
+              }
+            })
+
+
+        });
+      });
+
+
+
+
+      //******Turn map layers on and off
+      function layerToggle(tmpCheck, layer) {
+        if (tmpCheck == true) {
+          map.addLayer(layer);
+        }
+        else {
+          map.removeLayer(layer);
+        }
+      }
+
+
+
+      //******Adjust max height of visible legend divs
+      function resize(tmpGlyph) {
+        var tmpDivs = [];
+        if (d3.select(tmpGlyph).classed("glyphicon-plus-sign") == true) { displayCnt = 1; tmpDivs.push(tmpGlyph.id.replace("LayersGlyph", "")); } else { displayCnt = 0; }
+
+        legendParts.forEach(function(part) {
+          if (tmpGlyph.id.includes(part) == false) {
+            if (d3.select("#" + part + "LayersGlyph").classed("glyphicon-minus-sign") == true) {
+              displayCnt += 1;
+              tmpDivs.push(part);
+            }
+          }
+        });
+
+        var labelHeight = document.getElementById(legendParts[0] + "LayersLabel").getBoundingClientRect().height * legendParts.length;
+        var hrHeight = d3.selectAll(".leaflet-control-layers-separator")[0].length * 11;
+        var formHeight = Number(window.getComputedStyle(document.getElementById("legendForm"), null).getPropertyValue("max-height").replace("px",""));
+        var tmpMaxHeight = (formHeight - labelHeight - hrHeight - (legendParts.length * 5))/displayCnt;
+
+        tmpDivs.forEach(function(div, i) { 
+            d3.select("#" + div + "LayersDiv").style("max-height", tmpMaxHeight + "px");
+        });
+
+        //console.log(formHeight + ", " + labelHeight + ", " + hrHeight + ", " + tmpMaxHeight + ", " + displayCnt);
+      }
+
+      //d3.select("body").append("img").attr("src", "graphs/n_protection_eco3.png").style({"position": "fixed", "top": "100px"});
+
+      //d3.select(".leaflet-control-layers-base").property("title", "Click on radio button to change the baselayer option");
+      //d3.select(".leaflet-control-layers-overlays").property("title", "Check the box to add layer to map (may be slight delay)");
+
+      //******Add custom weighting tool
+      //var customWeight = new L.Control.customWeight();
+      //map.addControl(customWeight);
+      //completePrioritization();
+
+      //******Add graph tool
+      //L.control.graph().addTo(map);
+
+      //******Add Download tool - use temporarily as graph display
+      var downLoadFile = new L.Control.downLoadFile();
+      map.addControl(downLoadFile);
+      completeGraph();
+
+      //******Add Print tool
+      var printMap = new L.Control.print();
+      map.addControl(printMap);
+
+
+      //******Make tooltip for displaying attribute data
+      var tooltip = d3.select("body")
+        .append("div")
+        .attr("class", "d3Tooltip");
+
+
+      //******Make header div
+      d3.select("body")
+        .append("div")
+        .attr("class", "header")
+        .style("padding", "5px")
+        .style("height", "50px")
+        .html('<span class="brand">N-CLAS Interactive Web Tool</span> <div class="pull-right"><a title="Click to display information on how to use this tool" href="#" data-toggle="modal" data-target="#helpDiv">About N-CLAS</a> | <a title="Click to go to the Ecosheds homepage" href="http://ecosheds.org">SHEDS Home</a>');
+
+
+      //*******Make LOADING div
+      d3.select("body")
+        .append("div")
+        .attr("class", "helpBackground")
+        .attr("id", "loadingDiv")
+        .append("h1")
+        .text("LOADING...")
+        .style("font-weight", "bold")
+        .attr("id", "loading"); 
+
+      //*******Make Help/information div
+      d3.select("body")
+        .append("div")
+        .attr("class", "modal fade ui-draggable in")
+        .attr("id", "helpDiv")
+        .style("display", "none")
+        .append("div")
+        .attr("class", "modal-dialog modal-lg")
+        .attr("id", "infoDiv")
+        .append("div")
+        .attr("class", "helpHeader")
+        .text("N-CLAS: Nitrogen Critical Loads Explorer")
+        .append("span")
+        .attr("class", "glyphicon glyphicon-remove-sign pull-right minimize-button")
+        .attr("data-toggle", "modal")
+        .attr("data-target", "#helpDiv")
+        .property("title", "Close help");
+        
+      d3.select("#infoDiv")
+        .append("hr")
+        .attr("class", "hr");
+
+      d3.select("#infoDiv")
+        .append("div")
+        .text("Helpful information coming soon...");
+
+      function changeGlyph(tmpEl) {
+        var selEl = d3.select("#" + tmpEl.id);
+        if (selEl.classed("glyphicon-minus-sign")) {
+          selEl.classed("glyphicon-minus-sign", false);
+          selEl.classed("glyphicon-plus-sign", true);
+          tmpEl.title = "Click to maximize panel";
+        }
+        else {
+          selEl.classed("glyphicon-plus-sign", false);
+          selEl.classed("glyphicon-minus-sign", true);
+          tmpEl.title = "Click to minimize panel";
+        }
+      }
+
+
+
+
+      //******Make variables for d3 topoJSON and TSV data
+      var topos = {};  //global topoJSON files variable
+      var brush = {};   //global brush variable
+      var hist = {};   //global histogram object variable
+      var graphs = [];   //global list of current graphs variable
+      var layers = [];   //global list of topoJSON map layers
+      var crossingCov = [];  //global array of crossing covariate data 
+
+      //******Add in custom color pallate for streams
+      colorbrewer.streams = {};
+      colorbrewer.streams["5"] = ["#081d58","#253494","#225ea8","#1d91c0","#41b6c4"];
+      colorbrewer.streams["6"] = ["#081d58","#253494","#225ea8","#1d91c0","#41b6c4", "#7fcdbb"];
+
+
+
+      //******Wait for all topoJSON files to load
+      queue()
+        .defer(d3.json, 'class_1_areas_topo.json')
+        .defer(d3.json, 'fs_admin_areas_topo.json')
+        .defer(d3.json, 'ecoregions_level_3_topo.json')
+        .defer(d3.json, 'ecoregions_level_2_topo.json')
+        .defer(d3.json, 'ecoregions_topo.json')
+        .defer(d3.json, 'states_topo.json')
+        //.defer(d3.tsv, 'crossings_covariates_rof_delay.tsv')
+        //.defer(d3.tsv, 'catchments_covariates.tsv')
+        //.defer(d3.tsv, 'streams_covariates.tsv')
+        //.defer(d3.tsv, 'catchments_political.tsv')
+        //.defer(d3.tsv, 'covariate_info.tsv')
+        .await(displayIt);
+
+
+
+
+
+
+
+      //******Bind topoJSON data
+      function displayIt(error, class1Data, fsData, eco3Data, eco2Data, ecoData, stateData) {
+        topos.class1 = topojson.feature(class1Data, class1Data.objects.class_1_wilderness_areas_ecoregions_wgs84);
+        topos.fs = topojson.feature(fsData, fsData.objects.fs_admin_areas_ecoregions_wgs84);
+        topos.eco3 = topojson.feature(eco3Data, eco3Data.objects.ecoregions_level_3_L3NAME_dissolved_wgs84);
+        topos.eco2 = topojson.feature(eco2Data, eco2Data.objects.ecoregions_level_2_L2NAME_dissolved_wgs84);
+        topos.eco = topojson.feature(ecoData, ecoData.objects.ecoregions_dissolved_wgs84);
+        topos.state = topojson.feature(stateData, stateData.objects.states_names_ecoregions_wgs84);
+
+        //******Add properties to topos and push layer (class name, SVG g object, unique identifier short_heading, colorbrewer class)
+        areaID.forEach(function(tmpID, i) {
+          addProps(tmpID, areaLayers[i], "unique_id", "RdYlBu");
+        });
+
+        topos.eco.color = {"Ecoregions_Combined": "orange"};
+        topos.eco2.color = {"ATLANTIC_HIGHLANDS": "#cc5200", "MIXED_WOOD_PLAINS": "#0000ff", "MIXED_WOOD_SHIELD": "#00e600"};
+        topos.eco3.color = {"Acadian_Plains_and_Hills": "#4D2600", "Driftless_Area": "#FFB3FF", "Eastern_Great_Lakes_Lowlands": "#004D00", "Erie_Drift_Plain": "#990099", "North_Central_Appalachians": "#000000", "North_Central_Hardwood_Forests": "#B35900", "Northeastern_Coastal_Zone": "#000099", "Northern_Appalachian_and_Atlantic_Maritime_Highlands": "#FFFF00", "Northern_Allegheny_Plateau": "#FF0000", "Northern_Lakes_and_Forests": "#0066FF", "Northern_Minnesota_Wetlands": "#00FF00", "Southern_Michigan/Northern_Indiana_Drift_Plains": "#FF9900"};
+        
+
+        //******Add covariate TSV files to topojson
+        //crossCov = readTSV(crossCov, topos.crossings);
+        //catchCov = readTSV(catchCov, topos.catchments);
+        //streamCov = readTSV(streamCov, topos.streams);
+        
+        //******Read in political featureids
+        //topos.political = strToNum(political);        
+
+/*
+        //******Add covariate title and description information
+        var tmpLayers = ["crossings", "catchments", "streams", "political"];
+        tmpLayers.forEach(function(d) {
+          topos[d]["title"] = {};
+          topos[d]["title"]["unique_id"] = "Unique ID";
+          topos[d]["title"]["featureid"] = "Catchment ID";
+          topos[d]["tooltip"] = {};
+          topos[d]["unit"] = {};
+          topos[d]["direction"] = {};
+          topos[d]["data_type"] = {};
+          topos[d]["scale"] = {};
+          topos[d]["display"] = {};
+          topos[d]["conversion"] = {};
+          topos[d]["minVal"] = {};
+          topos[d]["maxVal"] = {};
+          topos[d]["minClip"] = {};
+          topos[d]["maxClip"] = {};
+          topos[d]["max"] = {};
+        });
+
+        covInfo.forEach(function(d) {
+          topos[d.layer]["title"][d.short_heading] = d.long_heading;
+          topos[d.layer]["tooltip"][d.short_heading] = d.tooltip;
+          topos[d.layer]["unit"][d.short_heading] = d.unit;
+          topos[d.layer]["direction"][d.short_heading] = d.direction;
+          topos[d.layer]["data_type"][d.short_heading] = d.data_type;
+          topos[d.layer]["scale"][d.short_heading] = d.scale;
+          topos[d.layer]["display"][d.short_heading] = d.display;
+          topos[d.layer]["conversion"][d.short_heading] = {};
+          if (jQuery.isEmptyObject(d.conversion) == false) {
+            topos[d.layer]["conversion"][d.short_heading] = JSON.parse(d.conversion);
+          }
+          topos[d.layer]["conversion"][d.short_heading]["raw"] = d.conversion;
+        });
+
+        //******Get keys for covariate data
+        topos.crossings.keys = d3.keys(crossCov[0]);
+        topos.catchments.keys = d3.keys(catchCov[0]);
+        topos.streams.keys = d3.keys(streamCov[0]);
+        topos.political.keys = d3.keys(political[0]);
+
+        //******Transform covariate data if necessary
+        var tmpLayers = [[crossCov, "crossings"], [catchCov, "catchments"], [streamCov, "streams"]];
+        tmpLayers.forEach(function(d) {
+          topos[d[1]].keys.forEach(function(key) {
+            var tmpMax = d3.max(d[0], function(data) {return data[key];});
+            topos[d[1]]["max"][key] = tmpMax;
+            //topos[d[1]]["min"][key] = d3.min(d[0], function(data) { if(data[key] != -9999) {return data[key];} });
+            d[0].forEach(function(row) {
+              switch(topos[d[1]]["scale"][key]) {
+                case "log":
+                  if (row[key] != -9999) {
+                    row[key] = Math.log(row[key] + 0.1);
+                  }
+                  break;
+                case "log_rec":
+                  if (row[key] != -9999) {
+                    row[key] = -(Math.log(tmpMax + 0.1 - row[key]));
+                  }
+              }
+            });
+          });
+        });
+
+
+        //******Make crossfilter dimensions
+        cfDimension(topos.crossings, crossCov);
+        cfDimension(topos.catchments, catchCov);
+        cfDimension(topos.streams, streamCov);
+
+        //******Release covariate data
+        crossingCov = crossCov;  //keep to add weighted ROF covariates to
+        crossCov = null;
+        catchCov = null;
+        streamCov = null;
+*/
+
+        //******Set d3 map data
+        bounds = d3.geo.bounds(topos.state);
+        path = d3.geo.path()
+                 .projection(projectPoint)
+                 .pointRadius(3.5);
+
+        //******Add drop down box to select crossing attribute for styling
+        //addLegend(topos.crossings);
+        //addLegend(topos.catchments);
+        //addLegend(topos.streams);
+
+        //******Add drop down box to select political filter class and type for filtering
+        //addPolFilters(topos.political);
+
+        //******Add drop down box to select attributes for filtering
+        //addFilterLayers(layers);
+
+        //******Add the pair-wise links to the spatial join div
+        //addCFLinks(layers);
+        
+        //******Add topoJSON layers
+        d3.select("#areaLayer-1").property("checked", true);
+        map.addLayer(areaLayers[1]);
+        
+       
+        //******Set map view
+        map.on("viewreset", reset);
+        reset();
+
+        //******Remove "Loading..." text
+        d3.select("#loadingDiv").style("display", "none");
+      }
+      
+
+
+      //******Add attribute names and values to table
+      function getAttributes(tmpFeat, topo, opacity) {
+        if (opacity == 0) {return;}
+        d3.select("#attributesDiv").style("display", "block");
+        d3.select("#attributesControl").property("title", "Click to hide feature attributes window");
+
+        var tmpArray = topo.keys.map(function(d) { return {"att": d, val: formatAtt(topo, d, tmpFeat[d]) }; } );
+        var columns = ["att", "val"]
+
+        var rows = d3.select("#attValuesTable").selectAll('.attTR')
+          .data(tmpArray);
+        rows.exit().remove();
+        rows.enter()
+          .append('tr')
+          .attr("class", "attTR");          
+
+        var cells = rows.selectAll("td")
+          .data(function(row) {
+            return columns.map(function (column) {
+              return {column: column, value: row[column]};
+            });
+          });
+        cells.enter()
+            .append('td')
+            .attr("class", "attTD");
+        cells
+          .text(function(d) { if (d.column == "att") {return formatTitle(topo, d.value);} else {return d.value;} })
+          .property("title", function(d) {if (d.column == "att") {return topo.tooltip[d.value];} else {return d.value;} });
+      }
+
+
+      //******Format title and units
+      function formatTitle(topo, att) {
+        if (topo.unit[att]) {
+          return topo.title[att]  + " (" + topo.unit[att] + ")";
+        }
+        else {
+          return topo.title[att];
+        }
+      }
+
+
+      //******Format data by its data_type
+      function formatAtt(topo, att, val) {
+        switch (topo.data_type[att]) {
+          case "decimal":
+            var tmpVal = val.toFixed(2);
+            break;
+          case "text":
+            if (Object.keys(topo.conversion[att]).length == 1) {
+              var tmpVal = val;
+            }
+            else {
+              var tmpVal = topo.conversion[att][val];
+            }
+            break;
+          case "integer":
+            var tmpVal = val;
+            break;
+          case "date":
+            var tmpTime = d3.time.format("%-m/%-d/%Y");
+            var tmpVal = tmpTime(new Date(val));
+            break;
+        }
+        if (Math.floor(val) == -9999) { tmpVal = "No Data"; };
+        return tmpVal;
+      }
+
+
+
+
+      //******Add checkboxes to link crossfilters
+      function addCFLinks(tmpLayers) {
+        tmpLayers.forEach(function(layer1, i) {
+          tmpLayers.forEach(function(layer2, j) {
+            if (j > i) {
+              d3.select("#linkLayers")
+                .append("div")
+                .attr("class", "hoverDiv")
+                .attr("id", layer1 + "-" + layer2 + "-link")
+                .property("title", "Check to spatially link the " + layer1.slice(0,-1) + " and " + layer2.slice(0,-1) + " layers");
+
+              d3.select("#" + layer1 + "-" + layer2 + "-link")
+                .append("input")
+                .attr({type: "checkbox", name: layer1 + "-" + layer2 + "-check"})
+                .attr("id", layer1 + "-" + layer2 + "-check")
+                .attr("class", "linkCheck")
+                .property("checked", false)
+                .on("click", function() { checkLink("featureid", layer1, true); });   //Layer1 doesn't matter, just a placeholder
+
+              d3.select("#" + layer1 + "-" + layer2 + "-link")
+                .append("label")
+                .text("Link " + layer1 + " & " + layer2)
+                .attr("class", "linkLabel")
+                .attr("id", layer1 + "-" + layer2 + "-linkLabel");
+            }
+          });
+        });
+      }
+     
+
+
+
+      //******Add properties to topos and push layer
+      function addProps(tmpName, tmpG, tmpID, tmpColor) {
+        topos[tmpName].class = tmpName;
+        topos[tmpName].g = tmpG;
+        topos[tmpName].uniqueID = tmpID;
+        topos[tmpName].covType = {};
+        topos[tmpName].filter = {};
+        topos[tmpName].binWidth = {};
+        topos[tmpName].color = tmpColor;
+        brush[tmpName] = {};
+        hist[tmpName] = {};
+        layers.push(tmpName);
+      }
+
+
+
+      function addPolFilters(topo) {
+        d3.select("#classPolFilterCell")
+          .append("div")
+          .attr("id", "classPolFilterCellDiv")
+          .attr("class", "cellDiv")
+          .append("h5")
+          .attr("class", "filterTitle")
+          .text("Class");
+
+        var select = d3.select("#classPolFilterCellDiv")
+          .append("select")
+          .attr("class", "filterAttrList")
+          .attr("id", "classPolFilterSelect")
+          .property("title", "Select class to use its values as options in the adjacent 'Area' selection box") 
+          .on("change", function() { addPolFilterTypes(topo, this.value); });
+
+        var optData = topo.keys.filter(function(key) { return key != "unique_id" && key != "featureid"; });
+
+        select.selectAll("option")
+          .data(optData)
+          .enter()
+            .append("option")
+              .attr("value", function (d) { if(d != "featureid") { return d;} })
+              .text(function (d) { if(d != "featureid") {return topos.political.title[d];} });
+
+        //******Add attribute selection box
+        d3.select("#typePolFilterCell")
+          .append("div")
+          .attr("id", "typePolFilterCellDiv")
+          .attr("class", "cellDiv")
+          .append("h5")
+          .attr("class", "filterTitle")
+          .text("Area");
+
+        var select = d3.select("#typePolFilterCellDiv")
+          .append("select")
+          .attr("class", "filterAttrList")
+          .attr("id", "typePolFilterSelect")
+          .style("width", "130px");
+
+        //******Add clear all button
+        d3.select("#polFilterSelectDiv")
+          .append("button")
+          .text("Clear All")
+          .property("title", "Click to remove all applied filters")
+          .on("click", function() { 
+            var tmpArray = topos.political.condition.slice();
+            tmpArray.forEach(function(cond) {
+              var i = cond.indexOf("-") + 1;
+              var j = cond.lastIndexOf("-");
+              removeCondition(topo, cond, cond.slice(i,j), cond.slice(j+1)); 
+            });
+          });
+
+
+
+        //******Make crossfilter groups
+        topo.filter = {};
+        var tmpCF = crossfilter(topo);
+        topo.filter.all = tmpCF.groupAll();
+
+        topo.keys.forEach(function(key, i) {
+          topo.filter[key] = tmpCF.dimension(function(d) { return d[key]; } );
+          topo.filter[key + "s"] = topo.filter[key].group();
+        });
+
+        //******Make array for holding filter conditions
+        topo.condition = [];
+
+        //******Initialise with first layer
+        addPolFilterTypes(topo, topo.keys[0]);
+      }
+
+
+
+      function addPolFilterTypes(topo, tmpKey) {
+        var select = d3.select("#typePolFilterSelect")
+          .property("title", "Select an area to filter features in the Crossings, Catchments, and Streams layers to those intersecting that area")
+          .on("change", function() { addPolFilter(topo, tmpKey, this.value); });
+
+        //Get grouped data from crossfilter
+        var optData = topo.filter[tmpKey + "s"].all();
+        optData = optData.map(function(d) { return d.key; } );
+        optData.splice(0,0, "...");
+
+        var options = select.selectAll("option")
+          .data(optData);
+       
+        options.exit().remove();
+        options.enter()
+          .append("option");
+        options
+          .attr("value", function (d, i) { return optData[i].toString().replace(/ /g, "_"); })
+          .text(function (d, i) { return optData[i]; });
+
+        //******Set selected index to 0
+        d3.select("#typePolFilterSelect")
+          .property("selectedIndex", function() {return 0;});
+      }
+
+     
+      function addPolFilter(topo, tmpClass, tmpArea) {
+        var tmpID = "polFilter-" + tmpClass + "-" + tmpArea;
+
+        if (topo.condition.indexOf(tmpID) == -1 && tmpArea != "...") {
+          topo.condition.push(tmpID);
+
+          d3.select("#polFilterConditions")
+            .append("div")
+            .attr("class", "polFilterCond")
+            .attr("id", tmpID)
+            .append("p")
+            //.text(tmpClass.charAt(0).toUpperCase() + tmpClass.slice(1) + " = " + tmpArea.replace(/_/g, " "))
+            .text(topo.title[tmpClass] + " = " + tmpArea.replace(/_/g, " "))
+            .style("display", "inline-block")
+            .style("margin", "0px");
+
+          d3.select("#" + tmpID)
+            .append("div")
+              .attr("class", "btn btn-default btn-xs pull-right")
+              .attr("id", "polFilterRemove-" + tmpClass + "-" + tmpArea)
+              .text("x")
+              .property("title", "Click to remove filter condition for " + tmpClass.charAt(0).toUpperCase() + tmpClass.slice(1) + " = " + tmpArea.replace(/_/g, " "))
+              .on("click", function() { removeCondition(topo, tmpID, tmpClass, tmpArea); });
+          
+          //******Add filter to crossfilter
+          applyPolCrossfilter(topo);
+        }
+      }
+
+
+      function applyPolCrossfilter(topo) {
+        //******Add filter to crossfilter
+        topo.keys.forEach(function(key) {
+          var tmpCond = [];
+          topo.condition.forEach(function(cond) {
+            var i = cond.indexOf("-") + 1;
+            var j = cond.lastIndexOf("-");
+            if (cond.slice(i,j) == key) {
+              tmpCond.push(cond.slice(j + 1).replace(/_/g, " "));
+            }
+          });
+          if (tmpCond.length > 0) {
+            topo.filter[key].filterFunction(function(d) { 
+              var tmpBi = 0;
+              tmpCond.forEach(function(cond) {
+                if (d == cond) {tmpBi = 1;}
+              });
+              return tmpBi;
+            });
+          }
+          else {
+            topo.filter[key].filterAll();
+          }
+        });
+
+        //*******Filter map by applied filters
+        checkLink("featureid", topo, true);
+      }
+
+
+
+      function removeCondition(topo, tmpID, tmpClass, tmpArea) {
+        topo.condition.splice(topo.condition.indexOf(tmpID), 1);
+        d3.select("#" + tmpID).remove();
+        applyPolCrossfilter(topo);
+        if (d3.select("#typePolFilterSelect").node().value == tmpArea) {
+          d3.select("#typePolFilterSelect").property("selectedIndex", function() {return 0;});
+        }
+      }
+
+
+
+
+      function addFilterLayers(tmpLayers) {
+        d3.select("#layerFilterCell")
+          .append("div")
+          .attr("id", "layerFilterCellDiv")
+          .attr("class", "cellDiv")
+          .append("h5")
+          .attr("class", "filterTitle")
+          .text("Layer");
+
+        var select = d3.select("#layerFilterCellDiv")
+          .append("select")
+          .attr("class", "filterAttrList")
+          .attr("id", "layerFilterSelect")
+          .property("title", "Select layer to use its attributes as options in the adjacent 'Attribute' selection box") 
+          .on("change", function() { addFilterSelect(topos[this.value]); });
+
+        select.selectAll("option")
+          .data(tmpLayers)
+          .enter()
+            .append("option")
+              .attr("value", function (d, i) { return tmpLayers[i]; })
+              .text(function (d, i) { return tmpLayers[i].charAt(0).toUpperCase() + tmpLayers[i].slice(1); });
+
+        //******Add attribute selection box
+        d3.select("#attributeFilterCell")
+          .append("div")
+          .attr("id", "attributeFilterCellDiv")
+          .attr("class", "cellDiv")
+          .append("h5")
+          .attr("class", "filterTitle")
+          .text("Attribute");
+
+        var select = d3.select("#attributeFilterCellDiv")
+          .append("select")
+          .attr("class", "filterAttrList")
+          .attr("id", "attributeFilterSelect")
+          .style("width", "182px");
+
+        //******Initialise with first layer
+        addFilterSelect(topos[tmpLayers[0]]);
+
+        //******Add values to totals portion of charts window
+        tmpLayers.forEach(function(d) {
+          var topo = topos[d];
+          d3.select("#totals")
+            .append("div")
+            .attr("class", "hoverDiv")
+            .property("title", "The number of " + topo.class + " currently selected out of the total number of " + topo.class)
+            .html(topo.class.charAt(0).toUpperCase() + topo.class.slice(1) + ' selected: ' + '<b><span id="active-' + topo.class + '">' + topo.filter.all.value() + '</span></b> of <b><span id="total">' + topo.filter.all.value() + '</span></b>'); ;
+        });
+      }
+        
+
+
+
+      function addFilterSelect(topo) {
+        var select = d3.select("#attributeFilterSelect")
+          .attr("data-layer", topo.class)
+          .property("title", "Select an attribute to display an interactive graph containing the frequency of its values")
+          .on("change", function() { addFilter(this.value, topos[this.dataset.layer]); });
+
+        var optData = topo.keys.filter(function(key) { return topo.display[key] == "yes"; });
+
+        optData.splice(0,0, "...");
+        topo.title["..."] = "...";
+        topo.tooltip["..."] = "Select an attribute to display an interactive graph containing the frequency of its values";
+
+        var options = select.selectAll("option")
+          .data(optData);
+       
+        options.exit().remove();
+        options.enter()
+          .append("option");
+        options
+          .attr("value", function (d, i) { return optData[i]; })
+          .text(function (d, i) { return topo.title[optData[i]]; });
+
+        //******Set selected index to 0
+        d3.select("#attributeFilterSelect")
+          .property("selectedIndex", function() {return 0;})
+          .property("title", topo.tooltip["..."]);
+      }
+
+
+
+
+
+
+      function addLegend(topo) {
+        d3.select("#legendDiv")
+          .append("div")
+          .attr("id", topo.class + "Legend")
+          .style("margin-bottom", "10px");
+
+        d3.select("#" + topo.class + "Legend")
+          .append("hr")
+          .attr("class", "hr");
+
+        d3.select("#" + topo.class + "Legend")
+          .append("h5")
+          .text(topo.class.charAt(0).toUpperCase() + topo.class.slice(1))
+          .attr("id", "legHead" + topo.class)
+          .attr("class", "layerTitle");
+
+        d3.select("#" + topo.class + "Legend")
+          .append("input")
+          .attr({type: "range", name: topo.class + "Opacity", min: 0, max: 100, value: 100})
+          .attr("id", topo.class + "Slider")
+          .property("title", topo.class + " opacity: 100%")
+          .style("margin-left", 87 - d3.select("#legHead" + topo.class).property("offsetWidth") + "px")
+          .on("input", function() {
+            var tmpOpacity = this.value/100; 
+            d3.select("#" + topo.class + "Slider").attr("value", this.value);
+            var tmpData = topo.filter.featureid.top(Infinity);
+            var tmpID = tmpData.map(function(d) {return d.featureid;});
+            topo.g.selectAll("." + topo.class).style("opacity", function(d) {
+              if(tmpID.indexOf(d.properties.featureid) > -1) {
+                return tmpOpacity;
+              }
+              else {
+                return 0;
+              }
+            });
+            this.title = "Opacity: " + this.value + "%"; 
+          });
+
+        var select = d3.select("#" + topo.class + "Legend")
+          .append("select")
+          .attr("class", "legAttrList")
+          .attr("id", topo.class + "Select")
+          .style("width", "182px")
+          .on("change", function () { changeStyle(this.value, topo); });
+
+        var optData = topo.keys.filter(function(key) { return topo.display[key] == "yes"; });
+
+        select.selectAll("option")
+          .data(optData)
+          .enter().append("option")
+          .attr("value", function (d, i) { return optData[i]; })
+          .text(function (d, i) { return topo.title[optData[i]]; });
+      }
+
+
+
+
+
+
+
+      //*****Reposition the SVG to cover the features.
+      function reset() {
+        path.pointRadius(3.5 + (((map.getZoom()/10) - 1) * 4));
+        
+        //******Set bounds (using Deerfield HUC 8 bounds)
+        var bottomLeft = projectPoint(bounds[0]);
+        var topRight = projectPoint(bounds[1]);
+          
+        topoSVG.attr('width', topRight[0] - bottomLeft[0])
+          .attr('height', bottomLeft[1] - topRight[1])
+          .style('margin-left', bottomLeft[0] + 'px')
+          .style('margin-top', topRight[1] + 'px');
+
+        var translation = -bottomLeft[0] + ',' + -topRight[1];
+
+        //******Select all layer g elements
+        var tmpG = topoSVG.selectAll("g");
+
+        //******Loop through each g element and transform the path
+        tmpG[0].forEach(function(g) {
+          var curG = d3.select(g);
+          var feature = curG.selectAll("path");
+          curG.attr('transform', 'translate(' + -bottomLeft[0] + ',' + -topRight[1] + ')');
+          feature.attr("d", path);
+        });  
+      }
+
+
+
+
+
+
+      //******Use Leaflet to implement a D3 geometric transformation.
+      function projectPoint(x) {
+        var point = map.latLngToLayerPoint(new L.LatLng(x[1], x[0]));
+        return [point.x, point.y];
+      }
+
+
+
+
+
+
+      //******Change number strings to values
+      function strToNum(tmpData) {
+        var tmpKeys = d3.keys(tmpData[0]);
+
+        var tmpCov = tmpData.map(function(d) {
+          var tmpJSON = {};
+          var tmpVals = d3.values(d);
+          tmpVals.forEach(function(val,i){ 
+            if (val == "NA") {
+              tmpJSON[tmpKeys[i]] = -9999;
+            }
+            else if (isNaN(val) == false) {
+              tmpJSON[tmpKeys[i]] = +d[tmpKeys[i]];
+            }
+            else {
+              if (val.indexOf("/") > -1) {
+                tmpJSON[tmpKeys[i]] = Date.parse(val);
+              }
+              else { 
+                tmpJSON[tmpKeys[i]] = d[tmpKeys[i]];
+              }
+            }
+          });
+          return tmpJSON;
+        });
+        return tmpCov
+      }
+
+
+
+      //******Transform TSV strings to values if appropriate and add to topojson
+      function readTSV(tmpData, topo) {
+        //******Get keys and values from TSV data and fill out covariate data type
+        var tmpKeys = d3.keys(tmpData[0]);
+        var tmpVals = d3.values(tmpData[0]);
+
+        tmpVals.forEach(function(val,i){
+          if (isNaN(val) == false || val == "NA") {
+            topo.covType[tmpKeys[i]] = "number";
+          }
+          else {
+            topo.covType[tmpKeys[i]] = "string";
+          }
+        });
+
+        //******Change TSV attribute strings to values if appropriate
+        var tmpCov = strToNum(tmpData);
+
+        //*******Map TSV to ID_key attribute (in this case either unique_id (crossings, streams) or featureid (catchments)
+        var tmpMap = d3.map(tmpCov, function(d) {return d[topo.uniqueID];});
+
+        //*******Add TSV data to topojson
+        topo.features.forEach(function(d) { 
+          try {
+            tmpKeys.forEach(function(key) {
+                d.properties[key] = tmpMap.get(d.id)[key];
+            });
+          }
+          catch(err) { 
+            console.log("No TSV data for id " + d.id);
+          }
+        });
+
+        return tmpCov;
+      }
+
+
+
+
+
+      //*******Make crossfilter dimensions and grouped dimensions
+      function cfDimension(topo, covariates) {
+        //******Assign crossing covariates to a crossfilter variable
+
+        var tmpCF = crossfilter(covariates);
+        topo.filter.all = tmpCF.groupAll();
+        topo.binWidth = {};
+        var lowKey = 0;
+
+        //******Dimension and group each covariate
+        topo.keys.forEach(function(key, i) {
+          topo.filter[key] = tmpCF.dimension(function(d) { return d[key]; } );
+          if (topo.covType[key] == "number") {
+            var tmpTop = topo.filter[key].top(1);
+            var tmpBot = topo.filter[key].bottom(Infinity);
+            for (var i = 0; i < tmpBot.length; i++) {
+              if (tmpBot[i][key] > -9999) {
+                lowKey = i;
+                break;
+              }
+            }
+            topo.minVal[key] = tmpBot[lowKey][key];
+            topo.maxVal[key] = tmpTop[0][key];
+
+            var divVal = (tmpTop[0][key] - tmpBot[lowKey][key]) / 40;
+            topo.binWidth[key] = divVal;
+            topo.filter[key + "s"] = topo.filter[key].group(function(d) {return Math.floor(d / divVal) * divVal;});
+
+            topo.minClip[key] = topo.filter[key + "s"].all()[0].key;
+            if (topo.minClip[key] <= -9998) {
+              topo.minClip[key] = topo.filter[key + "s"].all()[1].key;
+            }
+            topo.maxClip[key] = topo.filter[key + "s"].all()[topo.filter[key + "s"].size() - 1].key + topo.binWidth[key];
+          }
+          else {
+            topo.filter[key + "s"] = topo.filter[key].group();
+          }
+        });
+       }
+
+
+
+
+
+
+      //*******Show crossings attribute in tooltip
+      function showIt(tmpID) {
+        tooltip.text(tmpID);
+        tooltip.style("visibility", "visible");
+        tooltip.property("title", tmpID);
+      }
+
+
+
+
+      //*******Transform data
+      function transformData(scale, data, tmpMax) {
+        switch(scale) {
+          case "linear":
+            var normVals = data.map(function(d) { return d; });
+            break;
+          case "log":
+            var normVals = data.map(function(d) { return Math.log(d + 0.1); });
+            break;
+          case "log_rec":
+            var normVals = data.map(function(d) { return -(Math.log((tmpMax + 0.1) - d)); });
+            break
+          case "categorical":
+            var normVals = data.map(function(d) { return d; });
+            break;
+        }
+
+        return normVals;
+      }
+
+
+
+
+
+      //*******Back Transform data
+      function backTransformData(scale, data, tmpMax) {
+        switch(scale) {
+          case "linear":
+            var normVals = data.map(function(d) { return d; });
+            break;
+          case "log":
+            var normVals = data.map(function(d) { return Math.exp(d) - 0.1; });
+            break;
+          case "log_rec":
+            var normVals = data.map(function(d) { return tmpMax + 0.1 - Math.exp(-d); });
+            break
+          case "categorical":
+            var normVals = data.map(function(d) { return d; });
+            break;
+        }
+
+        return normVals;
+      }
+
+
+
+
+
+      //*******Change feature styles
+      function changeStyle(tmpAtt, topo) {
+        //*******Change tooltip text for select
+        //d3.select("#" + topo.class + "Select").property("title", topo.tooltip[tmpAtt]);
+
+        //*******Select features
+        var curG = d3.select(topo.g[0][0]);
+        var tmpFeat = curG.selectAll("." + topo.class);
+
+        tmpFeat.style({"stroke": function(d) {return topo.color[d.id.replace(/ /g, "_")];}, "stroke-width": "4px", "fill": function(d) {return topo.color[d.id.replace(/ /g, "_")];}} );
+        tmpFeat.attr("id", function(d) {return d.id;});
+/*
+        //*******Get data for passed in attribute
+        var tmpVals = d3.values(topo.features).map(function(d) { return d.properties[tmpAtt]; });
+
+        //*Filter out "NA" data
+        tmpVals = tmpVals.filter(function(val) {if(val > -9999){return true} else {return false};});
+
+        //*******Normalise scale
+        var maxVal = d3.max(tmpVals);
+        var normVals = transformData(topo.scale[tmpAtt], tmpVals, maxVal);
+  
+        var tmpSet = d3.set(normVals);
+        var tmpMin = d3.min([6, tmpSet.size()])
+
+        //*******Make a color scale
+        var colorArray = colorbrewer[topo.color][tmpMin].slice(0);
+        if (topo.direction[tmpAtt] == "reverse") {
+          colorArray.reverse();
+        }
+          
+        var newColor = d3.scale.quantize()
+          .domain([d3.min(normVals), d3.max(normVals)])
+          .range(colorArray);
+
+        //*******Style and label crossings by attribute value
+        if (topo.class == "streams") {
+          tmpFeat.style("stroke", function(d) {
+            if (d.properties[tmpAtt] > -9999) { //return newColor(d.properties[tmpAtt]); }
+              var tVal = transformData(topo.scale[tmpAtt], [d.properties[tmpAtt]], maxVal);
+              return newColor(tVal[0])
+            }
+            else {return "gray"}; 
+          });
+        }
+        else {
+          tmpFeat.style("fill", function(d) {
+            if (d.properties[tmpAtt] > -9999) { //return newColor(d.properties[tmpAtt]); }
+              var tVal = transformData(topo.scale[tmpAtt], [d.properties[tmpAtt]], maxVal);
+              return newColor(tVal[0])
+            }
+            else {return "gray"}; 
+          });
+        }
+
+        tmpFeat.attr("id", function(d) { 
+          if(d.properties[tmpAtt] > -9999) {
+            switch(topo.data_type[tmpAtt]) {
+              case "decimal":
+                return (topo.title[tmpAtt] + ": " + d.properties[tmpAtt].toFixed(2) + " " + topo.unit[tmpAtt]);
+                break;
+              case "integer":
+                return (topo.title[tmpAtt] + ": " + d.properties[tmpAtt] + " " + topo.unit[tmpAtt]);
+                break;
+              case "date":
+                var formatDate = d3.time.format("%-m/%-d/%Y");
+                return (topo.title[tmpAtt] + ": " + formatDate(new Date(d.properties[tmpAtt])));
+                break;
+              case "text":
+                return (topo.title[tmpAtt] + ": " + topo.conversion[tmpAtt][d.properties[tmpAtt]]);
+                break;
+            }
+          }
+          else {
+            return (topo.title[tmpAtt] + ": No Data");
+          }
+        })
+
+        //*******Make a legend
+        var list = d3.select("#" + topo.class + "-list-inline");
+        list.remove();
+
+        var legend = d3.select("#" + topo.class + "Legend")
+         .append("ul")
+         .attr("id", topo.class + "-list-inline")
+         .attr("class", "legend-colors")
+         .property("title", topo.tooltip[tmpAtt]);
+
+        var keys = legend.selectAll("li.key")
+          .data(newColor.range());
+
+        keys.enter().append("li")
+          .attr("class", "key")
+          .style("border-top-color", String)
+          .text(function(d, i) {
+            var r = newColor.invertExtent(d);
+            tmpR = backTransformData(topo.scale[tmpAtt], r, topo.max[tmpAtt]);
+            switch(topo.data_type[tmpAtt]) {
+              case "decimal":
+                return tmpR[0].toFixed(2);
+                break;
+              case "integer":
+                return tmpR[0].toFixed(1);
+                break;
+              case "date":
+                var tmpDate = new Date(tmpR[0]);
+                var shortDate = d3.time.format("%-m/%Y");
+                return shortDate(tmpDate);
+                break;
+              case "text":
+                return topo.conversion[tmpAtt][i+1];
+                break;
+            }
+          });
+*/
+       }
+
+
+
+
+
+
+      //*******Add crossfilter histogram
+      function addFilter(tmpKey, topo) {
+        //*******Change tooltip text for select
+        d3.select("#attributeFilterSelect").property("title", topo.tooltip[tmpKey]);
+
+        if (graphs.indexOf(topo.class + "-" + tmpKey) > -1 || tmpKey == "...") {
+          return;
+        }
+        else {
+          graphs.push(topo.class + "-" + tmpKey);
+        }
+
+        //******Define graph attributes
+        var margin = {top: 10, right: 10, bottom: 20, left: 10},
+          width = 380 - margin.left - margin.right,
+          height = 100 - margin.top - margin.bottom;
+
+        var x = d3.scale.linear().rangeRound([0, width]);
+        var y = d3.scale.linear()
+          .range([height, 0]);
+
+        var xAxis = d3.svg.axis()
+          .scale(x)
+          .orient("bottom");
+
+        //**Format ticks for special data types
+        switch(topo.data_type[tmpKey]) {
+          case "date":
+            xAxis.tickFormat(function(d) { var tmpDate = d3.time.format("%-m/%Y"); return tmpDate(new Date(d)); });
+            xAxis.ticks(5);
+            break;
+          case "text":
+            xAxis.tickFormat(function(d) { if (isNaN(topo.conversion[tmpKey][d])) {return d + " (" + topo.conversion[tmpKey][d] + ")";} else {return topo.conversion[tmpKey][d];} });
+            xAxis.ticks(Object.keys(topo.conversion[tmpKey]).length - 1);
+            break;
+          default:
+            var twoDec = d3.format(".2f");
+            switch(topo.scale[tmpKey]) {
+              case "log":
+                xAxis.tickFormat(function(d) { return twoDec(Math.exp(d)); });
+                xAxis.ticks(5);
+                break;
+              case "log_rec":
+                xAxis.tickFormat(function(d) { return twoDec(topo.max[tmpKey] - Math.exp(-d)); });
+                xAxis.ticks(5);
+                break;
+              default:
+                xAxis.tickFormat(function(d) { return twoDec(d); });
+                xAxis.ticks(5);
+            }
+        }
+
+
+        //******Add brush
+        brush[topo.class][tmpKey] = d3.svg.brush()
+          .x(x)
+          .on("brushstart", function() { brushStart(tmpKey, topo); })
+          .on("brush", function() { brushMove(tmpKey, topo); })
+          .on("brushend", function() { brushEnd(tmpKey, topo); });
+
+
+        //******Add chart div, title div, and reset option
+        d3.select("#charts")
+          .append("div")
+            .attr("class", "chart")
+            .attr("id", topo.class + "-" + tmpKey)
+            .property("title", "Click and drag inside chart to select data")
+          .append("div")
+            .attr("class", "title")
+            .attr("id", "title-" + topo.class + "-" + tmpKey)
+            .style("margin-left", "2px")
+            .property("title", topo.tooltip[tmpKey])
+            .text(topo.class.charAt(0).toUpperCase() + topo.class.slice(1) + ": " + topo.title[tmpKey])
+          .append("a")
+            .attr("class", "reset")
+            .attr("id", "reset-" + topo.class + "-" + tmpKey)
+            .text("reset")
+            .style("display", "none")
+            .property("title", "Click to clear selection box from chart")
+            .on("click", function() { brushReset(tmpKey, topo); });
+
+
+        //******Add remove button
+        d3.select("#title-" + topo.class + "-" + tmpKey)
+          .append("div")
+            .attr("class", "btn btn-default btn-xs pull-right")
+            .attr("id", topo.class + "-" + tmpKey)
+            .text("x")
+            .property("title", "Click to remove chart for " + topo.class.charAt(0).toUpperCase() + topo.class.slice(1) + ": " + topo.title[tmpKey])
+            .on("click", function() { removeFilter(this.id, topo); });
+
+
+        //******Add stats div and extent
+        d3.select("#" + topo.class + "-" + tmpKey)
+          .append("div")
+            .attr("class", "stats")
+            .attr("id", "stats-" + topo.class + "-" + tmpKey);
+
+        var statsDiv = d3.select("#stats-" + topo.class + "-" + tmpKey);
+
+        statsDiv.append("input")
+          .attr({type: function() {if(topo.data_type[tmpKey] == "date") {return "text";} else { return "number"}} })
+          .attr("class", "extent-input")
+          .attr("id", "extent-input-lower-" + topo.class + "-" + tmpKey)
+          .property("title", "Lower value for selected range of " + topo.title[tmpKey] + " distribution");
+
+        statsDiv.append("p")
+          .attr("class", "extent-input-p")
+          .text("-");
+
+        statsDiv.append("input")
+          .attr({type: function() {if(topo.data_type[tmpKey] == "date") {return "text";} else { return "number"}} })
+          .attr("class", "extent-input")
+          .attr("id", "extent-input-upper-" + topo.class + "-" + tmpKey)
+          .property("title", "Upper value for selected range of " + topo.title[tmpKey] + " distribution");
+
+
+        //******Add mean to stats div
+        d3.select("#stats-" + topo.class + "-" + tmpKey)
+          .append("span")
+            .attr("class", "mean pull-right")
+            .attr("id", "mean-" + topo.class + "-" + tmpKey)
+            .property("title", "Average of selected values");
+
+
+        //******Add svg
+        var svg = d3.select("#" + topo.class + "-" + tmpKey)
+          .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .attr("id", "svg-" + topo.class + "-" + tmpKey)
+          .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            .attr("id", "g-" + topo.class + "-" + tmpKey);
+
+        //******Add clip path rectangle
+        svg.append("clipPath")
+          .attr("id", "clip-" + topo.class + "-" + tmpKey)
+          .append("rect")
+            .attr("width", width)
+            .attr("height", height);
+
+        //******Get data and make graph
+        var tmpData = topo.filter[tmpKey + "s"].all();
+
+        var lowKey = 0;
+        if (tmpData[0].key < -9998) {
+          lowKey = 1;
+        }
+
+        x.domain([tmpData[lowKey].key, tmpData[tmpData.length - 1].key + topo.binWidth[tmpKey]]);
+        y.domain([0, d3.max(tmpData, function(d) { if ( d.key > -9999) { return d.value; } })]);
+
+        var tmpX = svg.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0," + height + ")")
+          .call(xAxis);
+
+        if (topo.data_type[tmpKey] == "text") {
+          tmpX.select("text").style("text-anchor", "start");
+        }
+
+        var tmpData = topo.filter[tmpKey + "s"].all();
+        hist[topo.class][tmpKey] = {"x": x, "y": y, "height": height, "width": width};
+      
+        //******Add background bars
+        svg.selectAll("background.bar")
+            .data(tmpData)
+          .enter().append("rect")
+            .attr("class", "background bar")
+            .attr("x", function(d) { return x(d.key); })
+            .attr("width", (x.range()[1] - x.range()[0])/40)  
+            .attr("y", function(d) { return y(d.value); })
+            .attr("height", function(d) { return height - y(d.value); });
+
+        //******Add foreground bars
+        svg.selectAll(".foreground.bar")
+            .data(tmpData)
+          .enter().append("rect")
+            .attr("class", "foreground bar")
+            .attr("x", function(d) { return x(d.key); })
+            .attr("width", (x.range()[1] - x.range()[0])/40)  
+            .attr("y", function(d) { return y(d.value); })
+            .attr("height", function(d) { return height - y(d.value); });
+
+        svg.selectAll(".foreground.bar")
+          .attr("clip-path", "url(#clip-" + topo.class + "-" + tmpKey + ")");
+      
+        var gBrush = svg.append("g")
+          .attr("class", "brush")
+          .attr("id", "brush-" + topo.class + "-" + tmpKey)
+          .call(brush[topo.class][tmpKey]);
+
+        gBrush.selectAll("rect").attr("height", height);
+        gBrush.selectAll(".resize").append("path").attr("d", resizePath);
+
+        //******* Set upper and lower brush properties
+        var inpMin = backTransformData(topo.scale[tmpKey], [topo.minClip[tmpKey]], topo.max[tmpKey]);
+        var inpMax = backTransformData(topo.scale[tmpKey], [topo.maxClip[tmpKey] + topo.binWidth[tmpKey]], topo.max[tmpKey]);
+
+        var tmpLower = d3.select("#extent-input-lower-" + topo.class + "-" + tmpKey)
+          .property("min", Math.floor(inpMin*100)/100)
+          .property("max", Math.ceil(inpMax*100)/100)
+          .property("step", Math.round((inpMax - inpMin))/100);
+
+        var tmpUpper = d3.select("#extent-input-upper-" + topo.class + "-" + tmpKey)
+          .property("min", Math.floor(inpMin*100)/100)
+          .property("max", Math.ceil(inpMax*100)/100)
+          .property("step", Math.round((inpMax - inpMin))/100);
+
+        d3.select("#extent-input-lower-" + topo.class + "-" + tmpKey).on("change", function () {extentChange(tmpKey, topo, tmpLower, tmpUpper); });
+        d3.select("#extent-input-upper-" + topo.class + "-" + tmpKey).on("change", function () {extentChange(tmpKey, topo, tmpLower, tmpUpper); });      
+
+        brushReset(tmpKey, topo);
+
+        function resizePath(d) {
+          var e = +(d == "e"),
+            x = e ? 1 : -1,
+            y = height / 3;
+          return "M" + (0.5 * x) + "," + y + "A6,6 0 0 " + e + " " + (6.5 * x) + "," + (y + 6) + "V" + (2 * y - 6) + "A6,6 0 0 " + e + " " + (0.5 * x) + "," + (2 * y) + "Z" + "M" + (2.5 * x) + "," + (y + 8) + "V" + (2 * y - 8) + "M" + (4.5 * x) + "," + (y + 8) + "V" + (2 * y - 8);
+        }
+
+      }
+
+
+
+
+
+
+
+
+      //******Remove graph from window
+      function removeFilter(class_key, topo) {
+        var dash = class_key.indexOf("-");
+        var tmpClass = class_key.slice(0, dash);
+        var key = class_key.slice(dash + 1, class_key.length);
+
+        graphs.splice(graphs.indexOf(class_key), 1);
+        brushReset(key, topo);
+        var select = d3.select("#" + class_key);
+        select.remove();
+
+        //******If select dropdown is this attribute change back to ...
+        if (d3.select("#attributeFilterSelect").node().value == key) {
+          d3.select("#attributeFilterSelect").property("selectedIndex", function() {return 0;})
+        }
+      }
+
+
+
+
+
+      function extentChange(tmpKey, topo, tmpLower, tmpUpper) {
+        if (topo.data_type[tmpKey] == "date") {         
+          var valLow = Date.parse(tmpLower.property("value"));
+          var valHigh = Date.parse(tmpUpper.property("value"));
+        }
+        else {
+          var valLow = parseFloat(tmpLower.property("value"));
+          var valHigh = parseFloat(tmpUpper.property("value"));
+        }
+
+        if (valLow > valHigh) {
+          var tmpHold = tmpUpper.property("value");
+          tmpUpper.property("value", tmpLower.property("value"));
+          tmpLower.property("value", tmpHold);
+          tmpHold = valHigh;
+          valHigh = valLow;
+          valLow = tmpHold;
+        }
+
+        var inpMin = transformData(topo.scale[tmpKey], [valLow], topo.max[tmpKey])[0];
+        var inpMax = transformData(topo.scale[tmpKey], [valHigh], topo.max[tmpKey])[0];
+
+        d3.select("#brush-" + topo.class + "-" + tmpKey).call(brush[topo.class][tmpKey].extent([inpMin, inpMax]));
+        brushEnd(tmpKey, topo);
+      }
+
+
+      function brushStart(tmpKey, topo) {
+       topo.filter[tmpKey].filterRange([brush[topo.class][tmpKey].extent()[0], brush[topo.class][tmpKey].extent()[1]]);
+       checkLink(tmpKey, topo, false);
+      }
+
+
+      function brushMove(tmpKey, topo) {
+        topo.filter[tmpKey].filterRange([brush[topo.class][tmpKey].extent()[0], brush[topo.class][tmpKey].extent()[1]]);
+        checkLink(tmpKey, topo, false);
+      }
+
+
+      function brushEnd(tmpKey, topo) {
+        topo.filter[tmpKey].filterRange([brush[topo.class][tmpKey].extent()[0], brush[topo.class][tmpKey].extent()[1]]);       
+        checkLink(tmpKey, topo, false);
+        d3.select("#reset-" + topo.class + "-" + tmpKey).style("display", "inline-block");
+      }
+
+
+      function brushReset(tmpKey, topo) {
+        d3.select("#brush-" + topo.class + "-" + tmpKey).call(brush[topo.class][tmpKey].clear());
+        topo.filter[tmpKey].filterAll();
+        checkLink(tmpKey, topo, false);
+        d3.select("#reset-" + topo.class + "-" + tmpKey).style("display", "none");
+      }
+
+
+      function filterMap(tmpKey, topo, isLink) {
+        var tmpSubset = topo.filter[topo.uniqueID].top(Infinity);
+        var tmpID = tmpSubset.map(function(d) {return d[topo.uniqueID];});
+        var tmpData = d3.selectAll("." + topo.class).data();
+        var tmpSel = d3.selectAll("." + topo.class);
+        tmpSel.style("opacity", function(d, i) { 
+          if (tmpID.indexOf(tmpData[i].properties[topo.uniqueID]) > -1) {
+            return d3.select("#" + topo.class + "Slider").attr("value")/100;
+          }
+          else {
+            return 0;
+          }
+        });
+
+        //******Update crossings selected
+        d3.select("#active-" + topo.class).html(topo.filter.all.value());
+
+        //******Update filter range (if isLink == false)
+        if (isLink == false) {
+          if (brush[topo.class][tmpKey].empty() && topo.filter.all.value() > 0) {
+            setInputs(topo, tmpKey, topo.minVal[tmpKey], topo.maxVal[tmpKey], topo.minClip[tmpKey], topo.maxClip[tmpKey]);
+          }
+          else {
+            var extMin = brush[topo.class][tmpKey].extent()[0]
+            var extMax = brush[topo.class][tmpKey].extent()[1]
+            setInputs(topo, tmpKey, extMin, extMax, extMin, extMax);
+          }
+        }
+
+        updateStats(tmpKey, topo);
+
+        updateHistogram(tmpKey, topo);
+      }
+
+
+
+      //******Set lower and upper input values and adjust clip path
+      function setInputs(topo, tmpKey, tmpMin, tmpMax, clipMin, clipMax) {
+        var inpMin = backTransformData(topo.scale[tmpKey], [clipMin], topo.max[tmpKey])[0];
+        var inpMax = Math.ceil(backTransformData(topo.scale[tmpKey], [clipMax], topo.max[tmpKey])[0]*100)/100;
+
+        if (topo.data_type[tmpKey] == "date") {
+          var tmpFormat = d3.time.format("%m/%d/%Y");
+          d3.select("#extent-input-lower-" + topo.class + "-" + tmpKey).property("value", tmpFormat(new Date(inpMin)));
+          d3.select("#extent-input-upper-" + topo.class + "-" + tmpKey).property("value", tmpFormat(new Date(inpMax)));
+        }
+        else {
+          d3.select("#extent-input-lower-" + topo.class + "-" + tmpKey).property("value", Math.round(inpMin*100)/100);
+          d3.select("#extent-input-upper-" + topo.class + "-" + tmpKey).property("value", Math.round(inpMax*100)/100);
+        }
+
+        d3.select("#clip-" + topo.class + "-" + tmpKey + " rect")
+          .attr("x", hist[topo.class][tmpKey].x(clipMin))
+          .attr("width", hist[topo.class][tmpKey].x(clipMax) - hist[topo.class][tmpKey].x(clipMin));
+      }
+
+
+
+
+
+      //******Set featureid according to which layers are linked and political filters
+      function checkLink(tmpKey, topo, isLink) {
+        //******Return array of layers that are linked and share featureIDs 
+        var linkLayers, IDS = getLinkIDs();
+
+        //******Filter the map based on common featureids
+        layers.forEach(function(layer) {
+          if (isLink == false && layer == topo.class) {
+            filterMap(tmpKey, topos[layer], false);
+          }
+          else {
+            filterMap("featureid", topos[layer], true);
+          }
+        });
+      }
+
+
+
+
+      //******Determine linked layers
+      function getLinkIDs() {
+        var linkLayers = [];
+
+        layers.forEach(function(layer1, i) {
+          layers.forEach(function(layer2, j) {
+            if (j > i) {
+              topos[layer1].filter.featureid.filterAll();
+              topos[layer2].filter.featureid.filterAll();
+
+              if (d3.select("#" + layer1 + "-" + layer2 + "-check").property("checked") == true) {
+                if (linkLayers.indexOf(layer1) == -1) {
+                  linkLayers.push(layer1);
+                }
+                if (linkLayers.indexOf(layer2) == -1) {
+                  linkLayers.push(layer2);
+                }
+              }
+            }
+          });
+        });
+
+        var IDs = [];
+        linkLayers.forEach(function(layer1, i) {
+          var tmpSubset = topos[layer1].filter.featureid.top(Infinity);
+          var tmpID1 = tmpSubset.map(function(d) {return d["featureid"];});
+          linkLayers.forEach(function(layer2, j) {
+            if (j > i) {
+              var tmpSubset2 = topos[layer2].filter.featureid.top(Infinity);
+              var tmpID2 = tmpSubset2.map(function(d) {return d["featureid"];});
+              if (IDs.length == 0 && i == 0) {
+                IDs = tmpID1.filter(function(val) {
+                  return tmpID2.indexOf(val) != -1;
+                });
+              }
+              else {
+                var IDsFilter = IDs.filter(function(val) {
+                  return (tmpID1.indexOf(val) != -1 && tmpID2.indexOf(val) != -1);
+                });
+                IDs = IDsFilter;
+              }
+            }
+          });
+        });
+
+        linkLayers.forEach(function(layer) {
+          topos[layer].filter.featureid.filterFunction(function(d) { 
+            return IDs.indexOf(d) != -1;
+          });
+        });
+
+        //******Filter by political IDs
+        var polSubset = topos.political.filter.featureid.top(Infinity);
+        var polIDs = polSubset.map(function(d) {return d["featureid"];});
+        layers.forEach(function(layer) {
+          topos[layer].filter.featureid.filterFunction(function(d) {
+            if(linkLayers.indexOf(layer) == -1) { 
+              return polIDs.indexOf(d) != -1;
+            }
+            else {
+              return (polIDs.indexOf(d) != -1 && IDs.indexOf(d) != -1);
+            }
+          });
+        });
+
+        return linkLayers, IDs;
+      }
+
+
+
+      
+      //******Update filter statistics
+      function updateStats(tmpKey, topo) {
+        //******Update filter mean
+        graphs.forEach(function(class_key) {
+          var dash = class_key.indexOf("-");
+          var tmpClass = class_key.slice(0, dash);
+          var key = class_key.slice(dash + 1, class_key.length);
+
+          if (class_key.indexOf(topo.class) > -1) {
+            if (topo.filter["all"].value() > 0 ) {
+              if (topo.data_type[key] == "date") {
+                var tmpFormat = d3.time.format("%-m/%-d/%Y")
+                d3.select("#mean-" + class_key).html("Mean: " + tmpFormat(new Date(d3.mean(topo.filter[key].top(Infinity), function(d) { if (d[key] > -9999) {return d[key];} }))));
+              }
+              else {
+                d3.select("#mean-" + class_key).html("Mean: " + d3.mean(topo.filter[key].top(Infinity), function(d) { if (d[key] > -9999) {return d[key];} }).toFixed(2));
+              }
+
+              if (brush[tmpClass][key].empty()) {
+                setInputs(topo, key, topo.minVal[key], topo.maxVal[key], topo.minClip[key], topo.maxClip[key]);
+              }
+              else {
+                setInputs(topo, key, brush[tmpClass][key].extent()[0], brush[tmpClass][key].extent()[1], brush[tmpClass][key].extent()[0], brush[tmpClass][key].extent()[1]);
+              }
+            }
+            else {
+              if (topo.data_type[key] == "date") {
+                d3.select("#mean-" + class_key).html("Mean: 0/0/0000");
+              }
+              else {
+                d3.select("#mean-" + class_key).html("Mean: 0.00");
+              }
+            }
+          }  
+        });
+      }
+
+
+
+
+      //******Update filter histogram based on current brush
+      function updateHistogram(tmpKey, topo) {
+        graphs.forEach(function(class_key) {
+          var dash = class_key.indexOf("-");
+          var tmpClass = class_key.slice(0, dash);
+          var key = class_key.slice(dash + 1, class_key.length);
+
+          if (class_key.indexOf(topo.class) > -1) { 
+            if (class_key != topo.class + "-" + tmpKey) {
+              redrawHist(key, topo);
+            }
+          }
+        });
+      }
+
+      //******Redraw the histogram
+      function redrawHist(key, topo) {
+        //******If brush is present, remove it and get featureID's, then add it back
+        if (!brush[topo.class][key].empty()) {
+          topo.filter[key].filterAll();
+          var linkLayers, IDs = getLinkIDs();
+          var tmpData = JSON.parse(JSON.stringify(topo.filter[key + "s"].all()));
+          topo.filter[key].filterRange([brush[topo.class][key].extent()[0], brush[topo.class][key].extent()[1]]);
+          var linkLayers, IDs = getLinkIDs();
+        }
+        else {
+          var tmpData = topo.filter[key + "s"].all();
+        }
+
+        var svg = d3.select("#g-" + topo.class + "-" + key);
+        var x = hist[topo.class][key].x;
+        var y = hist[topo.class][key].y;
+        var height = hist[topo.class][key].height;
+        var width = hist[topo.class][key].width;
+        y.domain([0, d3.max(tmpData, function(d) { if (d.key > -9999) { return d.value; } })]);
+
+        //******update background bars
+        var update = svg.selectAll(".background.bar")
+          .data(tmpData);
+
+        update.exit().remove();
+        update.enter().insert("rect", ":first-child")
+          .attr("class", "background bar");
+        update
+          .attr("x", function(d) { return x(d.key); })
+          .attr("width", (x.range()[1] - x.range()[0])/40)  
+          .attr("y", function(d) { return y(d.value); })
+          .attr("height", function(d) { return height - y(d.value); });
+
+        //******update foreground bars
+        var update = svg.selectAll(".foreground.bar")
+          .data(tmpData);
+
+        update.exit().remove();
+        update.enter().insert("rect", ":first-child")
+          .attr("class", "foreground bar");
+        update
+          .attr("x", function(d) { return x(d.key); })
+          .attr("width", (x.range()[1] - x.range()[0])/40)  
+          .attr("y", function(d) { return y(d.value); })
+          .attr("height", function(d) { return height - y(d.value); });
+      }
+
+
+    </script>
+  </body>
+</html>

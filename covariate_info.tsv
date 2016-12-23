@@ -1,0 +1,40 @@
+layer	short_heading	long_heading	unit	direction	data_type	scale	display	tooltip	conversion
+crossings	score	Passage Score		forward	decimal	linear	yes	The aquatic passage score for the road-stream crossing (0 = Impassable, 1 = Completely passable)	
+crossings	bar_type	Structure Type		reverse	text	categorical	yes	Type of stream crossing structure (1 = Culvert, 2 = Bridge, 3 = Dam)	{"1":"Culvert","2":"Bridge","3":"Dam"}
+crossings	drain_bar	Drainage (connected)	KM^2	forward	decimal	log	yes	Drainage area (square kilometers) of all upstream reaches to first encountered road-stream crossing	
+crossings	drain_tot	Drainage Area	KM^2	forward	decimal	log	yes	Drainage area (square kilometers) of all upstream reaches	
+crossings	strkm_bar	Habitat (connected)	KM	forward	decimal	log	yes	Stream length (kilometers) of all upstream reaches to first encountered road-stream crossing	
+crossings	strkm_tot	Stream Length	KM	forward	decimal	log	yes	Stream length (kilometers) of all upstream reaches	
+crossings	upstr_bars	Structure Count		reverse	integer	log	yes	Total number of upstream structures crossing the stream	
+crossings	Slope_perc	Stream Slope	%	forward	decimal	log	yes	The slope of the stream reach containing the crossing	
+crossings	Q2_m3_s	Q2 Discharge	M^3/s	forward	decimal	log	yes	The predicted two-year high discharge value determined using the Jacob's regime equation for gravel dominated stream beds	
+crossings	w_W_m2_ST	Unit Stream Power	W/M	forward	decimal	log	yes	The total energy exerted by the stream divided by the width of the stream determined using Q2 discharge and bankful width	
+crossings	hydro_rof	Hydrologic Risk		reverse	decimal	linear	yes	Hydrologic risk of failure probability for stream crossing (0 = Good, 1 = Poor)	
+crossings	struct_rof	Structural Risk		reverse	decimal	linear	yes	Structural risk of failure probability for road-stream crossing (0 = Good, 1 = Poor)	
+crossings	geo_rof	Geomorphic Risk		reverse	decimal	linear	yes	Geomorphic risk of failure probability for road-stream crossing (0 = Good, 1 = Poor)	
+crossings	ave_del	Disruption (mean)	Min.	reverse	decimal	log	yes	Average traffic delay to emergency sevices for all trips if road-stream crossing becomes compromised 	
+crossings	ave_aff_del	Disruption (affected mean)	Min.	reverse	decimal	log	yes	Average traffic delay to emergency sevices to affected trips if road-stream crossing becomes compromised 	
+crossings	max_del	Disruption (maximum)	Min.	reverse	decimal	log	yes	Maximum traffic delay to emergency sevices for all trips if road-stream crossing becomes compromised 	
+crossings	ln_comp_del	Disruption (composite)		reverse	decimal	linear	yes	Sum of all logistically converted trip delays transformed by the natural logarithm and scaled to most affected crossing (0 = Least affected, 1 = most affected)	
+crossings	Observed_Date	Assessment Date		forward	date	linear	yes	Date the crossing was field assessed (NA indicates crossing has not been field assessed)	
+crossings	featureid	Feature ID		forward	integer	linear	no	The unique identifier of the catchment in which the stream crossing is located	
+crossings	unique_id	Unique ID		forward	integer	linear	no	The unique identifier of the stream crossing	
+crossings	crossing_id	Crossing ID		forward	text	linear	no	The NAACC XY identifier (culverts and bridges) or TNC identifier (dams) of the stream crossing	
+catchments	agriculture	Agriculture	%	reverse	decimal	log	yes	Percentage of the catchment used for agriculture	
+catchments	elevation	Elevation	M	forward	decimal	linear	yes	Average elevation (meters) of the catchment	
+catchments	forest	Forest Cover	%	forward	decimal	log_rec	yes	Percentage of the catchment covered with forest	
+catchments	impervious	Impervious Surface	%	reverse	decimal	log	yes	Percentage of the catchment covered with impervious surface	
+catchments	slope_pcnt	Slope	%	forward	decimal	log	yes	Average slope (percent) of the catchment	
+catchments	water	Water Cover	%	reverse	decimal	log	yes	Percentage of the catchment covered with water	
+catchments	featureid	Feature ID		forward	integer	linear	no	The unique identifier of the catchment	
+streams	str_order	Stream Order		forward	text	categorical	yes	Stream order (Strahler method) of stream reach	{"1":"1","2":"2","3":"3","4":"4","5":"5","6":"6"}
+streams	occ_cur	Habitat Suitability		reverse	decimal	log_rec	yes	Probability of habitat suitability of stream reach for brook trout	
+streams	T_mean_sum	Temperature	C	forward	decimal	linear	yes	Average summer temperature (degrees celsius) of stream reach	
+streams	T_inertia	Resistance	C	reverse	decimal	linear	yes	Total summed differences (degrees celsius) between predicted water temperature and air temperature for the spring to fall time period	
+streams	featureid	Feature ID		forward	integer	linear	no	The unique identifier of the catchment in which the stream centroid is located	
+streams	unique_id	Unique ID		forward	integer	linear	no	The unique identifier of the stream	
+political	state	State							
+political	county	County							
+political	town	Town							
+political	dot_district	DOT District							
+political	huc12_name	HUC 12							
