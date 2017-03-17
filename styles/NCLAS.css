@@ -1,11 +1,164 @@
-body, html {
+html {
   width: 100%;
   height: 100%;
+  min-width: 1000px;
+  min-height: 452px;
+  overflow-x: auto;
+  overflow-y: auto;
 }
 
-#map {
+body {
   width: 100%;
+  height: calc(100% - 102px);
+  overflow: visible;
+}
+
+.header {
+  position: absolute;
+}
+
+.header, .header h2, .header h4 {
+  min-width: 1000px;
+}
+
+.navbar {
+  margin-top: 100px;
+  z-index: 1001;
+  margin-bottom: 0;
+  border-radius: 0;
+  min-width: 1000px;
+}
+
+#left_panel {
+  width: 150px;
   height: 100%;
+  min-height: 450px;
+  float: left;
+  background: rgb(22,54, 92);
+  border-right: 2px solid black;
+}
+
+#right_panel {
+  width: 350px;
+  height: 100%;
+  min-height: 450px;
+  //min-width: 350px;
+  float: right;
+  background: rgb(22,54, 92);
+  border-right: 2px solid black;
+  overflow-y: auto;
+}
+
+#right_panel select {
+  font-size: 14px;
+  color: black;
+  margin: 5px;
+}
+
+#right_panel label {
+  font-size: 14px;
+  text-align: left;
+  display: block;
+  margin: 2px 2px 2px 10px;
+  color: white;
+}
+
+#right_panel p {
+  margin-left: 30px;
+  margin-right: 15px;
+  font-weight: normal;
+  font-size: 14px;
+  text-align: left;
+}
+
+#right_panel input[type="radio"], #right_panel input[type="checkbox"] {
+  cursor: pointer;
+}
+  
+.choice {
+  font-size: 24px;
+  color: white;
+  text-align: center;
+  display: none;
+}
+
+.nav-pills li {
+  font-size: 17px;
+  margin: 10px 0 10px 10px;
+  color: white;
+  width: 48%;
+}
+
+.selDiv {
+  color: white;
+  font-size: 30px;
+  margin: 20px 0 20px 0;
+  text-align: center;
+  border: 2px solid rgb(22,54,92);
+}
+
+.selDiv:hover {
+  cursor: pointer;
+  border-color: white;
+}
+
+.output, .results {
+  display: none;
+}
+
+.results img {
+  width: 90%;
+  margin: 5px;
+  cursor: pointer;
+}
+
+#resImg {
+  max-width: 100%;
+  height: 100%;
+  border: 1px solid black;
+}
+
+#graphImg {
+  //position: absolute;
+  //display: none;
+  background: white;
+  border: 1px solid black;
+  border-radius: 6px;
+  //max-height: 80%;
+  max-width: 100%;
+  height: 100%;
+  //margin: auto;
+  //top: 150px;
+  //left: 150px;
+  //z-index: 2000;
+}
+
+.outLabel {
+  font-size: 18px;
+  //text-decoration: underline;
+}
+
+#map, .container-menu, #oldGraph {
+  width: calc(100% - 500px);
+  margin-top: 150px;
+  position: absolute;
+  left: 150px;
+  height: calc(100% - 150px);
+  min-height: 450px;
+  min-width: 500px;
+  top: 0px;
+}
+
+.container-menu {
+  background: beige;
+  padding: 30px;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+ul img {
+  margin: 10px;
+  border: 1px solid black;
 }
 
 .state, .eco, .eco2, .eco3, .fs, .class1 {
@@ -18,6 +171,7 @@ body, html {
   fill-opacity: 0.6;
   stroke-opacity: 0.99;
   cursor: crosshair;
+  stroke: aqua !important;
 }
 
 .fs {
@@ -111,7 +265,7 @@ body, html {
 }
 
 .leaflet-top {
-  padding-top: 50px;
+  //padding-top: 50px;
 }
 
 .leaflet-touch .leaflet-control-layers, .leaflet-touch .leaflet-bar {
@@ -304,18 +458,6 @@ body, html {
 #speciesLayersDiv {
   overflow-y: auto;
   max-height: 140px;
-}
-
-#graphImg {
-  position: relative;
-  display: none;
-  background: white;
-  border: 1px solid black;
-  border-radius: 6px;
-  max-height: 80%;
-  max-width: 80%;
-  margin: auto;
-  top: 50px;
 }
 
 #filtersDiv {

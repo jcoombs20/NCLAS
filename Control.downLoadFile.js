@@ -55,9 +55,13 @@ L.control.downLoadFile = function (options) {
 //******Add show graph html elements
 function completeGraph() {
   d3.select("body")
+    .append("div")
+    .attr("id","oldGraph")
+    .attr("class", "choice")
+    .style({"background":"beige", "display":"none", "text-align":"center", "padding":"20px"})
     .append("img")
-    .attr("id", "graphImg")
-    .on("mouseleave", function() { d3.select(this).style("display", "none"); graphID.forEach(function(img, i) { d3.select("#graphImg-" + i).property("checked", false); }); });
+    .attr("id", "graphImg");
+    //.on("mouseleave", function() { d3.select(this).style("display", "none"); graphID.forEach(function(img, i) { d3.select("#graphImg-" + i).property("checked", false); }); });
 
   var graphID = ["lower_cl_percent", "cl_bins_area", "exc_min_cl_percent", "exc_min_cl_area", "cumulative_cl", "n_protection", "n_protection_eco2", "n_protection_eco3"];
   var graphTitles = ["% Area bottom CL by species", "Area CL bin by species", "% N exceedance of min CL", "Area N exceedance of min CL", "% Cumulative CL", "% Area protection - Total", "% Area protection - Level 2 ecoregions", "% Area protection - Level 3 ecoregions"];
@@ -83,8 +87,11 @@ function completeGraph() {
 
 
 function graphImgSwitch(img) {
+  d3.select("#oldGraph")
+    .style("display", "block");
+
   d3.select("#graphImg")
-    .style({"display": "block"})
+    //.style("display", "block")
     .attr("src", "graphs/" + img + ".png");
 }
 
