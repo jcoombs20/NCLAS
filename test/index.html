@@ -1,0 +1,78 @@
+<!doctype html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+		<title>N-CLAS postgresql/D3 Visualization Testing</title>
+		<link rel="icon" type="image/png" href="d3.png">
+
+		<link rel="stylesheet" href="d3_styles.css" type="text/css">
+
+		<script src="http://ecosheds.org:3413/socket.io/socket.io.js"></script>
+		<script src="d3.min.js"></script>
+		<script src="socket_emit.js"></script>
+		<script src="graphing.js"></script>
+
+		<style>
+			.bar {
+				fill: url(#Gradient1);
+				stroke: black;
+				stroke-width: 3px;
+				stroke-linejoin: round;
+				fill-opacity: 1;
+				}
+
+			.bar:hover {
+				fill: url(#Gradient2);
+				}
+		</style>	
+		
+	</head>
+
+	<body onload="socket_emit()">
+		<div id="layers"></div>
+
+		<div id="graph1" onclick="regraph(event)">
+			<svg class="chart">
+				<defs>
+					<linearGradient id="Gradient1" x1="0" x2="1" y1="0" y2="1">
+						<stop offset="0%" stop-color="yellow"/>
+						<stop offset="100%" stop-color="red"/>
+					</linearGradient>
+
+					<linearGradient id="Gradient2" x1="0" x2="1" y1="0" y2="1">
+		        			<stop offset="0%" stop-color="cyan"/>
+	        				<stop offset="100%" stop-color="navy"/>
+					</linearGradient>
+				</defs>
+			</svg>
+		</div>
+
+		<div id="regraph">
+			<div id="minX" class="modGraph">
+				Min X Value:&nbsp; <input type="text" id="minXNum" class="modVal" value="0"><button class="defaultVal" onclick="defaultVal(0)">Default</button>
+			</div>
+
+			<div id="maxX" class="modGraph">
+				Max X Value: <input type="text" id="maxXNum" class="modVal" value="100"><button class="defaultVal" onclick="defaultVal(1)">Default</button>
+			</div>
+
+			<div id="minY" class="modGraph">
+				Min Y Value:&nbsp; <input type="text" id="minYNum" class="modVal" value="0"><button class="defaultVal" onclick="defaultVal(2)">Default</button>
+			</div>
+
+			<div id="maxY" class="modGraph">
+				Max Y Value: <input type="text" id="maxYNum" class="modVal" value="100"><button class="defaultVal" onclick="defaultVal(3)">Default</button>
+			</div>
+
+			<div id="bins" class="modGraph">
+				Bin Number:&nbsp; <input type="text" id="binNum" class="modVal" value="20" onchange="modCnt = 0;"><button class="defaultVal" onclick="defaultVal(4)">Default</button>
+			</div>
+
+			<div id="updateGraph">
+				<button id="refresh" onclick="updateChar(tmpData)">Refresh</button>
+			</div>
+		</div>
+		
+	</body>
+</html>

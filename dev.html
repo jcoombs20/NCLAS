@@ -6,45 +6,42 @@
 
     <!--link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/-->
     <link rel="stylesheet" href="styles/bootstrap.min.css"/>
+    <!--link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/2.4.0/introjs.min.css"/-->
+    <link rel="stylesheet" href="introjs.min.css"/>
     <!--link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css"/-->
     <link rel="stylesheet" href="leaflet.css"/>
     <!--link rel="stylesheet" href="http://colorbrewer2.org/export/colorbrewer.css"/-->
     <link rel="stylesheet" href="colorbrewer.css"/>
     <link rel="stylesheet" href="styles/Control.BingGeocoder.css"/>
-    <link rel="stylesheet" href="styles/Control.extentHistory.css"/>
+    <link rel="stylesheet" href="styles/Control.maxExtent.css"/>
     <link rel="stylesheet" href="styles/Control.mousePosition.css"/>
-    <link rel="stylesheet" href="styles/Control.legend.css"/>
-    <link rel="stylesheet" href="styles/Control.political.css"/>
-    <link rel="stylesheet" href="styles/Control.attributes.css"/>
-    <link rel="stylesheet" href="styles/Control.graph.css"/>
-    <link rel="stylesheet" href="styles/Control.customWeight.css"/>
     <link rel="stylesheet" href="styles/Control.downLoadFile.css"/>
     <link rel="stylesheet" href="styles/Control.print.css"/>
-    <link rel="stylesheet" href="styles/app.css" />
+    <link rel="stylesheet" href="styles/app.css"/>
     <link rel="stylesheet" href="styles/NCLAS.css"/>
 
     <!--script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script-->
     <script src="leaflet.js"></script>
     <!--script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script-->
-    <script src="jquery.min.js"></script>
+    <script src="jquery-3.2.1.min.js"></script>
+    <script src="jquery-ui.min.js"></script>
     <!--script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script-->
     <script src="bootstrap.min.js"></script>
     <script src="http://maps.google.com/maps/api/js?v=3"></script>
-    <script src="bundle.js"></script>
+    <!--script src="bundle.js"></script-->
     <script src="Bing_tile.js"></script>
-    <script src="Google_tile.js"></script>
     <script src="Control.BingGeocoder.js"></script>
-    <script src="Control.extentHistory.js"></script>
+    <script src="Control.maxExtent.js"></script>
     <script src="Control.mousePosition.js"></script>
-    <script src="Control.legend.js"></script>
-    <script src="Control.political.js"></script>
-    <script src="Control.attributes.js"></script>
-    <script src="Control.graph.js"></script>
-    <script src="Control.customWeight.js"></script>
     <script src="Control.downLoadFile.js"></script>
     <script src="Control.print.js"></script>
-    <script src="Control.layerSwitcher.js"></script>
+    <!--script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/2.4.0/intro.min.js"></script-->
+    <script type="text/javascript" src="intro.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.min.js"></script>
 
+
+    <script src="http://ecosheds.org:3413/socket.io/socket.io.js"></script>
+    <script src="socket_emit.js"></script>
     <!--script src="http://d3js.org/d3.v3.min.js"></script-->
     <script src="d3.v3.min.js"></script>
     <!--script src="http://d3js.org/topojson.v1.min.js"></script-->
@@ -54,7 +51,6 @@
     <!--script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script-->
     <script src="queue.min.js"></script>
     <script src="crossfilter.min.js"></script>
-    <!--script src="esri-leaflet.js"></script-->
 
   </head>
 
@@ -70,61 +66,255 @@
         </ul>
       </div>
     </nav>
-
-    <div id="container" style="height:calc(100% - 50px);">
+    
+    <div id="container">
       <div id="left_panel">
-        <div class="selDiv" id="selArea" style="background:rgb(189,68,65);">Select<br>Area</div>
-        <div class="selDiv" id="selSpp" style="background:rgb(118,147,60);">Select<br>Species</div>
-        <div class="selDiv" id="selOut" style="background:rgb(54,96,146);">Select<br>Output</div>
-        <div class="selDiv" id="selRes" style="background:rgb(255,192,0);height:84px;padding-top:20px">Results</div>
-      </div>
-      <div id="map"></div>
-      <div id="right_panel">
-        <div class="choice" style="color:white;font-size:24px;padding:10px;text-align:center;display:block;">
-          Click "Select Area" on left panel to begin
+        <div id="left_panel_container">
+          <div class="selDiv selected" id="selArea" style="background:rgb(189,68,65);" title="Select Area">Select<br>Area</div>
+          <div class="selDiv disabled" id="selSpp" style="background:rgb(118,147,60);" title="Complete previous step to enable">Select<br>Species</div>
+          <div class="selDiv disabled" id="selOut" style="background:rgb(54,96,146);" title="Complete previous step to enable" data-toggle="" data-target="#outputDiv">Select<br>Output</div>
+          <div class="selDiv disabled" id="selRes" style="background:rgb(255,192,0);" title="Complete previous step to enable">View Results</div>
         </div>
+        <div id="left_collapse"><span id="left_collapse_glyph" class="glyphicon glyphicon-triangle-left"></span></div>
+      </div>
+      <div id="map">
+        <div id="toolbar"></div>
+      </div>
+      <div id="right_panel">
+        <div id="right_panel_container"></div>
+        <div id="right_collapse"><span id="right_collapse_glyph" class="glyphicon glyphicon-triangle-right"></span></div>
       </div>
     </div>
 
     <script type='text/javascript'>
+      //******Connect to postgresql database
+      socket_emit();
+
       //******Initialize bootstrap tooltip
       $(document).ready(function(){
         $('[data-toggle="tooltip"]').tooltip();   
       });
 
-      //******Add Map
-      var map = new L.Map('map', {center: new L.LatLng(44, -81.5), zoomControl: false, zoom: 6, minZoom: 2, maxZoom: 20, inertiaDeceleration: 1000});
+      //******Call funtion to reposition windows on resize
+      window.addEventListener('resize', resizePanels);
+
+      function resizePanels() {
+        var htmlRect = {};
+        htmlRect.height = Math.max(window.innerHeight, $('html').height());
+        htmlRect.top = 0;
+        htmlRect.bottom = htmlRect.height;
+        htmlRect.width = Math.max(window.innerWidth, $('html').width());
+        htmlRect.left = 0;
+        htmlRect.right = htmlRect.width;
+        var tmpWindows = ["legendDiv", "downloadDiv"];
+        
+        tmpWindows.forEach(function(win) {
+          var winRect = document.getElementById(win).getBoundingClientRect();
+          if(winRect.bottom > htmlRect.bottom) {
+            d3.select("#" + win).style("top", htmlRect.height - winRect.height + "px");
+          }
+          if(winRect.right > htmlRect.right) {
+            d3.select("#" + win).style("left", htmlRect.width - winRect.width + "px");
+          }
+        });
+
+        var mapRect = document.getElementById("map").getBoundingClientRect();
+        var tmpWindows = ["d3Tooltip"];
+        
+        tmpWindows.forEach(function(win) {
+          var winRect = document.getElementById(win).getBoundingClientRect();
+          if(winRect.bottom > mapRect.bottom) {
+            d3.select("#" + win).style("top", mapRect.height - winRect.height + "px");
+          }
+          if(winRect.right > mapRect.right) {
+            d3.select("#" + win).style("left", mapRect.width - winRect.width + "px");
+          }
+        });
+
+        //***Resize container-results width
+        var tmpWidth = Math.max(window.innerWidth, 1280);
+
+        if(d3.select("#left_collapse_glyph").classed("glyphicon-triangle-left") == true) {
+          tmpWidth -= 165;
+        }
+        else {
+          tmpWidth -= 15;
+        }
+
+        if(d3.select("#right_collapse_glyph").classed("glyphicon-triangle-right") == true) {
+          tmpWidth -= 365;
+        }
+        else {
+          tmpWidth -= 15;
+        }
+
+        d3.select("#container-results").style({"width":tmpWidth + "px"});
+
+        //***Rescale chart canvas
+        if(d3.select("#container-results").style("display") == "block" && d3.select(".canvasChartsLarge")[0][0] != null) {
+          var tmpID = d3.select(".canvasChartsLarge").select("canvas").attr("id");
+          var tmpIDSmall = tmpID.replace("Large","");
+          var xTickFont = setFontSizeLarge(d3.select("#" + tmpIDSmall).attr("value"));
+          var canRectDiv = document.getElementById("canvasChartsLargeDiv").getBoundingClientRect();
+          var widthPercent = (canRectDiv.width - 690)/(1830 - 690);
+          var canRect = document.getElementById(tmpID).getBoundingClientRect();
+          var widthPercentCan = (Math.max(canRect.width, 730) - 730)/(1380 - 730);
+
+          chartCanvas[tmpID].options.title.fontSize = (20 + (20 * widthPercent));
+
+          if(tmpIDSmall == 'fig13b' || tmpIDSmall == 'fig13f' || tmpIDSmall.includes("fig6")) {
+            chartCanvas[tmpID].options.legend.labels.fontSize = (9 + (9 * widthPercent));
+            chartCanvas[tmpID].options.legend.labels.boxWidth = (9 + (9 * widthPercent));
+            chartCanvas[tmpID].options.legend.labels.padding = (9 + (9 * widthPercent));
+          }
+          else if(tmpIDSmall.includes('fig9b') || tmpIDSmall.includes('fig13g') || tmpIDSmall.includes('fig13c')) {
+            chartCanvas[tmpID].options.legend.labels.fontSize = (13 + (13 * widthPercent));
+            chartCanvas[tmpID].options.legend.labels.boxWidth = (13 + (13 * widthPercent));
+            chartCanvas[tmpID].options.legend.labels.padding = (13 + (13 * widthPercent));
+          }
+          else {
+            chartCanvas[tmpID].options.legend.labels.fontSize = (12 + (12 * widthPercent));
+            chartCanvas[tmpID].options.legend.labels.boxWidth = (12 + (12 * widthPercent));
+            chartCanvas[tmpID].options.legend.labels.padding = (12 + (12 * widthPercent));
+          }
+          chartCanvas[tmpID].options.scales.xAxes[1].scaleLabel.fontSize = (18 + (18 * widthPercent));          
+          chartCanvas[tmpID].options.scales.xAxes[0].ticks.fontSize = (xTickFont + (xTickFont * (widthPercent)));          
+          chartCanvas[tmpID].options.scales.xAxes[0].scaleLabel.fontSize = (14 + (14 * widthPercent));          
+          chartCanvas[tmpID].options.scales.yAxes[0].scaleLabel.fontSize = (14 + (14 * widthPercent));
+          if(tmpID.includes("tab")) {
+            chartCanvas[tmpID].options.scales.yAxes[0].ticks.fontSize = (9 + (9 * widthPercent));
+          }
+          else {
+            chartCanvas[tmpID].options.scales.yAxes[0].ticks.fontSize = (12 + (12 * widthPercent));
+          }
+          chartCanvas[tmpID].options.tooltips.titleFontSize = (16 + (6 * (1 - widthPercentCan)));
+          chartCanvas[tmpID].options.tooltips.bodyFontSize = (14 + (6 * (1 - widthPercentCan)));
+
+          if(tmpID.includes("tab")) {
+            chartCanvas[tmpID].options.layout.padding.top = (55 + (55 * widthPercentCan));
+          }
+       
+          chartCanvas[tmpID].clear();
+          chartCanvas[tmpID].render(0, true);
+          chartCanvas[tmpID].update();
+
+          if(tmpID.includes("tab")) {
+            var tmpPrint = chartCanvas[tmpID];
+            var tmpRect = document.getElementById(tmpID).getBoundingClientRect();
+            if(tmpRect.width < 796) {
+              setTimeout(function() {
+                tmpRect = document.getElementById(tmpID).getBoundingClientRect();
+                addInfo(tmpPrint, chartOpts[tmpIDSmall].large.cl[0], tmpRect, "large", widthPercentCan);
+              }, 200);
+            }
+            else {
+              addInfo(tmpPrint, chartOpts[tmpIDSmall].large.cl[0], tmpRect, "large", widthPercentCan);
+            }
+          }
+        }
+
+          d3.select("#resTabsDiv").selectAll("canvas")[0].forEach(function(tmpCan) {
+            chartCanvas[tmpCan.id + "Small"].update();
+            var tmpPrint = chartCanvas[tmpCan.id + "Small"];
+            var tmpRect = document.getElementById(tmpCan.id).getBoundingClientRect();
+            addInfo(tmpPrint, chartOpts[tmpCan.id].small.cl[0], tmpRect, "small", 1);
+          });
+
+        //***Resize species dropdown list
+        d3.select("#speciesListDropdown").style("max-height", window.innerHeight - 143 + "px");
+      }
+
+
+      //******Add Map with custom zoom depending on screen size
+      if(window.innerWidth > 1900) {
+        var map = new L.Map('map', {center: new L.LatLng(43.5, -80), zoomControl: false, zoom: 6, minZoom: 2, maxZoom: 20, inertiaDeceleration: 1000});
+      }
+      else {
+        var map = new L.Map('map', {center: new L.LatLng(40, -78), zoomControl: false, zoom: 5, minZoom: 2, maxZoom: 20, inertiaDeceleration: 1000});
+      }
+      d3.select(".leaflet-control-attribution a").property("target", "_blank")
 
       //******Add map controls
-      L.control.mousePosition().addTo(map);
-      L.control.scale({ maxWidth: 200 }).addTo(map);
-      L.control.zoom({ position: 'topleft', zoomInTitle: "Zoom in (can also be done with mouse wheel, double-click, '+' key, or by pressing the 'shift' key while clicking and dragging a rectangle)", zoomOutTitle: "Zoom out (can also be done with the mouse wheel or the '-' key)" }).addTo(map);
-      L.control.navbar().addTo(map);
-      //L.control.legend().addTo(map);
-      //L.control.political().addTo(map);
-      //L.control.attributes().addTo(map);
+      //******Bottom Right
+      L.control.zoom({ position: 'bottomright', zoomInTitle: "Zoom in (can also be done with mouse wheel, double-click, '+' key, or by pressing the 'shift' key while clicking and dragging a rectangle)", zoomOutTitle: "Zoom out (can also be done with the mouse wheel or the '-' key)" }).addTo(map);
+      L.control.maxExtent().addTo(map);
 
-      //******Bing geocoder control
+      //******Bottom Left
+      L.control.scale({ maxWidth: 200 }).addTo(map);
+      L.control.mousePosition().addTo(map);
+
+      //***Bing geocoder control
       var tmpPoint = new L.marker;
       var bingGeocoder = new L.Control.BingGeocoder('At3gymJqaoGjGje-JJ-R5tJOuilUk-gd7SQ0DBZlTXTsRoMfVWU08ZWF1X7QKRRn', { callback: function (results) {
-                     var bbox = results.resourceSets[0].resources[0].bbox,
-                            first = new L.LatLng(bbox[0], bbox[1]),
-                            second = new L.LatLng(bbox[2], bbox[3]),
-                            tmpBounds = new L.LatLngBounds([first, second]);
-                     this._map.fitBounds(tmpBounds);
-                     this._map.removeLayer(tmpPoint);
-                     tmpPoint = new L.marker(results.resourceSets[0].resources[0].point.coordinates).bindPopup(results.resourceSets[0].resources[0].address.formattedAddress);
-                     this._map.addLayer(tmpPoint);
-                   }
+        if(results.statusCode == 200) {
+          if(d3.select("#bingGeocoderSubmit").classed("glyphicon-search")) {
+            $(document).ready(function(){
+              $('[data-toggle="tooltip"]').tooltip();   
+            });
+            document.getElementById("bingGeocoderInput").blur();
+            var bbox = results.resourceSets[0].resources[0].bbox,
+              first = new L.LatLng(bbox[0], bbox[1]),
+              second = new L.LatLng(bbox[2], bbox[3]),
+              tmpBounds = new L.LatLngBounds([first, second]);
+            this._map.fitBounds(tmpBounds);
+            this._map.removeLayer(tmpPoint);
+            tmpPoint = new L.marker(results.resourceSets[0].resources[0].point.coordinates);  //.bindPopup(results.resourceSets[0].resources[0].address.formattedAddress);
+            this._map.addLayer(tmpPoint);
+            d3.select(".leaflet-marker-icon")
+              .attr("id","mapIcon")
+              .attr("data-toggle", "tooltip")
+              .attr("data-container", "body")
+              .attr("data-placement", "auto top")
+              .attr("data-html", "true")
+              .attr("title", '<p><b><center>' + results.resourceSets[0].resources[0].name + '</center></b></p>');
+            d3.select(tmpPoint)
+              .on("click", function() { clearSearch(); });
+            d3.select("#bingGeocoderSubmit")
+              .classed("glyphicon-search", false)
+              .classed("glyphicon-remove", true)
+              .style({"background":"#ff0040", "background":"linear-gradient(#ff0040, #b3002d)", "color":"#990000"})
+              .property("title", "Click to clear search results");
+          }
+          else {
+            clearSearch();
+          }
+        }
+        }
+      });
+      //bingGeocoder.addTo(map);
+     
+
+      //******Clear the results of the geo search
+      function clearSearch() {
+        map.removeLayer(tmpPoint);
+        d3.select(".tooltip").remove();
+        d3.select("#bingGeocoderInput").property("value", "");
+
+        d3.select("#bingGeocoderSubmit")
+          .classed("glyphicon-remove", false)
+          .classed("glyphicon-search", true)
+          .style({"background":"", "color":""})
+          .property("title", "Click to zoom to specified location");
+      }
+
+      //******Add base layers
+      var googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+        maxZoom: 20,
+        subdomains:['mt0','mt1','mt2','mt3']
+      });
+      var googleSatellite = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
+        maxZoom: 20,
+        subdomains:['mt0','mt1','mt2','mt3']
+      }); 
+      var googleStreet = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
+        maxZoom: 20,
+        subdomains:['mt0','mt1','mt2','mt3']
+      });
+      var googleTerrain = googleTerrain = L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{
+        maxZoom: 20,
+        subdomains:['mt0','mt1','mt2','mt3']
       });
 
-      map.addControl(bingGeocoder);
-
-      //******Add basemaps
-      var googleHybrid = new L.Google('HYBRID');
-      var googleSatellite = new L.Google('SATELLITE');
-      var googleStreet = new L.Google('ROADMAP');
-      var googleTerrain = new L.Google('TERRAIN');
       var bingHybrid = new L.BingLayer("At3gymJqaoGjGje-JJ-R5tJOuilUk-gd7SQ0DBZlTXTsRoMfVWU08ZWF1X7QKRRn", {type: 'AerialWithLabels'});
       var bingSatellite = new L.BingLayer("At3gymJqaoGjGje-JJ-R5tJOuilUk-gd7SQ0DBZlTXTsRoMfVWU08ZWF1X7QKRRn", {type: 'Aerial'});
       var bingStreet = new L.BingLayer("At3gymJqaoGjGje-JJ-R5tJOuilUk-gd7SQ0DBZlTXTsRoMfVWU08ZWF1X7QKRRn", {type: 'Road'});
@@ -164,11 +354,11 @@
       //******Species Layers
       var speciesID = ["ab_ba", "ac_ru", "ac_sa", "be_al", "be_pa", "ca_de", "fa_gr", "fr_am", "fr_pe", "ju_ci", "pi_ma", "pi_ru", "pi_re", "pi_ri", "pi_st", "po_gr", "po_tr", "qu_al", "qu_pr", "qu_ru", "th_oc", "ts_ca", "ul_am"];
       var speciesTitles = ["Balsam Fir", "Red Maple", "Sugar Maple", "Yellow Birch", "Paper Birch", "American Chestnut", "American Beech", "White Ash", "Green Ash", "Butternut", "Black Spruce", "Red Spruce", "Red Pine", "Pitch Pine", "White Pine", "Bigtooth Aspen", "Quaking Aspen", "White Oak", "Chestnut Oak", "Red Oak", "Northern White Cedar", "Eastern Hemlock", "American Elm"];
-      var speciesNames = ["Abies balsamea", "Acer rubrum", "Acer saccharum", "Betula alleghaniensis", "Betula papyrifera", "Castanea dentata", "Fagus Grandifolia", "Fraxinus americana", "Fraxinus pennsylvanica", "Juglans cinerea", "Picea mariana", "Picea rubens", "Pinus resinosa", "Pinus rigida", "Pinus strobus", "Populus grandidentata", "Populus tremuloides", "Quercus alba", "Quercus prinus", "Quercus rubra", "Thuja occidentalis", "Tsuga canadensis", "Ulmus americana"];
+      var speciesNames = ["Abies balsamea", "Acer rubrum", "Acer saccharum", "Betula alleghaniensis", "Betula papyrifera", "Castanea dentata", "Fagus grandifolia", "Fraxinus americana", "Fraxinus pennsylvanica", "Juglans cinerea", "Picea mariana", "Picea rubens", "Pinus resinosa", "Pinus rigida", "Pinus strobus", "Populus grandidentata", "Populus tremuloides", "Quercus alba", "Quercus prinus", "Quercus rubra", "Thuja occidentalis", "Tsuga canadensis", "Ulmus americana"];
       var speciesLayers = [];
 
       var layerExt = ["_cl_mins", "_exc_mins", "_exc_maxs", "_range"];
-      var layerExtTitles = ["Critical Load", "Exceedance Min", "Exceedance Max", "Extent"];
+      var layerExtTitles = ["Critical Load", "Exceedance Min", "Exceedance Max", "Species Range"];
 
       speciesID.forEach(function(tmpID, i) {
         speciesLayers[i] = [];
@@ -185,8 +375,11 @@
       });
 
       //******Add Community Layers
-      var commID = ["cl_mins_min", "cl_mins_max", "cl_maxs_min", "cl_maxs_max", "exc_cl_mins_min", "exc_cl_mins_max", "exc_cl_maxs_min", "exc_cl_maxs_max"]
-      var commTitles = ["Min CL (lower range)", "Max CL (lower range)", "Min CL (upper range)", "Max CL (upper range)", "Exceedance A (min min)", "Exceedance B (max min)", "Exceedance D (min max)", "Exceedance C (max max)"];
+      var commID = ["cl_mins_min", "cl_mins_max", "cl_maxs_max", "cl_maxs_min", "exc_cl_mins_min", "exc_cl_mins_max", "exc_cl_maxs_max", "exc_cl_maxs_min"]
+      var commTitles = ["Most Protective CL", "Intermediate CL C", "Least Protective CL", "Intermediate CL D", "EX of Most Protective CL", "EX of Intermediate CL C", "EX of Least Protective CL", "EX of Intermediate CL D"];
+      var commTooltip = ["Most protective Critical Load for most sensitive species", "Most protective Critical Load for least sensitive species", "Critical Load at which all species are severely at risk", "Critical Load at which at least one species is severely at risk", "Exceedance of most protective CL for most sensitive species", "Exceedance of most protective CL for least sensitive species", " Exceedance of CL at which all species are severely at risk", "Exceedance of CL at which at least one species is severely at risk"];
+      //var commID = ["cl_mins_min", "cl_mins_max", "cl_maxs_min", "cl_maxs_max", "exc_cl_mins_min", "exc_cl_mins_max", "exc_cl_maxs_min", "exc_cl_maxs_max"]
+      //var commTitles = ["Min CL (lower range)", "Max CL (lower range)", "Min CL (upper range)", "Max CL (upper range)", "Exceedance A (min min)", "Exceedance B (max min)", "Exceedance D (min max)", "Exceedance C (max max)"];
       var commLayers = [];
 
       commID.forEach(function(tmpID, i) {
@@ -203,8 +396,8 @@
 
       //******Add SVG Layers
       //******Area Select Layers
-      var areaID = ["state", "eco", "eco2", "eco3", "fs", "class1"];
-      var areaTitles = ["States", "Ecoregions Combined", "Ecoregions Level 2", "Ecoregions Level 3", "Forest Service Admin Areas", "Class I Areas"];
+      var areaID = ["state", "eco", "eco2", "eco3", "fs_wild", "fs", "class1"];
+      var areaTitles = ["States", "Ecoregions Combined", "Ecoregions Level 2", "Ecoregions Level 3", "Forest Service Wilderness Areas", "Forest Service Admin Areas", "Class I Areas"];
       var areaLayers = [];
 
       var topoSVG = d3.select(map.getPanes().overlayPane).append("svg");
@@ -226,19 +419,21 @@
             .data(topo.features)
           .enter().append("path")
             .attr("d", path)
+            //.attr("id", function(d) { return d.id.split(" ").join("_"); })
             .attr("class", topo.class)
-            .on("mouseover", function(data) { if(d3.select(this).style("opacity") > 0) {showIt(this.id);} })
-            .on("mousemove", function() { return tooltip.style("top", (d3.event.pageY-40) + "px").style("left", (d3.event.pageX+15) + "px"); })
-            .on("mouseout", function() { return tooltip.style("visibility", "hidden"); })
+            .on("mouseenter", function(data) { if(d3.select(this).style("opacity") > 0) {showIt(this.id);} })
+            .on("mousemove", function() { tooltip.style("top", (d3.event.pageY-40) + "px").style("left", (d3.event.pageX+15) + "px"); resizePanels(); })
+            .on("mouseleave", function() { tooltip.style("visibility", "hidden"); })
             .on("click", function(data) { 
               if (d3.select(this).style("stroke-opacity") == "1") {
                 d3.select(this).style({"fill-opacity": "", "stroke-opacity": ""});
                 d3.selectAll(".remCheck").property("checked", function() {if(this.value == data.id) {return false;} });
               } 
               else {
-                d3.select(this).style({"fill-opacity": "0.9", "stroke-opacity": "1"});
+                d3.select(this).style({"fill-opacity": "0.5", "stroke-opacity": "1"});
                 d3.selectAll(".remCheck").property("checked", function() {if(this.value == data.id) {return true;} });
               }
+              get_spp();
             });
         changeStyle("id", topo);
         //filterMap("featureid", topo, true);
@@ -253,26 +448,6 @@
         //d3.select("#" + topo.class + "Legend").style("display", "none");
       }
 
-      //******Make layer controller
-      var baseLayers = {}; 
-      var overlays = {}; 
-      var controlID = L.control.layers(baseLayers, overlays).addTo(map);
-
-
-      //******Turn on base and ovelay separator
-      d3.select(".leaflet-control-layers-separator").style("display", "block");
-
-      //******Remove layer control listeners
-      $('.leaflet-control-layers.leaflet-control').replaceWith($('.leaflet-control-layers.leaflet-control').clone());
-      $('.leaflet-control-layers-list').replaceWith($('.leaflet-control-layers-list').clone());
-      d3.select(".leaflet-control-layers-toggle")
-        .attr("id", "layerToggle")
-        .property("title", "Click to display layers window")
-        .on("click", function() { d3.select(".leaflet-control-layers.leaflet-control").classed("leaflet-control-layers-expanded", true); });
-      d3.select(".leaflet-control-layers.leaflet-control").on("wheel", function() { event.stopPropagation(); });
-
-      //******Create layer controller
-      createLayerSwitcher();
 
       //******Add in top menu divs
       d3.select("#container")
@@ -306,78 +481,1052 @@
       d3.select("#container")
         .append("div")
         .attr("id", "container-results")
-        .attr("class", "container-menu")
-        .html('<img id="resImg">')
-        .style({"display":"none", "background":"beige", "padding":"30px", "text-align":"center"});
+        //.attr("class", "container-menu")
+        .html('<span id="results_glyph" class="glyphicon glyphicon-remove-circle pull-right" onclick="d3.select(\'#container-results\').style(\'display\', \'none\'); d3.selectAll(\'.canvasChart\').classed(\'selected\', false);" title="Click to close results window"></span><img id="resImg">');
 
 
 
       //******Add menu actions
-      d3.select("#home").on("click", function() {d3.select("#mainMenu").selectAll("li").classed("active", false); d3.select(this).classed("active", true); d3.selectAll(".container-menu").style("display", "none");});
-      d3.select("#basics").on("click", function() {d3.select("#mainMenu").selectAll("li").classed("active", false); d3.select(this).classed("active", true); d3.selectAll(".container-menu").style("display", "none"); d3.select("#container-" + this.id).style("display", "block");});
-      d3.select("#approach").on("click", function() {d3.select("#mainMenu").selectAll("li").classed("active", false); d3.select(this).classed("active", true); d3.selectAll(".container-menu").style("display", "none"); d3.select("#container-" + this.id).style("display", "block");});
-      d3.select("#guide").on("click", function() {d3.select("#mainMenu").selectAll("li").classed("active", false); d3.select(this).classed("active", true); d3.selectAll(".container-menu").style("display", "none"); d3.select("#container-" + this.id).style("display", "block");});
-      d3.select("#tutorial").on("click", function() {d3.select("#mainMenu").selectAll("li").classed("active", false); d3.select(this).classed("active", true); d3.selectAll(".container-menu").style("display", "none"); d3.select("#container-" + this.id).style("display", "block");});
+      d3.select("#home").on("click", function() {d3.select("#mainMenu").selectAll("li").classed("active", false); d3.select(this).classed("active", true); d3.selectAll(".container-menu").style("display", "none"); d3.select("#right_panel").style("display", "block");});
+      d3.select("#basics").on("click", function() {d3.select("#mainMenu").selectAll("li").classed("active", false); d3.select(this).classed("active", true); d3.selectAll(".container-menu").style("display", "none"); d3.select("#container-" + this.id).style("display", "block"); d3.select("#right_panel").style("display", "none");});
+      d3.select("#approach").on("click", function() {d3.select("#mainMenu").selectAll("li").classed("active", false); d3.select(this).classed("active", true); d3.selectAll(".container-menu").style("display", "none"); d3.select("#container-" + this.id).style("display", "block"); d3.select("#right_panel").style("display", "none");});
+      d3.select("#guide").on("click", function() {d3.select("#mainMenu").selectAll("li").classed("active", false); d3.select(this).classed("active", true); d3.selectAll(".container-menu").style("display", "none"); d3.select("#container-" + this.id).style("display", "block"); d3.select("#right_panel").style("display", "none");});
+      d3.select("#tutorial").on("click", function() {d3.select("#mainMenu").selectAll("li").classed("active", false); d3.select(this).classed("active", true); d3.selectAll(".container-menu").style("display", "none"); d3.select("#container-" + this.id).style("display", "block"); d3.select("#right_panel").style("display", "none");});
 
 
+
+
+
+
+
+
+
+
+      //******Make layer controller
+      //***baselayers
+      var layerNames = {};
+      layerNames.baseLayers = {"Google Terrain": googleTerrain, "Google Hybrid": googleHybrid, "Google Satellite": googleSatellite, "Google Street": googleStreet, "Bing Hybrid": bingHybrid, "Bing Satellite": bingSatellite, "Bing Street": bingStreet, "USGS Topo": usgsTopo, "State Outlines": states, "None": blank};
+      layerNames.baseLayers.keys = d3.keys(layerNames.baseLayers);
+      layerNames.baseLayers.values = d3.values(layerNames.baseLayers);
+
+      //***Abiotic layers
+      layerNames.abiotics = {};
+      abioticTitles.forEach(function(tmpTitle,i) {
+        layerNames.abiotics[tmpTitle] = abioticLayers[i];
+      });
+      layerNames.abiotics.keys = d3.keys(layerNames.abiotics);
+      layerNames.abiotics.values = d3.values(layerNames.abiotics);
+
+      //***Area layers
+      layerNames.areas = {};
+      areaTitles.forEach(function(tmpTitle,i) {
+        layerNames.areas[tmpTitle] = areaLayers[i];
+      });
+      layerNames.areas.keys = d3.keys(layerNames.areas);
+      layerNames.areas.values = d3.values(layerNames.areas);
+      //***FS Wilderness that are Class 1
+      layerNames.areas.fs_wild_class1 = ["Boundary Waters Canoe Area Wilderness", "Great Gulf Wilderness", "Lye Brook Wilderness", "Presidential Range-Dry River Wilderness", "Rainbow Lake Wilderness"];
+
+      //***Species layers
+      layerNames.species = {};
+      speciesID.forEach(function(tmpTitle,i) {
+        layerNames.species[tmpTitle] = {}
+        layerExt.forEach(function(tmpExt,j) {
+          layerNames.species[tmpTitle][tmpExt] = speciesLayers[i][j];
+        });
+      });
+      layerNames.species.keys = d3.keys(layerNames.species); 
+      layerNames.species.values = d3.values(layerNames.species);
+      layerNames.species.keys.forEach(function(key) {
+        layerNames.species[key].keys = d3.keys(layerNames.species[key]);
+        layerNames.species[key].values = d3.values(layerNames.species[key]);
+      });
+
+      //***Community layers
+      layerNames.community = {};
+      commTitles.forEach(function(tmpTitle,i) {
+        layerNames.community[tmpTitle] = commLayers[i];
+      });
+      layerNames.community.keys = d3.keys(layerNames.community);
+      layerNames.community.values = d3.values(layerNames.community);
+      
+      
+
+
+
+
+
+
+      //******Add toolbar tools
+      //***Baselayers
+      d3.select("#toolbar")
+        .append("div")
+        .attr("id", "mapTools")
+        .append("div")
+        .attr("id", "baselayerSelect")
+        .attr("class", "layerList")
+        .append("div")
+        .attr("id", "baselayerList")
+        .attr("class", "cl_select")
+        .property("title", "Click to change map baselayer")
+        .html('<span id="baselayerListHeader">Change Map Baselayer</span><span class="glyphicon glyphicon-triangle-bottom pull-right" style="position:relative;top:3px;"></span>')
+        .on("click", function() { if(d3.select("#baselayerListDropdown").style("display") == "none") {d3.select("#baselayerListDropdown").style("display", "inline-block");} else {d3.select("#baselayerListDropdown").style("display", "none");} });;
+
+      d3.select("#baselayerSelect")
+        .append("div")
+        .attr("id", "baselayerListDropdown")
+        .attr("class", "layerListDropdown")
+        .on("mouseleave", function() { d3.select(this).style("display", "none") });
+
+      //******Add baselayer options
+      d3.select("#baselayerListDropdown").selectAll("div")
+        .data(layerNames.baseLayers.keys)
+        .enter()
+          .append("div")
+          .attr("class", "layerName")
+          .text(function(d) { return d; })
+          .property("value", function(d,i) { return i; })
+          .property("title", function(d) { return d; })
+          .on("click", function() { changeBaselayer(this); })
+          .append("span")
+          .attr("class", "glyphicon glyphicon-ok pull-right activeOverlay")
+          .style("visibility", function(d,i) { if(i == 8) {return "visible";} else {return "hidden";} });
+
+
+      //******Initialize baselayer
+      map.addLayer(states);
+      var oldBaseLayerIndex = 8;
+
+      //******Function to change baselayer on select change
+      function changeBaselayer(tmpDiv) {
+        //***Remove old layer
+        var layerDivs = d3.select("#baselayerListDropdown").selectAll("div");
+        
+        layerDivs[0].forEach(function(tmpLayer) {
+          if(d3.select(tmpLayer).select("span").style("visibility") == "visible") {
+            d3.select(tmpLayer).select("span").style("visibility", "hidden");
+            map.removeLayer(layerNames.baseLayers.values[d3.select(tmpLayer).property("value")]);
+          }
+        });
+
+        //***Add new layer
+        d3.select(tmpDiv).select("span").style("visibility", "visible");
+        map.addLayer(layerNames.baseLayers.values[tmpDiv.value]);
+        layerNames.baseLayers.values[tmpDiv.value].bringToBack();       
+      }
+
+
+
+
+
+
+      //***Abiotic layers
+      d3.select("#mapTools")
+        .append("div")
+        .attr("id", "abioticSelect")
+        .attr("class", "layerList")
+        .append("div")
+        .attr("id", "abioticList")
+        .attr("class", "cl_select")
+        .property("title", "Click to select abiotic layers to display on map")
+        .html('<span id="abioticListHeader">View Abiotic Map Layers</span><span class="glyphicon glyphicon-triangle-bottom pull-right" style="position:relative;top:3px;"></span>')
+        .on("click", function() { if(d3.select("#abioticListDropdown").style("display") == "none") {d3.select("#abioticListDropdown").style("display", "inline-block");} else {d3.select("#abioticListDropdown").style("display", "none");} });;
+
+      d3.select("#abioticSelect")
+        .append("div")
+        .attr("id", "abioticListDropdown")
+        .attr("class", "layerListDropdown")
+        .on("mouseleave", function() { d3.select(this).style("display", "none") });
+
+      //******Add abiotic options
+      d3.select("#abioticListDropdown").selectAll("div")
+        .data(layerNames.abiotics.keys)
+        .enter()
+          .append("div")
+          .attr("class", "layerName")
+          .text(function(d) { return d; })
+          .property("value", function(d,i) { return i; })
+          .property("title", function(d) { return d; })
+          .property("name", function(d,i) { return abioticID[i]; })
+          .on("click", function() { changeAbiotic(this); })
+          .append("span")
+          .attr("class", "glyphicon glyphicon-ok pull-right activeAbiotic")
+          .style("visibility", function(d) { if(d == "Deerfield Watershed") {return "visible";} else {return "hidden";} });
+
+      //******Add Geoserver Deerfield HUC8 layer to map
+      //map.addLayer(gsHuc8);
+
+      //******Function to add/remove abiotic layer
+      function changeAbiotic(tmpDiv) {
+        if(d3.select(tmpDiv).select("span").style("visibility") == "hidden") {
+          d3.select(tmpDiv).select("span").style("visibility", "visible");
+          map.addLayer(layerNames.abiotics.values[tmpDiv.value]);
+          layerNames.abiotics.values[tmpDiv.value].bringToFront();
+          addLegendImg(tmpDiv.name, tmpDiv.title, layerNames.abiotics.values[tmpDiv.value], ["abiotics",tmpDiv.title]);
+        } 
+        else {
+          d3.select(tmpDiv).select("span").style("visibility", "hidden");
+          map.removeLayer(layerNames.abiotics.values[tmpDiv.value]);
+          remLegendImg(tmpDiv.name);
+        }
+      }
+
+
+
+
+
+
+      //***Species layers
+      d3.select("#mapTools")
+        .append("div")
+        .attr("id", "speciesSelect")
+        .attr("class", "layerList")
+        .append("div")
+        .attr("id", "speciesList")
+        .attr("class", "cl_select")
+        .property("title", "Click to select species layers to display on map")
+        .html('<span id="speciesListHeader">View CL & Exceedance Map Layers</span><span class="glyphicon glyphicon-triangle-bottom pull-right" style="position:relative;top:3px;"></span>')
+        .on("click", function() { if(d3.select("#speciesListDropdown").style("display") == "none") {d3.select("#speciesListDropdown").style("display", "inline-block");} else {d3.select("#speciesListDropdown").style("display", "none");} });;
+
+      d3.select("#speciesSelect")
+        .append("div")
+        .attr("id", "speciesListDropdown")
+        .attr("class", "layerListDropdown")
+        .on("mouseleave", function() { d3.select(this).style("display", "none") })
+        .on("dblclick", function() { event.stopPropagation(); })
+        .on("wheel", function() { event.stopPropagation(); })
+        .on("mousemove", function() { event.stopPropagation(); })
+        .append("div")
+        .attr("id", "indSppDiv")
+        .attr("class", "collapse in");
+
+      //******Add species options
+      d3.select("#indSppDiv").selectAll("div")
+        .data(layerNames.species.keys)
+        .enter()
+          .append("div")
+          .html(function(d,i) { return '<div class="indSpp" value="' + i + '" name="' + d + '" title="' + speciesTitles[i] + " (" + speciesNames[i] + ")" + '" data-toggle="collapse" data-target="#' + d + 'Suboptions">' + speciesTitles[i] + '<span class="glyphicon glyphicon-triangle-bottom pull-right activeSpecies"></span></div><div class="sppSuboptDiv collapse" id="' + d + 'Suboptions" value="' + i + '" name="' + d + '"></div>'; });
+
+      //***Add species layer suboptions
+      d3.selectAll(".sppSuboptDiv")[0].forEach(function(tmpDiv,i) {
+        d3.select(tmpDiv).selectAll("div")
+          .data(layerNames.species[d3.select(tmpDiv).attr("name")].keys)
+          .enter()
+            .append("div")
+            .attr("class", "sppSubopt")
+            .text(function(d,i) { return layerExtTitles[i]; })
+            .property("value", function(d,i) { return i; })
+            .property("name", function(d,i) { return d3.select(tmpDiv).attr("name") + layerExt[i]; }) 
+            .property("title", function(d,i) { return speciesTitles[d3.select(tmpDiv).attr("value")] + " " + layerExtTitles[i]; })
+            .on("click", function(d,i) { changeSpecies(this, d3.select(tmpDiv).attr("name"), layerExt[i]); })
+            .append("span")
+            .attr("class", "glyphicon glyphicon-ok pull-right")
+            .style("visibility", "hidden");
+      });
+
+      //******Function to add/remove species layer
+      function changeSpecies(tmpDiv, spp, filePart) {
+        if(d3.select(tmpDiv).select("span").style("visibility") == "hidden") {
+          d3.select(tmpDiv).select("span").style("visibility", "visible");
+          map.addLayer(layerNames.species[spp].values[tmpDiv.value]);
+          layerNames.species[spp].values[tmpDiv.value].bringToFront();
+          addLegendImg(tmpDiv.name, tmpDiv.title, layerNames.species[spp].values[tmpDiv.value], ["species",spp,filePart]);
+        } 
+        else {
+          d3.select(tmpDiv).select("span").style("visibility", "hidden");
+          map.removeLayer(layerNames.species[spp].values[tmpDiv.value]);
+          remLegendImg(tmpDiv.name);
+        }
+      }
+
+
+
+
+      //******Add combined species option and suboptions
+      d3.select("#speciesListDropdown")
+        .insert("div", ":first-child")
+        .style("border-top", "2px solid #666666")
+        .html('<div class="layerName" title="Individual Species" data-toggle="collapse" data-target="#indSppDiv">Individual Species<span class="glyphicon glyphicon-triangle-bottom pull-right activeSpecies"></span></div><div class="sppSuboptDiv collapse" id="indSppSuboptions" name="indSpp"></div>');
+
+      d3.select("#speciesListDropdown")
+        .insert("div", ":first-child")
+        .html('<div class="layerName" name="all" title="Combined Species" data-toggle="collapse" data-target="#allSuboptions">Combined Species<span class="glyphicon glyphicon-triangle-bottom pull-right activeSpecies"></span></div><div class="sppSuboptDiv collapse" id="allSuboptions" name="all"></div>');
+
+      d3.select("#allSuboptions").selectAll("div")
+        .data(layerNames.community.keys)
+        .enter()
+          .append("div")
+          .attr("class", "sppSubopt")
+          .text(function(d) { return d; })
+          .property("value", function(d,i) { return i; })
+          .property("name", function(d,i) { return commID[i]; })
+          .property("title", function(d,i) { return commTooltip[i]; })
+          .on("click", function() { changeCommunity(this); })
+          .append("span")
+          .attr("class", "glyphicon glyphicon-ok pull-right")
+          .style("visibility", "hidden");
+
+      d3.select("#allSuboptions")
+        .insert("div", ":nth-child(5)")
+        .attr("class", "commTitle")
+        .text("Exceedance")
+        .property("title", "Exceedance (Exc) layers");
+
+      d3.select("#allSuboptions")
+        .insert("div", ":first-child")
+        .attr("class", "commTitle")
+        .text("Critical Load")
+        .property("title", "Critical Load (CL) layers");
+
+
+      //******Function to add/remove area layer
+      function changeCommunity(tmpDiv) {
+        if(d3.select(tmpDiv).select("span").style("visibility") == "hidden") {
+          d3.select(tmpDiv).select("span").style("visibility", "visible");
+          map.addLayer(layerNames.community.values[tmpDiv.value]);
+          layerNames.community.values[tmpDiv.value].bringToFront();
+          addLegendImg(tmpDiv.name, d3.select(tmpDiv).text(), layerNames.community.values[tmpDiv.value], ["community", d3.select(tmpDiv).text()]);
+        } 
+        else {
+          d3.select(tmpDiv).select("span").style("visibility", "hidden");
+          map.removeLayer(layerNames.community.values[tmpDiv.value]);
+          remLegendImg(tmpDiv.name);
+        }
+      }
+
+
+
+
+
+
+      //******Adds images to the legend
+      function addLegendImg(tmpName, tmpTitle, tmpLayer, tmpPath) {
+        legendDivs.push(tmpName);
+        d3.selectAll(".layerLegend").style("display", "none");
+
+        d3.select("#legendImgDiv")
+          .append("div")
+          .attr("id", tmpName + "Legend")
+          .attr("value", tmpPath)
+          .attr("class", "layerLegend")
+          .style("margin-top", "25px")
+          .append("h3")
+          .attr("class", "legendTitle")
+          .text(tmpTitle);
+
+        d3.select("#" + tmpName + "Legend")
+          .append("img")
+          .attr("class", "legendImg")
+          .attr("src", "http://felek.cns.umass.edu:8080/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=30&HEIGHT=30&LAYER=CL:" + tmpName)
+          .property("title", tmpTitle);
+
+        d3.select("#" + tmpName + "Legend")
+          .append("input")
+          .attr({type: "range", name: "layer", min: 0, max: 100, value: 100})
+          .attr("id", "legendSlider")
+          .property("title", tmpTitle + " Layer Opacity: 100%")
+          .on("input", function() { layerOpacity(this, tmpLayer); });
+
+        d3.select("#" + tmpName + "Legend")
+          .append("p")
+          .attr("class", "legendTrans")
+          .text("Transparency");
+
+        d3.select("#legendDefault").style("display", "none");
+
+        d3.select("#legendImgDiv")
+          .style("display", "block");
+        
+        if(legendDivs.length > 1) {
+          d3.select("#legendPrev").style("visibility", "visible");
+          d3.select("#legendNext").style("visibility", "hidden");
+        }
+
+        if(d3.select("#legendDiv").style("opacity") == 0) {
+          toolWindowToggle("legend");
+        }
+
+        setTimeout(function() { resizePanels(); }, 300);
+      }
+
+
+
+
+
+
+
+      //******Removes images to the legend
+      function remLegendImg(tmpName) {
+        var tmpBi = 0;
+        if(d3.select("#" + tmpName + "Legend").style("display") == "block") {
+          tmpBi = 1;
+        }
+
+        d3.select("#" + tmpName + "Legend").remove();
+        legendDivs.splice(legendDivs.indexOf(tmpName),1);
+
+        if(tmpBi == 1 && legendDivs.length > 0) {
+          d3.select("#" + legendDivs[0] + "Legend").style("display", "block");
+          var keys = d3.select("#" + legendDivs[0] + "Legend").attr("value").split(",");
+          if(keys.length == 2) {
+            layerNames[keys[0]][keys[1]].bringToFront();
+          }
+          else {
+            layerNames[keys[0]][keys[1]][keys[2]].bringToFront();
+          }
+        }
+
+        if(legendDivs.length == 0) {
+          d3.select("#legendImgDiv").style("display", "none");
+          d3.select("#legendDefault").style("display", "block");
+        }
+        else if(tmpBi == 1) {
+          if(legendDivs.length == 1) {
+            d3.selectAll("#legendPrev,#legendNext").style("visibility", "hidden");
+          }
+          else {
+            d3.select("#legendPrev").style("visibility", "hidden");
+            d3.select("#legendNext").style("visibility", "visible");
+          }
+        }
+      }
+
+
+
+
+
+
+
+      //******Change current legend div
+      function changeLegend(tmpDir) {
+        var tmpBi = 0;
+        legendDivs.some(function(tmpName,i) {
+          if(d3.select("#" + tmpName + "Legend").style("display") == "block") {
+            tmpBi = 1;
+            d3.selectAll(".layerLegend").style("display", "none");
+            if(tmpDir == "prev") {
+              d3.select("#" + legendDivs[i-1] + "Legend").style("display", "block");
+                var keys = d3.select("#" + legendDivs[i-1] + "Legend").attr("value").split(",");
+                if(keys.length == 2) {
+                  layerNames[keys[0]][keys[1]].bringToFront();
+                }
+                else {
+                  layerNames[keys[0]][keys[1]][keys[2]].bringToFront();
+                }
+            }
+            else {
+              d3.select("#" + legendDivs[i+1] + "Legend").style("display", "block");
+                var keys = d3.select("#" + legendDivs[i+1] + "Legend").attr("value").split(",");
+                if(keys.length == 2) {
+                  layerNames[keys[0]][keys[1]].bringToFront();
+                }
+                else {
+                  layerNames[keys[0]][keys[1]][keys[2]].bringToFront();
+                }
+            }
+          }
+          return tmpBi == 1;
+        });
+
+        tmpBi = 0;
+        legendDivs.some(function(tmpName,i) {
+          if(d3.select("#" + tmpName + "Legend").style("display") == "block") {
+            tmpBi = 1;
+            if(i == 0) {
+              d3.select("#legendPrev").style("visibility", "hidden");
+              d3.select("#legendNext").style("visibility", "visible");
+            }
+            else if(i == (legendDivs.length - 1)) {
+              d3.select("#legendPrev").style("visibility", "visible");
+              d3.select("#legendNext").style("visibility", "hidden");
+            }
+            else {
+              d3.select("#legendPrev").style("visibility", "visible");
+              d3.select("#legendNext").style("visibility", "visible");
+            }
+          }
+          return tmpBi == 1;
+        });              
+      }
+        
+
+
+
+
+
+
+      //******Add geolocater
+      d3.select("#toolbar")
+        .append("div")
+        .attr("id", "bingGeoLocate");
+        //.attr("class", "layerList");
+
+      document.getElementById('bingGeoLocate').appendChild(bingGeocoder.onAdd(map));
+
+
+
+
+
+
+      //******Make div for legend
+      d3.select("body")
+        .append("div")
+        .attr("class", "legend gradDown")
+        .attr("id", "legendDiv");
+
+      $('#legendDiv').draggable({containment: "html", cancel: ".toggle-group,input,textarea,button,select,option"});
+
+      d3.select("#legendDiv")
+        .append("h4")
+        .text("Legend")
+        .attr("class", "legTitle")
+        .attr("id", "legendTitle")
+        .append("span")
+        .html('<span class="glyphicon glyphicon-info-sign help-tooltip" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Legend</center></b></u></p><p>Displays legends for added map layers enabling their interpretation along with control over their transparency.</p>"</span>');
+ 
+      d3.select("#legendTitle")
+        .append("span")
+        .attr("class", "glyphicon glyphicon-remove pull-right minimize-button")
+        .property("title", "Click to hide Layers window")
+        .on("click", function() { toolWindowToggle("legend"); });
+
+      d3.select("#legendDiv")
+        .append("div")
+        .attr("id", "legendDefault")
+        .text("Add a map layer to view its legend...");
+
+      d3.select("#legendDiv")
+        .append("div")
+        .attr("id", "legendImgDiv")
+        .html('<span id="legendPrev" class="glyphicon glyphicon-menu-left pull-left" title="View previous legend" onclick="changeLegend(\'prev\')"></span><span id="legendNext" class="glyphicon glyphicon-menu-right pull-right" title="View next legend" onclick="changeLegend(\'next\')"></span>');
+
+
+
+
+
+      //******Change transparency of current legend layer
+      function layerOpacity(tmpSlider, tmpLayer) {
+        var tmpOpacity = tmpSlider.value/100; 
+        tmpSlider.title = "Opacity: " + tmpSlider.value + "%"; 
+        tmpLayer.setOpacity(tmpOpacity);
+      } 
+
+
+
+
+
+
+
+      //*****Make div for downloads
+      d3.select("body")
+        .append("div")
+        .attr("class", "legend gradDown")
+        .attr("id", "downloadDiv");
+
+      $('#downloadDiv').draggable({containment: "html", cancel: "input,label,textarea,button,select,option"});
+
+      d3.select("#downloadDiv")
+        .append("h4")
+        .text("Downloads")
+        .attr("class", "legTitle")
+        .attr("id", "downloadTitle")
+        .append("span")
+        .html('<span class="glyphicon glyphicon-info-sign help-tooltip" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Downloads</center></b></u></p><p>Download zip files containing GeoTIFFs for Abiotic and Species layers, and shapefiles for Area layers.</p>"></span>');
+ 
+      d3.select("#downloadTitle")
+        .append("span")
+        .attr("class", "glyphicon glyphicon-remove pull-right minimize-button")
+        .property("title", "Click to hide Downloads window")
+        .on("click", function() { toolWindowToggle("download"); });
+
+      d3.select("#downloadDiv")
+        .append("div")
+        .attr("id", "downloadOptions")
+        .append("div")
+        .style("height", "123px")
+        .html('<select id="downloadCat" class="downloadSelect"></select><select id="downloadSpecies" class="downloadSelect"></select><select id="downloadLayer" class="downloadSelect"></select>');
+
+      d3.select("#downloadOptions")
+        .append("div")
+        .attr("id", "downloadButton")
+        .attr("class", "cl_select disabled")
+        .style({"margin":"10px", "width":"calc(100% - 20px)", "padding":"0px"})
+        .property("title", "Click to download selected layer")
+        .html('<a id="dlLink" href="#"><span> Download Layer </span></a>');
+
+      var dlCat = ["Select category...", "Abiotic Layers", "Area Layers", "Combined Species Layers", "Individual Species Layers"];
+      d3.select("#downloadCat")
+        .property("title", "Select the category containing the layer you wish to download")
+        .on("mousedown", function() {  d3.select(this).select("option").style("display", "none"); })
+        .on("change", function() {  
+          d3.select(this).style("font-style", "normal");
+          if(d3.select("#downloadCat").property("selectedOptions")[0].value  == "Individual Species Layers") {
+            d3.select("#downloadSpecies").style("display", "inline-block");
+            d3.select("#downloadLayer").style("display", "none");
+             d3.select("#downloadButton").classed("disabled", true);
+          }
+          else {
+            d3.select("#downloadSpecies").style("display", "none");
+            dlLoadLayers(d3.select("#downloadCat").property("selectedOptions")[0].value);
+          }
+        })
+        .selectAll("options")
+        .data(dlCat)
+        .enter()
+          .append("option")
+          .attr("value", function(d,i) { return d; })
+          .property("disabled", function(d, i) { if(i == 0) {return "disabled";} }) 
+          .property("title", function(d) { return d; })
+          .text(function(d) { return d; });
+
+
+
+      d3.select("#downloadSpecies")
+        .property("title", "Select the species containing the layer you wish to download")
+        .style("display", "none")
+        .on("mousedown", function() {  d3.select(this).select("option").style("display", "none"); })
+        .on("change", function() {  d3.select(this).style("font-style", "normal"); dlLoadLayers("Individual Species Layers"); });
+
+      d3.select("#downloadSpecies").selectAll("option")
+        .data(layerNames.species.keys)
+        .enter()
+          .append("option")
+          .attr("value", function(d,i) { return d; })
+          .property("title", function(d,i) { return speciesTitles[i] + " (" + speciesNames[i] + ")"; })
+          .text(function(d,i) { return speciesTitles[i]; });
+
+        d3.select("#downloadSpecies")
+          .style("font-style", "")
+          .insert("option", ":first-child")
+          .property("disabled", true)
+          .text("Select species...");
+
+        d3.select("#downloadSpecies")
+          .property("selectedIndex", 0);
+
+
+        
+
+      d3.select("#downloadLayer")
+        .property("title", "Select the layer you wish to download")
+        .style("display", "none")
+        .on("mousedown", function() {  d3.select(this).select("option").style("display", "none"); })
+        .on("change", function() {  
+          d3.select(this).style("font-style", "normal"); 
+          d3.select("#downloadButton").classed("disabled", false);
+          d3.select("#dlLink").attr("href", function() { return set_dl_link(); });
+        })
+        .append("option")
+        .property("disabled", true)
+        .text("Select layer...");
+
+
+
+
+      //******Function to load layer names in download select
+      function dlLoadLayers(tmpCat) {
+        switch (tmpCat) {
+          case "Abiotic Layers":
+            var tmpData = layerNames.abiotics.keys;
+            var tmpVals = abioticID;
+            break;
+          case "Area Layers":
+            var tmpData = layerNames.areas.keys;
+            var tmpVals = areaID;
+            break;
+          case "Combined Species Layers":
+            var tmpData = layerNames.community.keys;
+            var tmpVals = commID;
+            break;
+          case "Individual Species Layers":
+            var tmpData = layerExtTitles;
+            var tmpVals = layerExt;
+            break;
+        }
+
+        d3.select("#downloadLayer").selectAll("option").remove()
+
+        d3.select("#downloadLayer")
+          .style("display", "inline-block")
+          .selectAll("option")
+          .data(tmpData)
+          .enter()
+            .append("option")
+            .attr("class", "dlOpt")
+            .attr("value", function(d,i) { return tmpVals[i]; })
+            .text(function(d,i) { return d; });
+
+        d3.select("#downloadLayer")
+          .style("font-style", "")
+          .insert("option", ":first-child")
+          .property("disabled", true)
+          .text("Select layer...");
+
+        d3.select("#downloadLayer")
+          .property("selectedIndex", 0);
+
+        d3.select("#downloadButton").classed("disabled", true);
+      }
+
+
+
+
+
+     //******Function to set download button href property
+     function set_dl_link() {
+       if(d3.select("#downloadCat").property("selectedOptions")[0].value == "Individual Species Layers") {
+         return "zips/" + d3.select("#downloadSpecies").property("selectedOptions")[0].value + d3.select("#downloadLayer").property("selectedOptions")[0].value + ".zip";
+       }
+       else {
+         return "zips/" + d3.select("#downloadLayer").property("selectedOptions")[0].value + ".zip";
+       }
+     }
+
+
+
+
+
+
+      //******Set z-indexes of moveable divs so that clicked one is always on top
+      d3.selectAll("#legendDiv,#polFilterDiv,#attributesDiv,#attrSelectDiv,#chartsDiv,#downloadDiv")
+        .on("mousedown", function() { setZ(this); });
+
+      function setZ(tmpWin) {
+        if (d3.select("#map").classed("introjs-showElement") == false) {
+          d3.selectAll("#legendDiv,#polFilterDiv,#attributesDiv,#attrSelectDiv,#chartsDiv,#downloadDiv").style("z-index", function() { if(d3.select(this).style("opacity") == 1) {return 1001;} else {return 7500;} }); 
+          d3.select(tmpWin).style("z-index", 1002);
+        }
+      }
+
+
+
+
+
+
+
+
+
+      //******Add collapse ability to left_panel
+      d3.select("#left_collapse")
+        .on("click", function() { toggleSelections(this.id); })
+        .property("title", "Click to hide panel");
+
+      //******Add collapse ability to right_panel
+      d3.select("#right_collapse")
+        .on("click", function() { toggleSelections(this.id); })
+        .property("title", "Click to hide panel");
+
+      //******Function to toggle left & right panels
+      function toggleSelections(tmpID) {
+        var tmpDir = tmpID.slice(0,tmpID.indexOf("_"));
+
+        if(tmpDir == "left") {
+          var oppDir = "right";
+        }
+        else {
+          var oppDir = "left";
+        }
+
+        if(d3.select("#" + tmpID + "_glyph").classed("glyphicon-triangle-" + tmpDir)) {
+          d3.select("#" + tmpID + "_glyph")
+            .classed("glyphicon-triangle-" + tmpDir, false)
+            .classed("glyphicon-triangle-" + oppDir, true);
+          d3.select("#" + tmpID).property("title", "Click to show panel");
+          if(tmpDir == "left") {
+            d3.select("#left_panel_container").transition().duration(500).ease("cubic-in-out").style({"width":"0px"});
+            d3.selectAll(".leaflet-left").transition().duration(500).ease("cubic-in-out").style({"margin-left":"20px"});
+            if(d3.select("#right_collapse_glyph").classed("glyphicon-triangle-right") == true) {
+              var tmpWidth = (Math.max(window.innerWidth, 1280) - 380) + "px";
+            }
+            else {
+              var tmpWidth = (Math.max(window.innerWidth, 1280) - 30) + "px";
+            }
+            d3.select("#container-results").transition().duration(500).ease("cubic-in-out").style({"left":"15px","width":tmpWidth});
+          }
+          else {
+            d3.select("#right_panel_container").transition().duration(500).ease("cubic-in-out").style({"width":"0px"});
+            d3.selectAll(".leaflet-right").transition().duration(500).ease("cubic-in-out").style({"margin-right":"20px"});
+            if(d3.select("#left_collapse_glyph").classed("glyphicon-triangle-left") == true) {
+              var tmpWidth = (Math.max(window.innerWidth, 1280) - 180) + "px";
+            }
+            else {
+              var tmpWidth = (Math.max(window.innerWidth, 1280) - 30) + "px";
+            }
+            d3.select("#container-results").transition().duration(500).ease("cubic-in-out").style({"width":tmpWidth});
+          }
+        }
+        else {
+          d3.select("#" + tmpID + "_glyph")
+            .classed("glyphicon-triangle-" + oppDir, false)
+            .classed("glyphicon-triangle-" + tmpDir, true);
+          d3.select("#" + tmpID).property("title", "Click to hide panel");
+          if(tmpDir == "left") {
+            d3.select("#left_panel_container").transition().duration(500).ease("cubic-in-out").style({"width":"150px"});
+            d3.selectAll(".leaflet-left").transition().duration(500).ease("cubic-in-out").style({"margin-left":"170px"});
+            if(d3.select("#right_collapse_glyph").classed("glyphicon-triangle-right") == true) {
+              var tmpWidth = (Math.max(window.innerWidth, 1280) - 530) + "px";
+            }
+            else {
+              var tmpWidth = (Math.max(window.innerWidth, 1280) - 180) + "px";
+            }
+            d3.select("#container-results").transition().duration(500).ease("cubic-in-out").style({"left":"165px","width":tmpWidth});
+          }
+          else {
+            d3.select("#right_panel_container").transition().duration(500).ease("cubic-in-out").style({"width":"350px"});
+            d3.selectAll(".leaflet-right").transition().duration(500).ease("cubic-in-out").style({"margin-right":"370px"});
+            if(d3.select("#left_collapse_glyph").classed("glyphicon-triangle-left") == true) {
+              var tmpWidth = (Math.max(window.innerWidth, 1280) - 530) + "px";
+            }
+            else {
+              var tmpWidth = (Math.max(window.innerWidth, 1280) - 380) + "px";
+            }
+            d3.select("#container-results").transition().duration(500).ease("cubic-in-out").style({"width":tmpWidth});
+          }
+        }
+        setTimeout(function() {
+          resizePanels();
+        }, 520);
+      }         
+
+
+
+
+
+      //******Take appropriate action when step is clicked
+      function stepAction(tmpEl) {
+      if(d3.select(tmpEl).classed("disabled") == false) {
+        d3.selectAll(".selDiv").classed("selected", false);
+        d3.select(tmpEl).classed("selected", true);
+        if(tmpEl.id != "selOut") {
+          d3.selectAll(".choice").style("display", "none");
+        }
+        switch (tmpEl.id) {
+          case "selArea":
+            d3.select("#areaChoice").style("display", "block");
+            break;
+          case "selSpp":
+            d3.select("#sppChoice").style("display", "block");
+            break;
+          case "selRes":
+            d3.select("#resChoice").style("display", "block");
+            break;
+        }
+        if(d3.select("#right_collapse_glyph").classed("glyphicon-triangle-left") == true) {
+          toggleSelections("right_collapse");
+        }
+      }
+      }
 
 
 
 
 
       //******Add area div
-      d3.select("#right_panel")
+      d3.select("#right_panel_container")
         .append("div")
         .attr("id", "areaChoice")
         .attr("class", "choice")
-        .html('<div style="background:rgb(189,68,65);"><b>Areas</b></div><select id="areaChoiceSel"></select><hr style="margin-top:5px;margin-bottom:5px;"><label><input id="areaAll" type="checkbox"></input><span> Select All </span><br></input><hr style="margin-top:5px;margin-bottom:5px;">');
-     
-      d3.select("#areaChoiceSel")
-        .on("change", function() {
-          addAreaNames(this.value);
-          areaLayers.forEach(function(data, i) { if(d3.select("#areaLayer-" + i).property("checked") == true) {layerToggle(false, data);} });
-          d3.selectAll(".areaLayers").property("checked",false);
-          d3.select("#areaLayer-" + this.value).property("checked", true);
-          layerToggle(true, areaLayers[this.value]);
-          checkAreas();
+        .style("display", "block")
+        .append("div")
+        .attr("id", "areaHeader")
+        .html('<div class="choiceHeader" style="background:rgb(189,68,65);">Areas</div>'); 
+
+      d3.select("#areaHeader")
+        .append("div")
+        .attr("id", "areaSelect")
+        .attr("class", "layerList")
+        .style("float", "none")
+        .append("div")
+        .attr("id", "areaList")
+        .attr("class", "cl_select")
+        .property("title", "Click to display list of area layers")
+        .html('<span id="areaListHeader">Select Area Layer</span><span class="glyphicon glyphicon-triangle-bottom pull-right" style="position:relative;top:3px;"></span>')
+        .on("click", function() { 
+          if(d3.select("#areaListDropdown").style("display") == "none") {
+            d3.select("#areaListDropdown").style("display", "inline-block");
+          }
+          else {
+            d3.select("#areaListDropdown").style("display", "none");
+          }
         });
 
+      d3.select("#areaHeader")
+        .append("p")
+        .attr("id", "areaSelectLabel");
 
-      d3.select("#areaAll")
-        .on("click", function() { checkAreas(); });
+      d3.select("#areaHeader")
+        .append("hr")
+        .style("margin", "5px 0px");
 
-      d3.select("#areaChoiceSel").selectAll("options")
-        .data(areaTitles)
+      d3.select("#areaSelect")
+        .append("div")
+        .attr("id", "areaListDropdown")
+        .attr("class", "layerListDropdown")
+        .style("display", "inline-block")
+        .on("mouseleave", function() { d3.select(this).style("display", "none") });
+
+      //******Add area options
+      d3.select("#areaListDropdown").selectAll("div")
+        .data(layerNames.areas.keys)
         .enter()
-          .append("option")
-          .attr("value", function (d,i) {return i;})
-          .text(function(d) {return d;});
+          .append("div")
+          .attr("class", "layerName")
+          .text(function(d) { return d; })
+          .property("value", function(d,i) { return i; })
+          .property("title", function(d) { return d; })
+          .on("click", function() { changeArea(this); })
+          .append("span")
+          .attr("class", "glyphicon glyphicon-ok pull-right activeArea")
+          .style("visibility", function(d) { if(d == "All Ecoregions") {return "visible";} else {return "hidden";} });
+
+      d3.select("#areaChoice")
+        .append("div")
+        .attr("id", "areaOptions");
+
 
       //******Add procedural steps action
-      d3.select("#selArea").on("click", function(){d3.selectAll(".choice").style("display", "none"); d3.select("#areaChoice").style("display", "block"); d3.selectAll(".container-menu").style("display", "none");});
+      d3.select("#selArea").on("click", function() { stepAction(this); });
 
-      //******Set initial choice to 'Ecoregions Combined'
-      d3.select("#areaChoiceSel").property("selectedIndex", function() {return 1;});
+      //******Function to add/remove area layer
+      function changeArea(tmpDiv) {
+        if(d3.select(tmpDiv).select("span").style("visibility") == "visible") {
+          d3.select(tmpDiv).select("span").style("visibility", "hidden")
+          d3.select("#areaSelectLabel").text("");
+          map.removeLayer(layerNames.areas.values[tmpDiv.value]);
+          var allLabels = d3.selectAll(".remLabel")
+          allLabels.remove();
+        }
+        else {
+          //***Remove old layer
+          d3.select("#areaListDropdown").selectAll("div")[0].forEach(function(tmpLayer) {
+            if(d3.select(tmpLayer).select("span").style("visibility") == "visible") {
+              d3.select(tmpLayer).select("span").style("visibility", "hidden");
+              map.removeLayer(layerNames.areas.values[d3.select(tmpLayer).property("value")]);
+            }
+          });
+
+          //***Add new layer
+          d3.select("#areaList").attr("value", layerNames.areas.keys[tmpDiv.value]);
+          d3.select(tmpDiv).select("span").style("visibility", "visible");
+          d3.select("#areaSelectLabel").text(layerNames.areas.keys[tmpDiv.value]);
+          map.addLayer(layerNames.areas.values[tmpDiv.value]);
+          addAreaNames(tmpDiv.value);
+          get_spp();
+        }
+      }
+
 
       //******Populate area field with choices
       function addAreaNames(i) {
-        var allLabels = d3.selectAll(".remLabel")
+        var allLabels = d3.selectAll(".remLabel,.fs_wild_key")
         allLabels.remove();
         topos[areaID[i]].names.forEach(function(d,j) {
-          d3.select("#areaChoice")
+          d3.select("#areaOptions")
             .append("label")
             .attr("class", "remLabel")
-            .html('<input id="area-' + j + '" class="remCheck" type="checkbox" value="' + d + '" onclick="colorFeat(this)"></input><span> ' + d + ' </span><br>');
+            .property("title", d)
+            .on("mouseenter", function() {
+              var tmpBi = 0;
+              var tmpLabel = this;
+              d3.selectAll("." + areaID[i])[0].some(function(d) {
+                if(d.id == tmpLabel.title) {
+                  if(d3.select(tmpLabel).select("input").property("checked") == false) {
+                    d3.select(d).style({"fill-opacity":"0.3", "Stroke-opacity":"0.99", "stroke":"aqua"});
+                  }
+                  else {
+                    d3.select(d).style({"stroke":"aqua"});
+                  }
+                  tmpBi = 1;
+                }
+                return tmpBi == 1;
+              });
+            })
+            .on("mouseleave", function() {
+              var tmpBi = 0;
+              var tmpLabel = this;
+              d3.selectAll("." + areaID[i])[0].some(function(d) {
+                if(d.id == tmpLabel.title) {
+                  if(d3.select(tmpLabel).select("input").property("checked") == false) {
+                    d3.select(d).style({"fill-opacity":"", "Stroke-opacity":"", "stroke":function() { if(d3.select("#areaList").attr("value").includes("Ecoregion")) { return topos[areaID[areaTitles.indexOf(d3.select("#areaList").attr("value"))]].color[d.id.replace(/ /g, "_")] } else { return ""; } } });
+                  }
+                  else {
+                    d3.select(d).style({"stroke":function() { if(d3.select("#areaList").attr("value").includes("Ecoregion")) { return topos[areaID[areaTitles.indexOf(d3.select("#areaList").attr("value"))]].color[d.id.replace(/ /g, "_")] } else { return ""; } } });
+                  }
+                  tmpBi = 1;
+                }
+                return tmpBi == 1;
+              });
+            })
+            .on("dblclick", function() { 
+              var tmpBi = 0;
+              var tmpLabel = this;
+              d3.selectAll("." + areaID[i])[0].some(function(d) {
+                if(d.id == tmpLabel.title) {
+                  var bbox = d3.select(d).node().getBBox();
+                  var UL = map.containerPointToLatLng([bbox.x, bbox.y]);
+                  var LR = map.containerPointToLatLng([(bbox.x + bbox.width), (bbox.y + bbox.height)]);
+                  map.fitBounds([[UL.lat, UL.lng],[LR.lat, LR.lng]]);
+                  tmpBi = 1;
+                }
+                return tmpBi == 1;
+              });
+            })
+            .on("click", function() {
+              colorFeat(d3.select(this).select("input")[0][0], i);
+            })
+            .html('<input id="area-' + j + '" class="remCheck" type="checkbox" value="' + d + '" onchange="get_spp()"></input><span value="' + d + '"> ' + d + ' </span><br>');
         });
-        checkAreas();  
+
+        d3.selectAll(".remLabel")
+          .classed("fsWildClass1",  function() { return (areaID[i] == "fs_wild" && layerNames.areas.fs_wild_class1.indexOf(d3.select(this).property("title")) > -1) })
+          .select("span")
+            .text(function() { if(areaID[i] == "fs_wild" && layerNames.areas.fs_wild_class1.indexOf(d3.select(this).attr("value")) > -1) {return d3.select(this).text() + "*";} else {return d3.select(this).text();} });
+
+        d3.select("#areaOptions")
+          .append("label")
+          .attr("id", "areaAllLabel")
+          .attr("class", "remLabel")
+          .style("margin-top", "10px")
+          .property("title", "Select all options")
+          .on("click", function() { checkAreas(i); get_spp(); })
+          .html('<input id="areaAll" type="checkbox"></input><span> Select All </span>');
+
+        if(areaID[i] == "fs_wild") {
+          d3.select("#areaOptions")
+            .append("div")
+            .attr("class", "fs_wild_key")
+            .html('<p style="color:yellow;margin-top:10px;margin-bottom:0px;text-align:right;">Class 1 Area*</p><p style="margin-bottom:0px;text-align:right;">Class 2 Area</p>');
+        }
+
+        checkAreas(i);  
       }
 
+
+      //******Get name values of selected areas and query database for species with positive exceedance values
+      function get_spp() {
+        //***Remove existing labels
+        d3.select("#sppChoice").selectAll("label").remove();
+
+        var tmpVals = [];
+        d3.selectAll(".remCheck")[0].forEach(function(d) { if(d.checked) { tmpVals.push(d.value); } });
+        if(tmpVals.length > 0) {
+          d3.select("#selSpp").classed("disabled", false).property("title", "Select species");
+          socket.emit('get_spp', tmpVals);
+        }
+        else {
+          d3.select("#selSpp").classed("disabled", true).classed("selected", false).property("title", "Complete previous step to enable");
+          d3.select("#container-results").style("display", "none");
+        }
+        checkOutput();
+      }
+
+
       //******Adjust fill opacity for selected features
-      function colorFeat(tmpObj) {
-        topos[areaID[d3.select("#areaChoiceSel").property("value")]].g.selectAll("." + areaID[d3.select("#areaChoiceSel").property("value")])[0].forEach(function(feat) {
+      function colorFeat(tmpObj, i) {
+        topos[areaID[i]].g.selectAll("." + areaID[i])[0].forEach(function(feat) {
           if(feat.id == tmpObj.value) {
             if(tmpObj.checked == true) {
-              d3.select(feat).style({"fill-opacity": "0.9", "stroke-opacity": "1"});
+              d3.select(feat).style({"fill-opacity": "0.5", "stroke-opacity": "1"});
             }
             else {
               d3.select(feat).style({"fill-opacity": "", "stroke-opacity": ""});
@@ -386,16 +1535,23 @@
         });
       }
 
+
       //******Evaluate 'Select All' areas state
-      function checkAreas() {
+      function checkAreas(i) {
         if(d3.select("#areaAll").property("checked") == true) {
           d3.selectAll(".remCheck").property("checked", true);
+          d3.select("#areaAllLabel").property("title", "Deselect all options")
+            .select("span")
+              .text("Deselect All");
         } 
         else { 
           d3.selectAll(".remCheck").property("checked", false);
+          d3.select("#areaAllLabel").property("title", "Select all options")
+            .select("span")
+              .text("Select All");
         }
 
-        d3.selectAll(".remCheck")[0].forEach(function(tmpObj) {colorFeat(tmpObj);});
+        d3.selectAll(".remCheck")[0].forEach(function(tmpObj) { colorFeat(tmpObj, i); });
       }
 
 
@@ -405,24 +1561,16 @@
 
 
       //******Add species div
-      d3.select("#right_panel")
+      d3.select("#right_panel_container")
         .append("div")
         .attr("id", "sppChoice")
         .attr("class", "choice")
-        .html('<div style="background:rgb(118,147,60);"><b>Species</b></div><ul id="ulSpp" class="nav nav-pills"><li id="comSpp" class="active"><a href="#">Common Names</a></li><li id="sciSpp"><a href="#">Scientific Names</a></li></ul><hr style="margin-top:5px;margin-bottom:5px;"><label><input id="sppAll" type="checkbox"></input><span> Select All </span><br></input><hr style="margin-top:5px;margin-bottom:5px;"></label>');
-
-        d3.select("#sppAll")
-          .on("click", function() { checkSpp(); });
+        .append("div")
+        .attr("id", "sppHeader")
+        .html('<div class="choiceHeader" style="background:rgb(118,147,60);">Individual Species</div><ul id="ulSpp" class="nav nav-pills"><li id="comSpp" class="active"><a href="#">Common Names</a></li><li id="sciSpp"><a href="#">Scientific Names</a></li></ul><hr style="margin-top:5px;margin-bottom:5px;">');  //<label><input id="sppAll" type="checkbox"></input><span> Select All </span><br></input><hr style="margin-top:5px;margin-bottom:5px;"></label>');
 
       //******Add procedural steps action
-      d3.select("#selSpp").on("click", function(){d3.selectAll(".choice").style("display", "none"); d3.select("#sppChoice").style("display", "block"); d3.selectAll(".container-menu").style("display", "none");});
-
-      //******Add species names
-      speciesTitles.forEach(function(spp, i) {
-        d3.select("#sppChoice")
-          .append("label")
-          .html('<input id="spp-' + i + '" class="sppCheck" type="checkbox" onclick="addSppRange(this)" value="' + i + '"></input><span class="sppSpan"> ' + spp + ' </span><br>');
-      });
+      d3.select("#selSpp").on("click", function() { stepAction(this); });
 
       //******Add pill functionality
       d3.select("#comSpp")
@@ -431,7 +1579,7 @@
           d3.select(this).classed("active", true);
           addSpp(speciesTitles, "normal");
         });
-        
+
       d3.select("#sciSpp")
         .on("click", function() {
           d3.select("#ulSpp").selectAll("li").classed("active", false);
@@ -439,11 +1587,110 @@
           addSpp(speciesNames, "italic");
         });
 
+      d3.select("#sppChoice")
+        .append("div")
+        .attr("id", "sppOptions");
+
+
+      //******Add species names
+      function addSpeciesNames(ExcArr, NoExcArr) {
+        //***Add exceedance species first
+        if(ExcArr.length > 0) {
+          d3.select("#sppOptions")
+            .append("label")
+            .attr("class", "sppCheck")
+            .text("Species with Exceedance of Minimum CL")
+            .style({"text-decoration":"underline","font-size":"15px","color":"lightcoral"});
+
+          speciesNames.forEach(function(spp, i) {
+            if(ExcArr.indexOf(spp) > -1) {
+              d3.select("#sppOptions")
+                .append("label")
+                .property("title", speciesTitles[i] + " (" + speciesNames[i] + ")")
+                .html('<input id="spp-' + i + '" class="sppCheck excYes" type="checkbox" onclick="checkOutput()" value="' + i + '"></input><span class="sppSpan" value="' + i + '"> ' + speciesTitles[i] + ' </span><br>');
+            }
+          });
+
+          d3.select("#sppOptions")
+            .append("label")
+            .attr("id", "sppExcAllLabel")
+            .style("margin-top", "10px")
+            .property("title", "Select all species with exceedance")
+            .on("click", function() { checkSppAll("Yes"); checkOutput(); })
+            .html('<input id="sppExcAll" type="checkbox"></input><span>Select All</span>');
+        }
+
+        //***Add No exceedance species second
+        if(NoExcArr.length > 0) {
+          d3.select("#sppOptions")
+            .append("label")
+            .attr("class", "sppCheck")
+            .text("Species without Exceedance of Minimum CL")
+            .style({"text-decoration":"underline","font-size":"15px","color":"lightgreen","margin-top":function() {if(ExcArr.lenght == 0) {return "";} else {return "10px";} } });
+
+          speciesNames.forEach(function(spp, i) {
+            if(NoExcArr.indexOf(spp) > -1) {
+              d3.select("#sppOptions")
+                .append("label")
+                .property("title", speciesTitles[i] + " (" + speciesNames[i] + ")")
+                .html('<input id="spp-' + i + '" class="sppCheck excNo" type="checkbox" onclick="checkOutput()" value="' + i + '"></input><span class="sppSpan" value="' + i + '"> ' + speciesTitles[i] + ' </span><br>');
+            }
+          });
+
+          d3.select("#sppOptions")
+            .append("label")
+            .attr("id", "sppNoExcAllLabel")
+            .style("margin-top", "10px")
+            .property("title", "Select all species without exceedance")
+            .on("click", function() { checkSppAll("No"); checkOutput(); })
+            .html('<input id="sppNoExcAll" type="checkbox"></input><span>Select All</span>');
+
+        }
+      }
+
+      function checkSppAll(type) {
+        if(type == "Yes") {
+          if(d3.select("#sppExcAll").property("checked") == true) {
+            d3.selectAll(".excYes").property("checked", true);
+            d3.select("#sppExcAllLabel")
+              .property("title", "Deselect all species with exceedance")
+              .select("span")
+                .text("Deselect All");
+          }
+          else {
+            d3.selectAll(".excYes").property("checked", false);
+            d3.select("#sppExcAllLabel")
+              .property("title", "Select all species with exceedance")
+              .select("span")
+                .text("Select All");
+          }
+        }
+        else if(type == "No") {
+          if(d3.select("#sppNoExcAll").property("checked") == true) {
+            d3.selectAll(".excNo").property("checked", true);
+            d3.select("#sppNoExcAllLabel")
+              .property("title", "Deselect all species without exceedance")
+              .select("span")
+                .text("Deselect All");
+          }
+          else {
+            d3.selectAll(".excNo").property("checked", false);
+            d3.select("#sppNoExcAllLabel")
+              .property("title", "Select all species without exceedance")
+              .select("span")
+                .text("Select All");
+          }
+        }
+      }
+          
+        
       //******Swap species names between common and scientific
       function addSpp(sppArray, tmpStyle) {
         var tmpSpp = d3.selectAll(".sppSpan")
-          .data(sppArray);
-        tmpSpp.text(function(spp) {return " " + spp + " ";});
+          //.data(sppArray);
+        tmpSpp[0].forEach(function(spp) {
+          d3.select(spp).text(function() { return " " + sppArray[d3.select(spp).attr("value")] + " "; });
+        });
         tmpSpp.style("font-style", tmpStyle);
       }
 
@@ -455,7 +1702,7 @@
         else { 
           d3.selectAll(".sppCheck").property("checked", false);
         }
-        d3.selectAll(".sppCheck")[0].forEach(function(tmpObj) {addSppRange(tmpObj);});
+        //d3.selectAll(".sppCheck")[0].forEach(function(tmpObj) {addSppRange(tmpObj);});
       }
 
       //******Add species range when species is selected
@@ -473,73 +1720,206 @@
 
 
 
+      //******Function to enable/disable 'select output' button
+      function checkOutput() {
+        var tmpBi = 0;
+        d3.selectAll(".sppCheck")[0].forEach(function(tmpCheck) {
+          if(d3.select(tmpCheck).property("checked") == true) {
+            tmpBi = 1;
+          }
+        });
+
+        if(tmpBi == 0) {
+          d3.selectAll("#selOut,#selRes").classed("disabled", true).classed("selected", false).property("title", "Complete previous step to enable");
+          d3.select("#selOut").attr("data-toggle", "");
+          if(d3.select("#resChoice").style("display") == "block") {
+            d3.select("#resChoice").style("display", "none");
+            d3.select("#areaChoice").style("display", "block");
+          }
+        }
+        else {
+          d3.select("#selOut").classed("disabled", false).property("title", "Select output").attr("data-toggle", "modal");
+          d3.select("#selRes").classed("disabled", true).classed("selected", false).property("title", "Complete previous step to enable");
+          if(d3.select("#resChoice").style("display") == "block") {
+            d3.select("#resChoice").style("display", "none");
+            d3.select("#areaChoice").style("display", "block");
+          }
+        }
+        d3.select("#container-results").style("display", "none");
+      }
 
 
 
-      //******Add output div
-      d3.select("#right_panel")
+
+
+
+
+      //******Add output modal div
+      //***Output choice (Basic, Tailored, Comprehensive)
+      d3.select("body")
+        .append("div")
+        .attr("class", "modal fade ui-draggable in")
+        .attr("id", "outputDiv")
+        .style("display", "none")
+        .append("div")
+        .attr("class", "modal-dialog modal-lg")
+        .attr("id", "outputOptions")
+
+      d3.select("#outputOptions")
         .append("div")
         .attr("id", "outChoice")
-        .attr("class", "choice")
-        .html('<div id="outDiv" style="background:rgb(54,96,146);"><b>Output</b></div><ul id="ulOut" class="nav nav-pills"><li id="comOut" class="active"><a href="#">Community</a></li><li id="indOut"><a href="#">Individuals</a></li></ul><hr style="margin-top:5px;margin-bottom:5px;"><div id="comOutDiv" class="output"></div><div id="indOutDiv" class="output"></div>');
+        .attr("class", "outChoice")
+        .html('<div id="outDiv" class="choiceHeader outputHeader">Select Output Type</div>'); //<ul id="ulOut" class="nav nav-pills"><li id="comOut" class="active"><a href="#">Combined Species</a></li><li id="indOut"><a href="#">Individual Species</a></li></ul><hr style="margin-top:5px;margin-bottom:5px;"><div id="comOutDiv" class="output"></div><div id="indOutDiv" class="output"></div>');
 
-      //******Add pill functionality
-      d3.select("#comOut")
-        .on("click", function() {
-          d3.select("#ulOut").selectAll("li").classed("active", false);
-          d3.select(this).classed("active", true);
-          d3.select("#indOutDiv").style("display","none");
-          d3.select("#comOutDiv").style("display","block");
-        });
-
-      d3.select("#indOut")
-        .on("click", function() {
-          d3.select("#ulOut").selectAll("li").classed("active", false);
-          d3.select(this).classed("active", true);
-          d3.select("#comOutDiv").style("display","none");
-          d3.select("#indOutDiv").style("display","block");
-        });
+      d3.select("#outDiv")
+        .append("span")
+        .attr("class", "glyphicon glyphicon-remove pull-right minimize-button outDivSpan")
+        .attr("data-toggle", "modal")
+        .attr("data-target", "#outputDiv")
+        .property("title", "Close Output Selections");
 
       //******Add procedural steps action
-      d3.select("#selOut").on("click", function(){d3.selectAll(".choice").style("display", "none"); d3.select("#outChoice").style("display", "block"); d3.selectAll(".container-menu").style("display", "none");});
+      d3.select("#selOut").on("click", function() { stepAction(this); });
 
-      //******Add in community output options
-      d3.select("#comOutDiv")
-        .html('<label><input id="comOutBasic" type="radio" name="comOutRadio" value="basic" checked></input><span class="outLabel"> Basic Output </span></label><p><i>This provides output map and summary tables based on the most protective critical load for the most sensitive species <b>(A)</b>.</i></p><label><input id="comOutFull" type="radio" name="comOutRadio" value="full"></input><span class="outLabel"> Full Output </span></label><p><i>This provides output map and summary tables based on <b>ALL</b> critical load values <b>(A-D)</b>.</i></p>')
-        .style("display", "block");
-
-      //******Add in community CL image and descriptions
-      d3.select("#comOutDiv")
-        .append("img")
-        .property("src", "images/comCL.jpg")
-        .style({"width":"85%", "border":"1px solid black"});
-      d3.select("#comOutDiv")
-        .append("p")
-        .style({"margin-left":"10px", "margin-right":"10px"})
-        .html('<i><b>A:</b> Most protective CL for most sensitive species<br><b>B</b> Most protective CL for least sensitive species<br><b>C</b> CL at which all species are severely at risk<br><b>D:</b> CL at which at least one species is severely at risk</i>');
-
-
-      //******Add in individual output options
-      d3.select("#indOutDiv")
-        .style("height", "458px")
-        .html('<label><input id="indOutBasic" type="radio" name="indOutRadio" value="basic" checked></input><span class="outLabel"> Basic Output </span></label><p><i>This provides output map and summary tables based on the most protective critical load for each species selected <b>(Min CL)</b>.</i></p><label><input id="indOutFull" type="radio" name="indOutRadio" value="full"></input><span class="outLabel"> Full Output </span></label><p><i>This provides output map and summary tables based on both critical load values <b>(Min CL and Max CL)</b>.</i></p>');
-
-      //******Add in community CL image and descriptions
-      d3.select("#indOutDiv")
-        .append("img")
-        .property("src", "images/indCL.jpg")
-        .style({"width":"85%", "border":"1px solid black"});
-      /*d3.select("#indOutDiv")
-        .append("p")
-        .style({"margin-left":"10px", "margin-right":"10px"})
-        .html('<i><b>A:</b> Most protective CL for most sensitive species<br><b>B</b> Most protective CL for least sensitive species<br><b>C</b> CL at which all species are severely at risk<br><b>D:</b> CL at which at least one species is severely at risk</i>');
-      */
-
-      //******Add generate results button
+      //******Add in output options
       d3.select("#outChoice")
         .append("div")
-        .style({"margin":"20px", "background":"rgb(255,192,0)", "color":"white", "border-radius":"5px", "font-weight":"bold", "cursor":"pointer"})
-        .text("Generate Results");
+        .attr("id", "outRadioDiv")
+        .style({"text-align":"left"})
+        .html('<label><input id="outBasic" type="radio" name="outRadio" value="basic" checked></input><span class="outLabel"> Basic Output </span></label><p><i>Simple output maps, summary figures, and tables (most protective critical load: most sensitive of all species present)</i></p><label><input id="outTail" type="radio" name="outRadio" value="tail"></input><span class="outLabel"> Tailored Output </span></label><p><i>Select from a checklist of questions to determine which output materials exactly suit your needs</i></p><label><input id="outComp" type="radio" name="outRadio" value="comp"></input><span class="outLabel"> Comprehensive Output </span></label><p><i>All relevant figures, tables, and maps</i></p>')
+        .style("display", "block");
+
+      //******Add button to advance to next screen
+      d3.select("#outChoice")
+        .append("div")
+        .attr("id","outOptButton")
+        .attr("class", "outButton")
+        .text("Continue with Selected Output Type")
+        .on("click", function() { 
+          d3.select("#outputOptions").style("display", "none");
+          if(document.querySelector('input[name=outRadio]:checked').value == "tail") {
+            d3.select("#areaScreen").text(d3.select("#areaList").attr("value"));
+            d3.select("#outputTailor").style("display", "block");
+          }
+          else {
+            d3.select("#outputPreview").style("display", "block");
+          }
+        });
+
+
+
+
+      //***Output Tailor
+      d3.select("#outputDiv")
+        .append("div")
+        .attr("class", "modal-dialog modal-lg")
+        .attr("id", "outputTailor")
+        .append("div")
+        .attr("id", "outTailorChoice")
+        .attr("class", "outChoice")
+        .html('<div id="outDivTailor" class="choiceHeader outputHeader">Tailored Output Screening Questions</div>');
+
+      d3.select("#outDivTailor")
+        .append("span")
+        .attr("class", "glyphicon glyphicon-remove pull-right minimize-button outDivSpan")
+        .attr("data-toggle", "modal")
+        .attr("data-target", "#outputDiv")
+        .property("title", "Close Output Window");
+
+      //******Add button to proceed to next window
+      d3.select("#outTailorChoice")
+        .append("div")
+        .style("background", "white")
+        .attr("id", "outTailorScreen")
+        .html('<p>1. Would you like to see only the most protective CL or CLs for a range of levels of protection?<span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></p>'
+          + '<label><input type="radio" id="outScreen1A" class="outCheck" name="outScreen1"><span>Most Protective CL</span></label><label><input type="radio" id="outScreen1B" class="outCheck" name="outScreen1"><span>Range of CLs</span></label>'
+          + '<p>2. Would you like to see outputs for individual species, all species combined, or both?</label><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></p>'
+          + '<label><input type="radio" id="outScreen2A" class="outCheck" name="outScreen2"><span>Individual Species Outputs</span></label><label><input type="radio" id="outScreen2B" class="outCheck" name="outScreen2"><span>Combined Species Outputs</span></label><label><input type="radio" id="outScreen3B" class="outCheck" name="outScreen2"><span>Both</span></label>'
+          + '<p>3. Would you like to compare your site to other <span id="areaScreen"></span>?<span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></p>'
+          + '<label><input type="radio" id="outScreen3A" class="outCheck" name="outScreen3"><span>Yes</span></label><label><input type="radio" id="outScreen3B" class="outCheck" name="outScreen3"><span>No</span></label>'
+          + '<p>4. What are your preferred units for area?<span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></p>'
+          + '<label><input type="radio" id="outScreen4A" value="acres" class="outCheck" name="outScreen4"><span>Acres</span></label><label><input type="radio" id="outScreen4B" value="hectares" class="outCheck" name="outScreen4"><span>Hectares</span></label>'
+        );
+
+      //******Add button to proceed to next window
+      d3.select("#outTailorChoice")
+        .append("div")
+        .attr("class", "outButton")
+        .text("Continue to Select Outputs")
+        .on("click", function() { 
+          d3.select("#outputTailor").style("display", "none");
+          d3.select("#outputPreview").style("display", "block");
+        });
+
+
+
+
+
+
+      //***Output Preview
+      d3.select("#outputDiv")
+        .append("div")
+        .attr("class", "modal-dialog modal-lg")
+        .attr("id", "outputPreview")
+        .append("div")
+        .attr("id", "outPreviewChoice")
+        .attr("class", "outChoice")
+        .html('<div id="outDivPreview" class="choiceHeader outputHeader">Preview Selected Output</div>');
+
+      d3.select("#outDivPreview")
+        .append("span")
+        .attr("class", "glyphicon glyphicon-remove pull-right minimize-button outDivSpan")
+        .attr("data-toggle", "modal")
+        .attr("data-target", "#outputDiv")
+        .property("title", "Close Output Selections");
+
+      //******Add button to generate results
+      d3.select("#outPreviewChoice")
+        .append("div")
+        .attr("class", "outButton")
+        .text("Generate Results")
+        .on("click", function() { 
+          get_output();
+          d3.select("#waitingDiv").style("display", "block");
+          d3.select("#container-results").style("display", "none");
+          d3.select("#selRes").classed("disabled", false).property("title", "View results");
+          d3.selectAll(".selDiv").classed("selected", false);
+          d3.select("#selRes").classed("selected", true);
+        });
+
+      d3.select("#outPreviewChoice")
+        .append("div")
+        .attr("id", "waitingDiv")
+        .html('<img src="images/animated-gears.gif"></img><h3>Processing</h3>');
+
+
+
+
+
+
+      function get_output() {
+        var tmpAreas = [];
+        d3.selectAll(".remCheck")[0].forEach(function(d) { if(d.checked) { tmpAreas.push(d.value); } });
+
+        var tmpSpp = [];
+        d3.selectAll(".sppCheck")[0].forEach(function(d) { if(d.checked) { tmpSpp.push(speciesNames[d.value]); } });
+
+        switch(document.querySelector('input[name=outRadio]:checked').value) {
+          case "basic":
+            var tmpVals = {"type":"basic", "area": d3.select("#areaList").attr("value"), "areas": tmpAreas}; //, "species": tmpSpp};
+            socket.emit('get_output', tmpVals);
+            break;
+          case "tail":
+            var tmpVals = {"type":"comp", "area": d3.select("#areaList").attr("value"), "areas": tmpAreas}; //, "species": tmpSpp};
+            socket.emit('get_output', tmpVals);
+            break;
+          case "comp":
+            var tmpVals = {"type":"comp", "area": d3.select("#areaList").attr("value"), "areas": tmpAreas}; //, "species": tmpSpp};
+            socket.emit('get_output', tmpVals);
+            break;
+        }
+      }
+
 
 
 
@@ -547,12 +1927,20 @@
 
 
       //******Add results div
-      d3.select("#right_panel")
+      d3.select("#right_panel_container")
         .append("div")
         .attr("id", "resChoice")
         .attr("class", "choice")
-        .html('<div id="resDiv" style="background:rgb(255,192,0);"><b>Results</b></div><ul id="ulRes" class="nav nav-pills"><li id="resFigs" class="active"><a href="#">Graphs</a></li><li id="resTabs"><a href="#">Tables</a></li></ul><hr style="margin-top:5px;margin-bottom:5px;"><div id="resFigsDiv" class="results"></div><div id="resTabsDiv" class="results"></div>');
+        .style("display", "block")
+        .append("div")
+        .attr("id", "resHeader")
+        .html('<div class="choiceHeader" style="background:rgb(255,192,0);">Results</div><ul id="ulRes" class="nav nav-pills"><li id="resFigs" class="active"><a href="#">Graphs</a></li><li id="resTabs"><a href="#">Tables</a></li><li id="resMaps"><a href="#">Maps</a></li></ul><hr style="margin-top:5px;margin-bottom:5px;">'); //<div id="resFigsDiv" class="results"></div><div id="resTabsDiv" class="results"></div>');
 
+      d3.select("#resChoice")
+        .append("div")
+        .attr("id", "resOptions")
+        .html('<div id="resFigsDiv" class="results"></div><div id="resTabsDiv" class="results"></div>');
+      
       //******Add pill functionality
       d3.select("#resFigs")
         .on("click", function() {
@@ -568,22 +1956,45 @@
           d3.select(this).classed("active", true);
           d3.select("#resFigsDiv").style("display", "none");
           d3.select("#resTabsDiv").style("display", "block");
+          setTimeout(function() {
+            d3.select("#resTabsDiv").selectAll("canvas")[0].forEach(function(tmpCan) {
+              chartCanvas[tmpCan.id + "Small"].update();
+              var tmpPrint = chartCanvas[tmpCan.id + "Small"];
+              var tmpRect = document.getElementById(tmpCan.id).getBoundingClientRect();
+              addInfo(tmpPrint, chartOpts[tmpCan.id].small.cl[0], tmpRect, "small", 1);
+            });
+          }, 300);
         });
 
+      d3.select("#resMaps")
+        .on("click", function() {
+          d3.select("#ulRes").selectAll("li").classed("active", false);
+          d3.select(this).classed("active", true);
+          d3.select("#speciesListDropdown").style("display", "inline-block");
+          d3.select("#container-results").style("display", "none");
+          if(d3.select("#left_collapse_glyph").classed("glyphicon-triangle-left")) {
+            toggleSelections("left_collapse");
+          }
+
+        });
+
+
       //******Add procedural steps action
-      d3.select("#selRes").on("click", function(){d3.selectAll(".choice").style("display", "none"); d3.select("#resChoice").style("display", "block");});
+      d3.select("#selRes").on("click", function() { stepAction(this); });
 
       //******Temporary way to add graphs and tables
-      var figs = ["Slide1", "Slide2", "Slide3", "Slide4", "Slide1_new", "Slide2_new", "Slide3_new", "Slide5", "Slide4_new", "Slide5_new", "Slide6_new", "Slide7_new", "Slide8_new", "Slide9_new", "Slide10_new", "Slide11_new"]
+/*
+      var figs = ["Slide1", "Slide2", "Slide3", "Slide4", "Slide1_new", "Slide2_new", "Slide3_new", "Slide5", "Slide4_new", "Slide5_new", "Slide6_new", "Slide7_new", "Slide8_new", "Slide9_new", "Slide10_new", "Slide11_new", "Slide1_newest", "Slide2_newest", "Slide3_newest", "Slide4_newest", "Slide5_newest", "Slide6_newest", "Slide7_newest", "Slide8_newest"]
       figs.forEach(function(fig) {
         d3.select("#resFigsDiv")
           .append("img")
           .property("src", "images/" + fig + ".JPG")
           .on("click", function() {addFigure(this.src);});
       });
+*/
 
       d3.select("#resFigsDiv").style("display", "block");
-
+/*
       //******Temporary way to add graphs and tables
       var tabs = ["table1_new", "table3_new", "table5_new", "table7_new", "table9_new", "table11_new", "table14_new", "table16_new", "table18_new", "table19_new", "table22_new", "table33_new", "table34_new", "table36_new", "table38_new"]
       tabs.forEach(function(tab) {
@@ -592,6 +2003,7 @@
           .property("src", "images/" + tab + ".jpg")
           .on("click", function() {addFigure(this.src);});
       });
+*/
 
       function addFigure(src) {
         d3.select("#resImg").property("src", src);
@@ -614,32 +2026,33 @@
       //L.control.graph().addTo(map);
 
       //******Add Download tool - use temporarily as graph display
-      var downLoadFile = new L.Control.downLoadFile();
-      map.addControl(downLoadFile);
-      completeGraph();
+      //var downLoadFile = new L.Control.downLoadFile();
+      //map.addControl(downLoadFile);
+      //completeGraph();
 
-      //******Add Print tool
-      var printMap = new L.Control.print();
-      map.addControl(printMap);
+      //******Add Print/download tool
+      //var printMap = new L.Control.print();
+      //map.addControl(printMap);
+      d3.select("#toolbar") //("#mainMenu").select(".container-fluid")
+        .append("div")
+        .attr("class", "pull-right")
+        .attr("id", "printDownload")
+        .html('<span id="legendControl" class="glyphicon glyphicon-screenshot" title="View legend window" onclick="toolWindowToggle(&quot;legend&quot;)"></span><span id="downloadControl" class="glyphicon glyphicon-download-alt" title="Download spatial data" onclick="toolWindowToggle(&quot;download&quot;)"></span><span id="printControl" class="glyphicon glyphicon-print" title="Print current map" onclick="window.print()"></span>');
+
 
 
       //******Make tooltip for displaying attribute data
       var tooltip = d3.select("body")
         .append("div")
+        .attr("id", "d3Tooltip")
         .attr("class", "d3Tooltip");
-
 
       //******Make header div
       d3.select("body")
         .append("div")
         .attr("class", "header")
-        .style({"padding":"7px", "height":"100px", "background-image":"url('images/tree_banner.jpg')", "background-size":"cover", "bottom-border":"2px solid black"})
-        .html('<img src="images/forest-service_red.png" style="margin-right:15px; float:left;"><h2 style="margin:0px; margin-top:15px; font-size:38px;"><b>N-CLAS:</b> Nitrogen Critical Loads Assessment by Site<br><h4 style="margin:0px"><i>High resolution, spatially explicit critical load and exceedance mapping to inform sustainable forest management</i></h4></h2>');
-        //.append("H2")
-        //.text("N-CLAS: Nitrogen Critical Loads Assessment by Site");
-        //.style("height", "50px")
-        //.html('<span class="brand">N-CLAS Interactive Web Tool</span> <div class="pull-right"><a title="Click to display information on how to use this tool" href="#" data-toggle="modal" data-target="#helpDiv">About N-CLAS</a> | <a title="Click to go to the Ecosheds homepage" href="http://ecosheds.org">SHEDS Home</a>');
-
+        .style({"padding":"5px 10px", "height":"75px", "background-image":"url('images/tree_banner.jpg')", "background-size":"cover", "bottom-border":"2px solid black"})
+        .html('<a href="https://www.usda.gov/" target="_blank"><img src="images/USDA color.jpg" title="United States Department of Agriculture" style="height:60px; margin-right:15px; margin-top:3px; border:solid black 1px; border-radius:4px; float:left;"></a><a href="https://www.fs.fed.us/" target="_blank"><img src="images/shield_color.png" title="U.S. Forest Service" style="height:66px; margin-right:15px; float:left;"></a><h2 style="margin:0px; margin-top:0px; font-size:38px;"><b>N-CLAS:</b> Nitrogen Critical Loads Assessment by Site<br><h4 style="margin:0px"><i>High resolution, spatially explicit critical load and exceedance mapping to inform sustainable forest management</i></h4></h2>');
 
       //*******Make LOADING div
       d3.select("body")
@@ -702,6 +2115,128 @@
       var layers = [];   //global list of topoJSON map layers
       var layersShow = []; //global list of topoJSON map layer formal names
       var crossingCov = [];  //global array of crossing covariate data 
+      var toggleWords = {"legend":"Layers", "attrSelect":"Attribute Selection", "polFilter":"Geographic Filter", "charts":"Charts", "attributes":"Feature Attributes", "download":"Downloads"}
+      var legendDivs = [];   //global array of active legends
+      var chartOpts = {};   //global chart option variable
+      var chartCanvas = {};   //global canvas id variable
+      var sppColors = {"Abies balsamea":"255, 0, 0", "Acer rubrum":"255, 79, 0", "Acer saccharum":"255, 116, 0", "Betula alleghaniensis":"255, 146, 0", "Betula papyrifera":"255, 173, 0", "Castanea dentata":"255, 198, 0", "Fagus grandifolia":"255, 223, 0", "Fraxinus americana":"255, 247, 0", "Fraxinus pennsylvanica":"215, 231, 0", "Juglans cinerea":"155, 197, 0", "Picea mariana":"94, 162, 0", "Picea rubens":"0, 128, 0", "Pinus resinosa":"75, 107, 88", "Pinus rigida":"88, 83, 150", "Pinus strobus":"72, 50, 212", "Populus grandidentata":"31, 0, 243", "Populus tremuloides":"60, 0, 208", "Quercus alba":"71, 0, 174", "Quercus prinus":"75, 0, 141", "Quercus rubra":"105, 28, 149", "Thuja occidentalis":"149, 62, 178", "Tsuga canadensis":"193, 96, 208", "Ulmus americana":"238, 130, 238"};  //Colors for species in graphs
+      //var sppColors = {"Abies balsamea":"#ff0000", "Acer rubrum":"#ff4f00", "Acer saccharum":"#ff7400", "Betula alleghaniensis":"#ff9200", "Betula papyrifera":"#ffad00", "Castanea dentata":"#ffc600", "Fagus grandifolia":"#ffdf00", "Fraxinus americana":"#fff700", "Fraxinus pennsylvanica":"#d7e700", "Juglans cinerea":"#9bc500", "Picea mariana":"#5ea200", "Picea rubens":"#008000", "Pinus resinosa":"#4b6b58", "Pinus rigida":"#585396", "Pinus strobus":"#4832d4", "Populus grandidentata":"#1f00f3", "Populus tremuloides":"#3c00d0", "Quercus alba":"#4700ae", "Quercus prinus":"#4b008d", "Quercus rubra":"#691c95", "Thuja occidentalis":"#953eb2", "Tsuga canadensis":"#c160d0", "Ulmus americana":"#ee82ee"};  //Colors for species in graphs
+      var areaColors = {};
+      areaColors["States"] = ['#ff0000','#ff6200','#ff9000','#ffb700','#ffdc00','#ffff00','#a7cc00','#4c9900','#427147','#584da2','#0000ff','#3e00cb','#4a009a','#6c1f97','#ac50c2','#ee82ee'];
+      areaColors["Ecoregions Combined"] = ['#ffa500'];
+      areaColors["Ecoregions Level 2"] = ['#cc5200','#0000ff','#00e600'];
+      areaColors["Ecoregions Level 3"] = ['#4D2600','#FFB3FF','#004D00','#990099','#000000','#B35900','#000099','#FFFF00','#FF0000','#0066FF','#00FF00','#FF9900'];
+      areaColors["Forest Service Wilderness Areas"] = ['#ff0000','#ff4300','#ff6200','#ff7a00','#ff9000','#ffa500','#ffb700','#ffca00','#ffdc00','#ffed00','#ffff00','#d3e500','#a7cc00','#7bb200','#4c9900','#008000','#427147','#556075','#584da2','#4b35d0','#0000ff','#2e00e5','#3e00cb','#4600b2','#4a009a','#4b0082','#6c1f97','#8c38ac','#ac50c2','#cd69d8','#ee82ee'];
+      areaColors["Forest Service Admin Areas"] = ['#ff0000','#ff8b00','#ffd300','#c8df00','#008000','#503cc4','#4200bf','#74259c','#ee82ee'];
+      areaColors["Class I Areas"] = ['#ff0000','#ff7a00','#ffb700','#ffed00','#a7cc00','#008000','#584da2','#2e00e5','#4a009a','#8c38ac','#ee82ee'];
+      var legImg = [];
+      legImg[0] = new Image();
+      legImg[0].src = "images/tab3bLegend.jpg";
+      legImg[1] = new Image();
+      legImg[1].src = "images/tab3cLegend.jpg";
+
+
+      Chart.plugins.register({
+        beforeDraw: function(chartInstance) {
+          var ctx = chartInstance.chart.ctx;
+          ctx.fillStyle = "white";
+          ctx.fillRect(0, 0, chartInstance.chart.width, chartInstance.chart.height);
+        }
+      });
+
+      Chart.defaults.global.defaultFontColor = 'black';
+      var red_white_red
+      chartOpts.default = {};
+      chartOpts.default.bar = {
+        type: 'bar',
+        data: {
+          //labels: tmpAreasFiltSplit,
+          datasets: [{
+            //data: tmpPercentFilt,
+            backgroundColor: 'rgba(192, 0, 0, 1)',
+            borderColor: 'rgba(192, 0, 0, 1)',
+            borderWidth: 2,
+            hoverBackgroundColor: 'rgba(192, 0, 0, 0.8)',
+            hoverBorderColor : 'black'
+          }]
+        },
+        options: {
+          layout: {
+            padding: {
+              layout: {
+                left: 5,
+                right: 5,
+                top: 5,
+                bottom: 5
+              }
+            }
+          },
+          title: {
+            display: true,
+            fontSize: 8,
+            //text: 'Exceedance of Most Protective Critical Load'
+          },
+          legend: {
+            display: false,
+            labels: {
+              padding: 10
+            }
+          },
+          scales: {
+            yAxes: [{
+              position: 'left',
+              scaleLabel: {
+                display: true,
+                //labelString: '% Area in Exceedance of CL',
+                fontSize: 7
+              },
+              ticks: {
+                beginAtZero:true,
+                fontSize: 6,
+                maxTicksLimit: 6
+              },
+              gridLines: {
+                color: 'rgba(0,0,0,0.3)'
+              }
+            }],
+            xAxes: [{
+              position: 'bottom',
+              barPercentage: 0.3,
+              categoryPercentage: 1,
+              ticks: {
+                autoSkip: false,
+                beginAtZero: true,
+                min: 0,
+                display: true,
+                fontStyle: 'normal',
+                //fontSize: setFontSizeSmall(d3.select("#areaList").attr("value")),
+                stepSize: 1
+              },
+              gridLines: {
+                color: 'rgba(0,0,0,0.3)',
+                display: false
+              }
+            }, {
+              position: 'top',
+              barPercentage: 0.3,
+              categoryPercentage: 1,
+              scaleLabel: {
+                display: true,
+                //labelString: d3.select("#areaList").attr("value") + ", Combined Species",
+                fontSize: 8
+              },
+              ticks: {
+                display: false
+              },
+              gridLines: {
+                display: false
+              }
+            }]
+          }
+        }
+      }
+
+
 
       //******Add in custom color pallate for streams
       colorbrewer.streams = {};
@@ -713,6 +2248,7 @@
       //******Wait for all topoJSON files to load
       queue()
         .defer(d3.json, 'class_1_areas_topo.json')
+        .defer(d3.json, 'fs_wilderness_topo.json')
         .defer(d3.json, 'fs_admin_areas_topo.json')
         .defer(d3.json, 'ecoregions_level_3_topo.json')
         .defer(d3.json, 'ecoregions_level_2_topo.json')
@@ -732,8 +2268,9 @@
 
 
       //******Bind topoJSON data
-      function displayIt(error, class1Data, fsData, eco3Data, eco2Data, ecoData, stateData) {
+      function displayIt(error, class1Data, fsWildData, fsData, eco3Data, eco2Data, ecoData, stateData) {
         topos.class1 = topojson.feature(class1Data, class1Data.objects.class_1_wilderness_areas_ecoregions_wgs84);
+        topos.fs_wild = topojson.feature(fsWildData, fsWildData.objects.fs_wilderness_ecoregions_wgs84);
         topos.fs = topojson.feature(fsData, fsData.objects.fs_admin_areas_ecoregions_wgs84);
         topos.eco3 = topojson.feature(eco3Data, eco3Data.objects.ecoregions_level_3_L3NAME_dissolved_wgs84);
         topos.eco2 = topojson.feature(eco2Data, eco2Data.objects.ecoregions_level_2_L2NAME_dissolved_wgs84);
@@ -745,17 +2282,18 @@
           addProps(tmpID, areaLayers[i], "unique_id", "RdYlBu");
         });
 
-        topos.eco.color = {"Ecoregions_Combined": "orange"};
+        topos.eco.color = {"All_Ecoregions": "orange"};
         topos.eco2.color = {"Atlantic_Highlands": "#cc5200", "Mixed_Wood_Plains": "#0000ff", "Mixed_Wood_Shield": "#00e600"};
         topos.eco3.color = {"Acadian_Plains_and_Hills": "#4D2600", "Driftless_Area": "#FFB3FF", "Eastern_Great_Lakes_Lowlands": "#004D00", "Erie_Drift_Plain": "#990099", "North_Central_Appalachians": "#000000", "North_Central_Hardwood_Forests": "#B35900", "Northeastern_Coastal_Zone": "#000099", "Northern_Appalachian_and_Atlantic_Maritime_Highlands": "#FFFF00", "Northern_Allegheny_Plateau": "#FF0000", "Northern_Lakes_and_Forests": "#0066FF", "Northern_Minnesota_Wetlands": "#00FF00", "Southern_Michigan/Northern_Indiana_Drift_Plains": "#FF9900"};
 
         //******Get feature ids
-        layers = ["class1", "fs", "eco3", "eco2", "eco", "state"];
+        layers = ["class1", "fs_wild", "fs", "eco3", "eco2", "eco", "state"];
         layers.forEach(function(layer) {
           topos[layer].names = [];
           topos[layer].features.forEach(function(d) {
             topos[layer].names.push(d.id);
           });
+          topos[layer].names.sort();
         });
 
         //******Get species names
@@ -870,11 +2408,11 @@
         //addCFLinks(layers);
         
         //******Add topoJSON layers
-        d3.select("#areaLayer-1").property("checked", true);
-        map.addLayer(areaLayers[1]);
+        //d3.select("#areaLayer-1").property("checked", true);
+        //map.addLayer(areaLayers[1]);
 
         //******Set area options
-        addAreaNames(1);
+        //addAreaNames(1);
         
         //******Set map view
         map.on("viewreset", reset);
@@ -882,7 +2420,24 @@
 
         //******Remove "Loading..." text
         d3.select("#loadingDiv").style("display", "none");
+        resizePanels();
       }
+
+
+      //******Function to toggle tool windows
+      function toolWindowToggle(tmpDiv) {
+        if (d3.select("#" + tmpDiv + "Div").style("opacity") == "1") {
+          d3.select("#" + tmpDiv + "Div").transition().style({"opacity":"0", "visibility":"hidden"});
+          d3.select("#hc" + tmpDiv.charAt(0).toUpperCase() + tmpDiv.slice(1) + "Div").property("title", "Click to show " + toggleWords[tmpDiv] + " window");
+          
+        }
+        else {
+          d3.select("#" + tmpDiv + "Div").transition().duration(250).ease("cubic").style({"opacity":"1", "display":"block", "visibility":"visible"});            
+          d3.select("#hc" + tmpDiv.charAt(0).toUpperCase() + tmpDiv.slice(1) + "Div").property("title", "Click to hide " + toggleWords[tmpDiv] + " window");
+          setZ(d3.select("#" + tmpDiv + "Div")[0][0]);
+        }
+      }
+
       
 
 
@@ -1334,7 +2889,6 @@
         //******Set bounds (using Deerfield HUC 8 bounds)
         var bottomLeft = projectPoint(bounds[0]);
         var topRight = projectPoint(bounds[1]);
-        console.log(bottomLeft + ", " + topRight);
           
         topoSVG.attr('width', topRight[0] - bottomLeft[0])
           .attr('height', bottomLeft[1] - topRight[1])
@@ -1352,6 +2906,7 @@
           var feature = curG.selectAll("path");
           curG.attr('transform', 'translate(' + -bottomLeft[0] + ',' + -topRight[1] + ')');
           feature.attr("d", path);
+          feature.style("stroke-width", (map.getZoom()/2)-1 + "px");
         });  
       }
 
@@ -1553,7 +3108,7 @@
         var curG = d3.select(topo.g[0][0]);
         var tmpFeat = curG.selectAll("." + topo.class);
 
-        tmpFeat.style({"stroke": function(d) {return topo.color[d.id.replace(/ /g, "_")];}, "stroke-width": "4px", "fill": function(d) {return topo.color[d.id.replace(/ /g, "_")];}} );
+        tmpFeat.style({"stroke": function(d) {return topo.color[d.id.replace(/ /g, "_")];}, "stroke-width": (map.getZoom()/2)-1 + "px", "fill": function(d) {return topo.color[d.id.replace(/ /g, "_")];}} );
         tmpFeat.attr("id", function(d) {return d.id;});
 /*
         //*******Get data for passed in attribute

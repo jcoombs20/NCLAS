@@ -1,0 +1,77 @@
+#regraph {
+	font: 1em sans-serif;
+	border: solid;
+	border-color: black;
+	border-width: 3px;
+	background-color: lightgray;
+	opacity: 1;
+	padding: 5px;
+	border-radius: 5px;
+	width: 262px;
+	display: none;
+	}
+
+.modGraph {
+	margin: 5px;
+	}
+
+.modVal {
+	opacity: 1;
+	text-align: center;
+	width: 60px;
+	font-weight: bolder;
+	}
+
+.defaultVal {
+	background-color: maroon;
+	margin: 5px;
+	border-radius: 4px;
+	font-weight: bolder;
+	color: white;
+	}	
+
+#refresh {
+	background-color: lime;
+	margin: 5px;
+	border-radius: 4px;
+	font-weight: bolder;
+	margin-left: 93px;
+	}
+
+.textShow {
+	font: 1em sans-serif;
+	fill: white;
+	stroke: none;
+	font-weight: bolder;
+	}
+
+.rectShow {
+	fill: gray;
+	stroke: black;
+	stroke-width: 3;
+	opacity: 0.9;
+	}
+
+.axis text {
+	font: 0.8em sans-serif;
+	stroke: none;
+	fill: black;
+	}
+
+.axis path,
+.axis line {
+	fill: none;
+	stroke: black;
+	stroke-width: 0.3em;
+	shape-rendering: crispEdges;
+	}
+
+.x.axis path {
+	display: inline;
+	}
+		
+.txtLabels {
+	font: 1.5em sans-serif;
+	font-weight: bolder;
+	text-anchor: middle;
+	}

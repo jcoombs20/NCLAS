@@ -1,7 +1,8 @@
 .leaflet-control-maxExtent-interior {
-    background-image: url(../images/max_Extent_small.png);
-    width: 36px;
-    height: 36px;
+    //background-image: url(../images/max_Extent_small.png);
+    background-image: url(../images/globe_small.png);
+    width: 32px;
+    height: 32px;
     background-position: 50% 50%;
     background-repeat: no-repeat;
     display: block;

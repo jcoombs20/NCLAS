@@ -572,7 +572,7 @@ aside {
   color: white;
   padding: 10px;
   font-family: 'Open Sans', "proxima-nova-alt", Helvetica, Arial, sans-serif;
-  z-index: 2000;
+  z-index: 1000;
 }
 
 .header .brand {
@@ -626,8 +626,8 @@ ul.dropdown-menu.variables{
 }
 
 .minimize-button{
-  padding: 0px 2px;
-  margin-right: 5px;
+  //padding: 0px 2px;
+  //margin-right: 5px;
 }
 
 .minimized{
