@@ -1148,12 +1148,12 @@
         );
 
       d3.select("#prefOptDivUnit").selectAll("input")
-        .on("change", function() { localStorage.setItem('outUnit', document.querySelector('input[name=outUnit]:checked').value); outUnit = document.querySelector('input[name=outUnit]:checked').value; if(d3.select("#outputQuestions").style("display") == "block") {refineHTML();} })
+        .on("change", function() { localStorage.setItem('outUnit', document.querySelector('input[name=outUnit]:checked').value); })
         .property("checked", function() { if(this.value == "hectares") { if(localStorage.getItem('outUnit') == "hectares") {return true;}} });
 
       d3.select("#prefOptDivName").selectAll("input")
         .on("change", function() {outSpecies = document.querySelector('input[name=outSpecies]:checked').value; localStorage.setItem('outSpecies', document.querySelector('input[name=outSpecies]:checked').value); })
-        .property("checked", function() { if(this.value == "common") { if(localStorage.getItem('outSpecies') == "common") {return true;}}; outSpecies = document.querySelector('input[name=outSpecies]:checked').value });
+        .property("checked", function() { if(this.value == "common") { if(localStorage.getItem('outSpecies') == "common") {return true;}} });
 
       var outUnit = document.querySelector('input[name=outUnit]:checked').value;
       var outSpecies = document.querySelector('input[name=outSpecies]:checked').value;
@@ -1946,7 +1946,6 @@
             d3.select("#outputTailor").style("display", "block");
           }
           else {
-            setFigChecks(document.querySelector('input[name=outRadio]:checked').value);
             d3.select("#outputPreview").style("display", "block");
           }
         });
@@ -2024,7 +2023,6 @@
             .classed("disabledButton", false)
             .property("title", "Click to proceed with the above answers")
             .on("click", function() {
-              refineHTML();
               localStorage.setItem('outArray', [document.querySelector('input[name=outScreen1]:checked').id, document.querySelector('input[name=outScreen2]:checked').id, document.querySelector('input[name=outScreen3]:checked').id])
               d3.select("#outputTailor").style("display", "none");
               d3.select("#outputQuestions").style("display", "block");
@@ -2057,28 +2055,14 @@
       //******Add screening questions
       d3.select("#outQuestionsChoice")
         .append("div")
-        .attr("id", "outRefineDiv");
-
-
-      function refineHTML() {
-        $(document).ready(function(){
-          $('[data-toggle="tooltip"]').tooltip();   
-        });
-
-        if(outUnit == "hectares") {
-          var offsetPix = 68;
-        }
-        else {
-          var offsetPix = 94;
-        }
-        
-        d3.select("#outRefineDiv").html('' 
+        .attr("id", "outRefineDiv")
+        .html(''
           + '<div id="questionsExc" class="outRefineDivs" style="display:block;">'
-            + '<div class="refQuestCatDiv" style="background:rgb(252,242,242);border-radius:4px 4px 0 0;">'
-              + '<label><input type="checkbox" class="refCheck" value="0"><span>Is there exceedance in the area?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
+            + '<div style="background:rgb(252,242,242);border-radius:4px 4px 0 0;">'
+              + '<label><input type="checkbox"><span>Is there exceedance in the area?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
             + '</div>'
-            + '<div class="refQuestCatDiv" style="background:rgb(252,242,242);">'
-              + '<label style="margin-left:70px;"><input type="checkbox" class="refCheck" value="1"><span>What percentage of my area is exceeded?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
+            + '<div style="background:rgb(252,242,242);">'
+              + '<label style="margin-left:70px;"><input type="checkbox"><span>What percentage of my area is exceeded?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
               + '<div id="refCarousel1" class="carousel slide" data-ride="carousel" style="margin-left:73px">'
                 + '<ol class="carousel-indicators">'
                   + '<li data-target="#refCarousel1" data-slide-to="0" class="active"></li>'
@@ -2098,19 +2082,19 @@
                 + '</a>'
               + '</div>'
             + '</div>'
-            + '<div class="refQuestCatDiv" style="background:rgb(252,242,242);">'
-              + '<label style="margin-left:70px;"><input type="checkbox" class="refCheck" value="2"><span>How many ' + outUnit + ' have CL exceedance?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
-              + '<div id="refCarousel2" class="carousel slide" data-ride="carousel" style="margin-left:' + offsetPix + 'px">'
+            + '<div style="background:rgb(252,242,242);">'
+              + '<label style="margin-left:70px;"><input type="checkbox"><span>How many ' + outUnit + ' have CL exceedance?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
+              + '<div id="refCarousel2" class="carousel slide" data-ride="carousel" style="margin-left:68px">'
                 + '<ol class="carousel-indicators">'
                   + '<li data-target="#refCarousel2" data-slide-to="0" class="active"></li>'
                   + '<li data-target="#refCarousel2" data-slide-to="1"></li>'
                 + '</ol>'
                 + '<div class="carousel-inner">'
                   + '<div class="item active">'
-                    + '<img src="images/fig15b_' + outUnit + '.jpg" alt="fig15b" style="width:100%;">'
+                    + '<img src="images/fig15b.jpg" alt="fig15b" style="width:100%;">'
                   + '</div>'
                   + '<div class="item">'
-                    + '<img src="images/fig15bi_' + outUnit + '.jpg" alt="fig15bi" style="width:100%;">'
+                    + '<img src="images/fig15bi.jpg" alt="fig15bi" style="width:100%;">'
                   + '</div>'
                 + '</div>'
                 + '<a class="left carousel-control" href="#refCarousel2" data-slide="prev">'
@@ -2123,8 +2107,8 @@
                 + '</a>'
               + '</div>'
             + '</div>'
-            + '<div class="refQuestCatDiv" style="background:rgb(252,242,242);border-radius:0 0 4px 4px;">'
-              + '<label><input type="checkbox" class="refCheck" value="3"><span>Which species have the most exceedance?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
+            + '<div style="background:rgb(252,242,242);border-radius:0 0 4px 4px;">'
+              + '<label><input type="checkbox"><span>Which species have the most exceedance?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
               + '<div id="refCarousel3" class="carousel slide" data-ride="carousel" style="margin-left:130px">'
                 + '<ol class="carousel-indicators">'
                   + '<li data-target="#refCarousel3" data-slide-to="0" class="active"></li>'
@@ -2136,10 +2120,10 @@
                     + '<img src="images/fig2a.jpg" alt="fig2a" style="width:100%;">'
                   + '</div>'
                   + '<div class="item">'
-                    + '<img src="images/fig2b_' + outUnit + '.jpg" alt="fig2b" style="width:100%;">'
+                    + '<img src="images/fig2b.jpg" alt="fig2b" style="width:100%;">'
                   + '</div>'
                   + '<div class="item">'
-                    + '<img src="images/fig2bi_' + outUnit + '.jpg" alt="fig2b" style="width:100%;">'
+                    + '<img src="images/fig2bi.jpg" alt="fig2b" style="width:100%;">'
                   + '</div>'
                 + '</div>'
                 + '<a class="left carousel-control" href="#refCarousel3" data-slide="prev">'
@@ -2156,8 +2140,8 @@
 
 
           + '<div id="questionsExcEM" class="outRefineDivs" style="display:none;">'
-            + '<div class="refQuestCatDiv" style="background:rgb(235,239,246);border-radius:4px 4px 0 0;height:34%;">'
-              + '<label><input type="checkbox" class="refCheck" value="4"><span>What is the extent and magnitude of exceedance<br>in my area?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
+            + '<div style="background:rgb(235,239,246);border-radius:4px 4px 0 0;height:34%;">'
+              + '<label><input type="checkbox"><span>What is the extent and magnitude of exceedance<br>in my area?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
               + '<div id="refCarousel4" class="carousel slide" data-ride="carousel" style="margin-left:116px">'
                 + '<ol class="carousel-indicators">'
                   + '<li data-target="#refCarousel4" data-slide-to="0" class="active"></li>'
@@ -2185,8 +2169,8 @@
                 + '</a>'
               + '</div>'
             + '</div>'
-            + '<div class="refQuestCatDiv" style="background:rgb(235,239,246);height:33%;">'
-              + '<label><input type="checkbox" class="refCheck" value="5"><span>What is the extent and magnitude of exceedance<br>by species?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
+            + '<div style="background:rgb(235,239,246);height:33%;">'
+              + '<label><input type="checkbox"><span>What is the extent and magnitude of exceedance<br>by species?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
               + '<div id="refCarousel5" class="carousel slide" data-ride="carousel" style="margin-left:117px">'
                 + '<ol class="carousel-indicators">'
                   + '<li data-target="#refCarousel5" data-slide-to="0" class="active"></li>'
@@ -2214,8 +2198,8 @@
                 + '</a>'
               + '</div>'
             + '</div>'
-            + '<div class="refQuestCatDiv" style="background:rgb(255,254,241);border-radius:0 0 4px 4px;height:33%;">'
-              + '<label><input type="checkbox" class="refCheck" value="6"><span>How sensitive is my area to N deposition based<br>on site conditions?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
+            + '<div style="background:rgb(255,254,241);border-radius:0 0 4px 4px;height:33%;">'
+              + '<label><input type="checkbox"><span>How sensitive is my area to N deposition based<br>on site conditions?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
               + '<div id="refCarousel6" class="carousel slide" data-ride="carousel" style="margin-left:129px">'
                 + '<ol class="carousel-indicators">'
                   + '<li data-target="#refCarousel6" data-slide-to="0" class="active"></li>'
@@ -2226,7 +2210,7 @@
                     + '<img src="images/fig1a.jpg" alt="fig1a" style="width:100%;">'
                   + '</div>'
                   + '<div class="item">'
-                    + '<img src="images/fig1b_' + outUnit + '.jpg" alt="fig1b" style="width:100%;">'
+                    + '<img src="images/fig1b.jpg" alt="fig1b" style="width:100%;">'
                   + '</div>'
                 + '</div>'
                 + '<a class="left carousel-control" href="#refCarousel6" data-slide="prev">'
@@ -2243,8 +2227,8 @@
 
 
           + '<div id="questionsNdepExc" class="outRefineDivs" style="display:none;">'
-            + '<div class="refQuestCatDiv" style="background:rgb(255,240,225);border-radius:4px 4px 0 0;height:34%;">'
-              + '<label><input type="checkbox" class="refCheck" value="7"><span>What percent of my area is <b>exceeded</b> at a given N<br>deposition level?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
+            + '<div style="background:rgb(252,242,242);border-radius:4px 4px 0 0;height:34%;">'
+              + '<label><input type="checkbox"><span>What percent of my area is <b>exceeded</b> at a given N<br>deposition level?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
               + '<div id="refCarousel7" class="carousel slide" data-ride="carousel" style="margin-left:103px">'
                 + '<ol class="carousel-indicators">'
                   + '<li data-target="#refCarousel7" data-slide-to="0" class="active"></li>'
@@ -2272,8 +2256,8 @@
                 + '</a>'
               + '</div>'
             + '</div>'
-            + '<div class="refQuestCatDiv" style="background:rgb(255,240,225);height:33%;">'
-              + '<label><input type="checkbox" class="refCheck" value="8"><span>What percent of my area is <b>exceeded</b> for each species<br>at a given N deposition level?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
+            + '<div style="background:rgb(252,242,242);height:33%;">'
+              + '<label><input type="checkbox"><span>What percent of my area is <b>exceeded</b> for each species<br>at a given N deposition level?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
               + '<div id="refCarousel8" class="carousel slide" data-ride="carousel" style="margin-left:69px">'
                 + '<ol class="carousel-indicators">'
                   + '<li data-target="#refCarousel8" data-slide-to="0" class="active"></li>'
@@ -2297,8 +2281,8 @@
                 + '</a>'
               + '</div>'
             + '</div>'
-            + '<div class="refQuestCatDiv" style="background:rgb(255,240,225);border-radius:0 0 4px 4px;height:33%;">'
-              + '<label><input type="checkbox" class="refCheck" value="9"><span>How does the percentage of my area that is <b>exceeded</b><br>at a given N deposition level compare to other<br>areas of the same type?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
+            + '<div style="background:rgb(252,242,242);border-radius:0 0 4px 4px;height:33%;">'
+              + '<label><input type="checkbox"><span>How does the percentage of my area that is <b>exceeded</b><br>at a given N deposition level compare to other<br>areas of the same type?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
               + '<div id="refCarousel9" class="carousel slide" data-ride="carousel" style="margin-left:72px">'
                 + '<ol class="carousel-indicators">'
                   + '<li data-target="#refCarousel9" data-slide-to="0" class="active"></li>'
@@ -2322,8 +2306,8 @@
 
 
           + '<div id="questionsNdepPro" class="outRefineDivs" style="display:none;">'
-            + '<div class="refQuestCatDiv" style="background:rgb(236,241,233);border-radius:4px 4px 0 0;height:34%;">'
-              + '<label><input type="checkbox" class="refCheck" value="10"><span>What percent of my area is <b>protected</b> at a given N<br>deposition level?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
+            + '<div style="background:rgb(236,241,233);border-radius:4px 4px 0 0;height:34%;">'
+              + '<label><input type="checkbox"><span>What percent of my area is <b>exceeded</b> at a given N<br>deposition level?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
               + '<div id="refCarousel10" class="carousel slide" data-ride="carousel" style="margin-left:103px">'
                 + '<ol class="carousel-indicators">'
                   + '<li data-target="#refCarousel10" data-slide-to="0" class="active"></li>'
@@ -2351,8 +2335,8 @@
                 + '</a>'
               + '</div>'
             + '</div>'
-            + '<div class="refQuestCatDiv" style="background:rgb(236,241,233);height:33%;">'
-              + '<label><input type="checkbox" class="refCheck" value="11"><span>What percent of my area is <b>protected</b> for each species<br>at a given N deposition level?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
+            + '<div style="background:rgb(236,241,233);height:33%;">'
+              + '<label><input type="checkbox"><span>What percent of my area is <b>exceeded</b> for each species<br>at a given N deposition level?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
               + '<div id="refCarousel11" class="carousel slide" data-ride="carousel" style="margin-left:69px">'
                 + '<ol class="carousel-indicators">'
                   + '<li data-target="#refCarousel11" data-slide-to="0" class="active"></li>'
@@ -2376,8 +2360,8 @@
                 + '</a>'
               + '</div>'
             + '</div>'
-            + '<div class="refQuestCatDiv" style="background:rgb(236,241,233);border-radius:0 0 4px 4px;height:33%;">'
-              + '<label><input type="checkbox" class="refCheck" value="12"><span>How does the percentage of my area that is <b>protected</b><br>at a given N deposition level compare to other<br>areas of the same type?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
+            + '<div style="background:rgb(236,241,233);border-radius:0 0 4px 4px;height:33%;">'
+              + '<label><input type="checkbox"><span>How does the percentage of my area that is <b>exceeded</b><br>at a given N deposition level compare to other<br>areas of the same type?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
               + '<div id="refCarousel12" class="carousel slide" data-ride="carousel" style="margin-left:72px">'
                 + '<ol class="carousel-indicators">'
                   + '<li data-target="#refCarousel12" data-slide-to="0" class="active"></li>'
@@ -2400,57 +2384,6 @@
           + '</div>'
         )
 
-        //***Add styles and titles
-        d3.select("#outRefineDiv").selectAll("label,input")
-          .style("cursor", "pointer")
-          .property("title", "Check to produce the associated example figures for your output");
-
-        d3.select("#outRefineDiv").selectAll(".carousel").property("title", "Example of output that will be produced when this option is checked");
-
-        //******Adjust images to accomodate screening question answers
-        //***Question 1
-        if(document.querySelector('input[name=outScreen1]:checked').id == "outScreen1A") {
-          d3.select(d3.select("#refCarousel4").select("div").selectAll("div")[0][2]).remove();
-          d3.select(d3.select("#refCarousel4").select("ol").selectAll("li")[0][2]).remove();
-
-          d3.select(d3.select("#refCarousel7").select("div").selectAll("div")[0][2]).remove();
-          d3.select(d3.select("#refCarousel7").select("ol").selectAll("li")[0][2]).remove();
-          d3.select(d3.select("#refCarousel7").select("div").selectAll("div")[0][1]).remove();
-          d3.select(d3.select("#refCarousel7").select("ol").selectAll("li")[0][1]).remove();
-
-          d3.select(d3.select("#refCarousel10").select("div").selectAll("div")[0][2]).remove();
-          d3.select(d3.select("#refCarousel10").select("ol").selectAll("li")[0][2]).remove();
-          d3.select(d3.select("#refCarousel10").select("div").selectAll("div")[0][1]).remove();
-          d3.select(d3.select("#refCarousel10").select("ol").selectAll("li")[0][1]).remove();
-        }
-
-        //***Question 2
-        if(document.querySelector('input[name=outScreen2]:checked').id == "outScreen2A") {
-          d3.select(d3.select("#questionsExcEM").selectAll(".refQuestCatDiv")[0][0]).selectAll("*").style({"opacity":"0.6", "pointer-events":"none"});
-        }
-        else if(document.querySelector('input[name=outScreen2]:checked').id == "outScreen2B") {
-          d3.select(d3.select("#questionsExc").selectAll(".refQuestCatDiv")[0][3]).selectAll("*").style({"opacity":"0.6", "pointer-events":"none"});
-          d3.select(d3.select("#questionsExcEM").selectAll(".refQuestCatDiv")[0][1]).selectAll("*").style({"opacity":"0.6", "pointer-events":"none"});
-          d3.select(d3.select("#questionsExcEM").selectAll(".refQuestCatDiv")[0][2]).selectAll("*").style({"opacity":"0.6", "pointer-events":"none"});
-          d3.select(d3.select("#questionsNdepExc").selectAll(".refQuestCatDiv")[0][1]).selectAll("*").style({"opacity":"0.6", "pointer-events":"none"});
-          d3.select(d3.select("#questionsNdepPro").selectAll(".refQuestCatDiv")[0][1]).selectAll("*").style({"opacity":"0.6", "pointer-events":"none"});
-        }
-
-        //***Question 3
-        if(document.querySelector('input[name=outScreen3]:checked').id == "outScreen3B") {
-          d3.select(d3.select("#questionsNdepExc").selectAll(".refQuestCatDiv")[0][2]).selectAll("*").style({"opacity":"0.6", "pointer-events":"none"});          
-          d3.select(d3.select("#questionsNdepPro").selectAll(".refQuestCatDiv")[0][2]).selectAll("*").style({"opacity":"0.6", "pointer-events":"none"});          
-        }     
-
-        //***Display div with the active dot
-        d3.selectAll(".outRefineDivs").style("display", "none");
-        d3.select("#" + d3.select("#refineDots").select(".active").attr("value")).style("display", "block");
-   
-        //***Set slide change time
-        $('.carousel').carousel({
-          interval: 2000
-        })
-      }
 
       //******Add dots to change questions
       d3.select("#outQuestionsChoice")
@@ -2481,113 +2414,13 @@
         .append("div")
         .attr("id", "outButtonQuestions")
         .attr("class", "outButton")
-        .style("margin-top", "0")
         .property("title", "Continue with above selections")
         .text("Continue with Above Selections")
         .on("click", function() {
-          setFigChecks("tail");
           d3.select("#outputQuestions").style("display", "none");
           d3.select("#outputPreview").style("display", "block");
         });
 
-
-
-
-
-
-
-      //******Function to disable figure thumbs for unselected figures
-      function setFigChecks(tmpOut) {
-        if(tmpOut == "basic") {
-          var outArray = {"fig15a": true, ["fig15b_" + outUnit]: true, ["fig15bi_" + outUnit]: false, "fig2a": true, ["fig2b_" + outUnit]: false, ["fig2bi_" + outUnit]: false, "fig11a": false, "fig12a": false, "fig12b": false, "fig3a": false, "fig4a": false, "fig4c": false, "fig1a": false, ["fig1b_" + outUnit]: false, "fig9a": false, "fig9b": false, "fig13e": false, "fig13h": false, "fig13g": false, "fig6c": false, "fig13f": false, "fig13a": false, "fig13d": false, "fig13c": false, "fig6a": false, "fig13b": false, "tab3b": true, "tab3c": true}; //, "tab2c": false, "tab2a": false, "tab1c": false, "tab1a": false};
-        }
-        else if(tmpOut == "tail") {
-          var outArray = {"fig15a": false, ["fig15b_" + outUnit]: false, ["fig15bi_" + outUnit]: false, "fig2a": false, ["fig2b_" + outUnit]: false, ["fig2bi_" + outUnit]: false, "fig11a": false, "fig12a": false, "fig12b": false, "fig3a": false, "fig4a": false, "fig4c": false, "fig1a": false, ["fig1b_" + outUnit]: false, "fig9a": false, "fig9b": false, "fig13e": false, "fig13h": false, "fig13g": false, "fig6c": false, "fig13f": false, "fig13a": false, "fig13d": false, "fig13c": false, "fig6a": false, "fig13b": false, "tab3b": false, "tab3c": false}; //, "tab2c": false, "tab2a": false, "tab1c": false, "tab1a": false};
-          var tmpChecked = d3.selectAll(".refCheck")[0];
-          tmpChecked.forEach(function(tmpEl) {
-            if(d3.select(tmpEl).property("checked")) {
-              switch (d3.select(tmpEl).attr("value")) {
-                case "0":
-                  
-                  break;
-                case "1":
-                  outArray.fig15a = true;
-                  break;
-                case "2":
-                  outArray["fig15b_" + outUnit] = true;
-                  outArray["fig15bi_" + outUnit] = true;
-                  break;
-                case "3":
-                  outArray.fig2a = true;
-                  outArray["fig2b_" + outUnit] = true;
-                  outArray["fig2bi_" + outUnit] = true;
-                  break;
-                case "4":
-                  outArray.fig11a = true;
-                  outArray.fig12a = true;
-                  if(document.querySelector('input[name=outScreen1]:checked').id == "outScreen1B") {
-                    outArray.fig12b = true;
-                  }
-                  break;
-                case "5":
-                  outArray.fig3a = true;
-                  outArray.fig4a = true;
-                  outArray.fig4c = true;                  
-                  break;
-                case "6":
-                  outArray.fig1a = true;
-                  outArray["fig1b_" + outUnit] = true;
-                  break;
-                case "7":
-                  outArray.fig13e = true;
-                  if(document.querySelector('input[name=outScreen1]:checked').id == "outScreen1B") {
-                    outArray.fig13h = true;
-                    outArray.fig13g = true;
-                  }
-                  break;
-                case "8":
-                  outArray.fig6c = true;
-                  outArray.tab3b = true;
-                  break;
-                case "9":
-                  outArray.fig13f = true;
-                  break;
-                case "10":
-                  outArray.fig13a = true;
-                  if(document.querySelector('input[name=outScreen1]:checked').id == "outScreen1B") {
-                    outArray.fig13d = true;
-                    outArray.fig13c = true;
-                  }
-                  break;
-                case "11":
-                  outArray.fig6a = true;
-                  outArray.tab3c = true;
-                  break;
-                case "12":
-                  outArray.fig13b = true;
-                  break;
-              }
-            }
-          });
-        }
-        else if(tmpOut == "comp") {
-          var outArray = {"fig15a": true, ["fig15b_" + outUnit]: true, ["fig15bi_" + outUnit]: true, "fig2a": true, ["fig2b_" + outUnit]: true, ["fig2bi_" + outUnit]: true, "fig11a": true, "fig12a": true, "fig12b": true, "fig3a": true, "fig4a": true, "fig4c": true, "fig1a": true, ["fig1b_" + outUnit]: true, "fig9a": true, "fig9b": true, "fig13e": true, "fig13h": true, "fig13g": true, "fig6c": true, "fig13f": true, "fig13a": true, "fig13d": true, "fig13c": true, "fig6a": true, "fig13b": true, "tab3b": true, "tab3c": true}; //, "tab2c": true, "tab2a": true, "tab1c": true, "tab1a": true};
-        }
-
-        var outArrayKeys = d3.keys(outArray);
-        outArrayKeys.forEach(function(key) {
-          if(outArray[key] == false) {
-            if(d3.select("#" + key + "Check").classed("glyphicon-ok-sign")) {
-              $("#" + key + "Check").click();
-            }
-          }
-          else {
-            if(d3.select("#" + key + "Check").classed("glyphicon-ban-circle")) {
-              $("#" + key + "Check").click();
-            }
-          }
-        });
-      }
 
 
 
@@ -2614,157 +2447,6 @@
         .attr("data-target", "#outputDiv")
         .property("title", "Close Output Selections");
 
-      d3.select("#outPreviewChoice")
-        .append("div")
-        .attr("id", "outPreviewDiv")
-        .html('<div id="prevThumbs"></div><div id="prevLarge" style="border-radius:0 4px 0 0;border-top:1px solid gray;"><p id="prevLargeP">Click on an image to view here</p><img id="prevLargeImg"></img></div><div id="prevDescribe" style="border-radius:0 0 4px 0;"><p id="prevDescribeP"></p></div>');
-
-      d3.select("#prevThumbs")
-        .html('<div id="prevExc" class="outPreviewDivs" style="display:block;"></div><div id="prevNdep" class="outPreviewDivs" style="display:none;"></div><div id="prevHoverImgDiv"><img id="prevHoverImg"></img></div>');
-
-      //***Add thumbnail images
-      var thumbArrayExc = [["fig15a", "fig15b_" + outUnit, "fig11a", "fig4c"], ["fig2a", "fig15bi_" + outUnit, "fig12a", "fig3a"], ["fig2b_" + outUnit, "fig2bi_" + outUnit, "fig12b", "fig4a"], ["fig1a", "fig1b_" + outUnit, "fig9a", "fig9b"]];
-      var iconTitleArrayExc = [["% Area in Exc of Min CL", "Title for fig15b", "Title for fig11a", "Title for fig4c"], ["Title for fig2a", "Title for fig15bi", "Title for fig12a", "Title for fig3a"], ["Title for fig2b", "Title for fig2bi", "Title for fig12b", "Title for fig4a"], ["Title for fig1a", "Title for fig1b", "Title for fig9a", "Title for fig9b"]];
-      var figDescArrayExc = [["Figure description for fig15a", "Figure description for fig15b", "Figure description for fig11a", "Figure description for fig4c"], ["Figure description for fig2a", "Figure description for fig15bi", "Figure description for fig12a", "Figure description for fig3a"], ["Figure description for fig2b", "Figure description for fig2bi", "Figure description for fig12b", "Figure description for fig4a"], ["Figure description for fig1a", "Figure description for fig1b", "Figure description for fig9a", "Figure description for fig9b"]];
-      var colorArrayExc = [["pink", "pink", "blue", "blue"], ["pink", "pink", "blue", "blue"], ["pink", "pink", "blue", "blue"], ["yellow", "yellow", "yellow", "yellow"]];
-
-      var thumbArrayNdep = [["fig13e", "tab3b", "fig13a", "tab3c"], ["fig13f", "fig13h", "fig13b", "fig13d"], ["fig13g", "fig6c", "fig13c", "fig6a"]];
-      var iconTitleArrayNdep = [["Title for fig13e", "Title for tab3b", "Title for fig13a", "Title for tab3c"], ["Title for fig13f", "Title for fig13h", "Title for fig13b", "Title for fig13d"], ["Title for fig13g", "Title for fig6c", "Title for fig13c", "Title for fig6a"]];
-      var figDescArrayNdep = [["Figure description for fig13e", "Figure description for tab3b", "Figure description for fig13a", "Figure description for tab3c"], ["Figure description for fig13f", "Figure description for fig13h", "Figure description for fig13b", "Figure description for fig13d"], ["Figure description for fig13g", "Figure description for fig6c", "Figure description for fig13c", "Figure description for fig6a"]];
-      var colorArrayNdep = [["mauve", "mauve", "green", "green"], ["mauve", "mauve", "green", "green"], ["mauve", "mauve", "green", "green"]];
-
-      addThumbs();
-
-      function addThumbs() {
-        thumbArrayExc.forEach(function(rowArray, i) {
-          d3.select("#prevExc")
-            .append("div")
-            .attr("id", "prevExcRow" + i);
-
-          rowArray.forEach(function(fig, j) {
-            d3.select("#prevExcRow" + i)
-              .append("div")
-              .attr("id", fig + "Div")
-              .attr("class", function() { return "prevThumbImgDiv " + colorArrayExc[i][j]; })
-              .append("p")
-              .text(iconTitleArrayExc[i][j]);
-
-            d3.select("#" + fig + "Div")
-              .append("img")
-              .attr("id", fig + "Img")
-              .attr("class", "prevThumbImg Exc")
-              .attr("value", [i,j])
-              .property("title", iconTitleArrayExc[i][j])
-              .attr("src", "images/" + fig + ".jpg");
-
-            d3.select("#" + fig + "Div")
-              .append("div")
-              .attr("class", "thumbGlyphsDiv")
-              .html('<span class="glyphicon glyphicon-info-sign"></span><span class="glyphicon glyphicon-question-sign"></span><span id="' + fig + 'Check" value="' + fig + '" class="glyphicon glyphicon-ok-sign figCheck"></span>');
-          });
-        });
-
-        //***Add enlarged view links
-        d3.selectAll(".prevThumbImg.Exc")
-          .on("click", function() {
-            var tmpVals = d3.select(this).attr("value").split(",");
-            d3.select("#prevLargeP").text(iconTitleArrayExc[tmpVals[0]][tmpVals[1]]);
-            d3.select("#prevLargeImg")
-              .attr("src", "images/" + thumbArrayExc[tmpVals[0]][tmpVals[1]] + ".jpg")
-              .style("display", "block")
-              .on("mouseover", function() { d3.select("#prevHoverImgDiv").style("display", "block"); })
-              .on("mouseout", function() { d3.select("#prevHoverImgDiv").style("display", "none"); });
-            d3.select("#prevDescribeP").text(figDescArrayExc[tmpVals[0]][tmpVals[1]]);
-            d3.select("#prevHoverImgDiv").attr("class", colorArrayExc[tmpVals[0]][tmpVals[1]]);
-            d3.select("#prevHoverImg").attr("src", "images/" + thumbArrayExc[tmpVals[0]][tmpVals[1]] + ".jpg");
-          });
-
-
-
-
-
-        thumbArrayNdep.forEach(function(rowArray, i) {
-          d3.select("#prevNdep")
-            .append("div")
-            .attr("id", "prevNdepRow" + i);
-
-          rowArray.forEach(function(fig, j) {
-            d3.select("#prevNdepRow" + i)
-              .append("div")
-              .attr("id", fig + "Div")
-              .attr("class", function() { return "prevThumbImgDiv " + colorArrayNdep[i][j]; })
-              .append("p")
-              .text(iconTitleArrayNdep[i][j]);
-
-            d3.select("#" + fig + "Div")
-              .append("img")
-              .attr("id", fig + "Img")
-              .attr("class", "prevThumbImg Ndep")
-              .attr("value", [i,j])
-              .property("title", iconTitleArrayNdep[i][j])
-              .attr("src", "images/" + fig + ".jpg");
-
-            d3.select("#" + fig + "Div")
-              .append("div")
-              .attr("class", "thumbGlyphsDiv")
-              .html('<span class="glyphicon glyphicon-info-sign"></span><span class="glyphicon glyphicon-question-sign"></span><span id="' + fig + 'Check" value="' + fig + '" class="glyphicon glyphicon-ok-sign figCheck"></span>');
-          });
-        });
-
-        d3.selectAll(".prevThumbImg.Ndep")
-          .on("click", function() {
-            var tmpVals = d3.select(this).attr("value").split(",");
-            d3.select("#prevLargeP").text(iconTitleArrayNdep[tmpVals[0]][tmpVals[1]]);
-            d3.select("#prevLargeImg")
-              .attr("src", "images/" + thumbArrayNdep[tmpVals[0]][tmpVals[1]] + ".jpg")
-              .style("display", "block")
-              .on("mouseover", function() { d3.select("#prevHoverImgDiv").style("display", "block"); })
-              .on("mouseout", function() { d3.select("#prevHoverImgDiv").style("display", "none"); });
-            d3.select("#prevDescribeP").text(figDescArrayNdep[tmpVals[0]][tmpVals[1]]);
-            d3.select("#prevHoverImgDiv").attr("class", colorArrayNdep[tmpVals[0]][tmpVals[1]]);
-            d3.select("#prevHoverImg").attr("src", "images/" + thumbArrayNdep[tmpVals[0]][tmpVals[1]] + ".jpg");
-          });
-
-
-        //***Add disable function to check mark icon
-        d3.selectAll(".figCheck")
-          .property("title", "Click to exclude figure from produced output")
-          .on("click", function() {
-            if(d3.select(this).classed("glyphicon-ok-sign")) {
-              d3.select(this)
-                .classed("glyphicon-ok-sign", false)
-                .classed("glyphicon-ban-circle", true)
-                .property("title", "Click to include figure in produced output");
-              d3.select("#" + d3.select(this).attr("value") + "Div").classed("unselected", true);
-            }
-            else {
-              d3.select(this)
-                .classed("unselected", false)
-                .classed("glyphicon-ban-circle", false)
-                .classed("glyphicon-ok-sign", true)
-                .property("title", "Click to exclude figure from produced output");
-              d3.select("#" + d3.select(this).attr("value") + "Div").classed("unselected", false);
-            }
-          });
-      }
-
-
-
-
-      //******Add dots to change preview graphs
-      d3.select("#outPreviewChoice")
-        .append("div")
-        .attr("id", "previewDots")
-        .html('<div id="prevDotExc" class="previewDots active" value="prevExc" title="Exceedance by area and species"></div><div id="prevDotNdep" class="previewDots" value="prevNdep" title="Area exceedance/protection for a given N deposition level"></div>');
-
-      d3.selectAll(".previewDots")
-        .on("click", function() { 
-          d3.selectAll(".previewDots").classed("active", false);
-          d3.select(this).classed("active", true);
-          d3.selectAll(".outPreviewDivs").style("display", "none");
-          d3.select("#" + d3.select(this).attr("value")).style("display", "block");
-        });
-
       //******Add back arrow
       d3.select("#outPreviewChoice")
         .append("div")
@@ -2783,7 +2465,6 @@
       d3.select("#outPreviewChoice")
         .append("div")
         .attr("class", "outButton")
-        .style("margin-top", "0")
         .text("Generate Results")
         .on("click", function() { 
           get_output();

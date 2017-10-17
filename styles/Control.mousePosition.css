@@ -1,5 +1,5 @@
 .leaflet-container .leaflet-control-mouseposition {
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0.4);
   //box-shadow: 0 0 5px #bbb;
   padding: 0px 5px;
   margin:0px 0px 5px 5px;
@@ -15,5 +15,5 @@
 }
 
 .leaflet-container .leaflet-control-mouseposition:hover {
-  background-color: rgba(255, 255, 255, 1);
+  background-color: rgba(255, 255, 255, 0.8);
 }

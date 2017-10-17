@@ -2,7 +2,7 @@ html {
   width: 100%;
   height: 100%;
   min-width: 1280px;
-  min-height: 594px;
+  min-height: 750px;
   //overflow: hidden;
 }
 
@@ -10,6 +10,80 @@ body {
   width: 100%;
   height: calc(100% - 102px);
   overflow: visible !important;
+}
+
+.msgBackgroundDiv {
+  width: 100%;
+  min-width: 1262px;
+  min-height: 750px;
+  height: 100%;
+  z-index: 99999;
+  position: absolute;
+  top: 0px;
+  display: none;
+  justify-content: center;
+  background: rgba(0,0,0,0.5);
+}
+
+#splashScreenDiv {
+  align-self: center;
+  text-align: center;
+  background: white;
+  border: 1px solid black;
+  border-radius: 4px;
+  font-size: 13px;
+  color: black;
+  width: 1200px;
+  height: 715px;
+  min-width: 1200px;
+  padding: 15px;
+  padding-left: 30px;
+}
+
+#splashWelcome {
+  text-align: center;
+  font-size: 33px;
+  font-weight: bold;
+  border-bottom: 1px solid gray;
+  margin: -15px -15px 0px -30px;
+  padding: 0px 15px;
+  border-radius: 4px 4px 0px 0px;
+  border-bottom: 2px solid gray;
+  color: white;
+  background: #4d5980;
+  background: linear-gradient(#56638f, #434d70);
+}
+
+#splashButton {
+  width: 300px;
+  position: relative;
+  margin-left: 384px;
+  margin-top: 15px;
+  height: 50px;
+  font-size: 25px;
+  border-color: darkgray;
+  box-shadow: 6px 6px 8px 2px rgba(0,0,0,0.2);
+}
+
+#splashButton:hover {
+  border-color: #262626;
+}
+
+.legendBtn {
+  margin: 5px 15px 10px 15px;
+  width: calc(100% - 30px);
+  font-weight: bold;
+  font-size: 15px;
+  text-shadow: 0px 1px white;
+  background: lightgray;
+  background: linear-gradient(lightgray, darkgray);
+  border-radius: 4px;
+  border: solid 2px lightgray;
+  height: 37px;
+}
+
+.legendBtn:active {
+  background: silver;
 }
 
 .glyphicon-remove, .glyphicon-triangle-top, .glyphicon-triangle-bottom {
@@ -133,6 +207,17 @@ body {
 .disabled:hover {
   border-color: rgb(22,54,92) !important;
   color: lightgray !important;
+}
+
+.disabledButton {
+  //pointer-events: none;
+  color: lightgray !important;
+  background: gray !important;
+  cursor: default !important;
+}
+
+.disabledButton:hover {
+  border: 2px solid gray !important;
 }
 
 .cl_select {
@@ -720,9 +805,21 @@ ul img {
   border-color: white;
 }
 
+.outBackArrow {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  font-size: 14px;
+  font-weight: normal;
+  opacity: 0.7;
+}
+
+.outBackArrow:hover {
+  opacity: 1;
+}
+
 #outputTailor {
   width: 1000px;
-  //height: 487px;
   background: #16365c;
   background: linear-gradient(#1e487b, #0f243e);
   border-style: solid;
@@ -744,7 +841,7 @@ ul img {
 }
 
 #outTailorScreen input[type="radio"] {
-  margin: 0px 10px 50px 30px;
+  margin: 0px 10px 70px 30px;
 }
 
 #outTailorScreen label {
@@ -755,13 +852,110 @@ ul img {
   cursor: pointer;
 }
 
-.outCheck {
-  
+#outputQuestions {
+  width: 1000px;
+  background: #16365c;
+  background: linear-gradient(#1e487b, #0f243e);
+  border: 1px solid black;
+  border-radius: 4px;
+  font-size: 13px;
+  align-self: center;
+  text-align: center;
+  display: none;
+}
+
+#outRefineDiv {
+  margin: 5px;
+  height: 578px;
+}
+
+.outRefineDivs {
+  border: 1px solid gray;
+  border-radius: 4px;
+  height: 100%;
+}
+
+.outRefineDivs>div {
+  display: flex;
+  align-items: center;
+}
+
+.outRefineDivs>div>label {
+  font-size: 18px;
+  font-weight: normal;
+  color: black;
+  margin-left: 5px;
+}
+
+.outRefineDivs>div>label>span {
+  margin-left: 5px;
+}
+
+.outRefineDivs>div>label .glyphicon {
+  margin-left: 10px;
+  opacity: 0.5;
+}
+
+.outRefineDivs>div>label .glyphicon:hover {
+  opacity: 1;
+}
+
+.carousel {
+  width: 350px;
+  display: inline-block;
+  margin-top: 3px;
+  margin-bottom: 3px;
+  border: 1px solid gray;
+  border-radius: 4px;
+}
+
+.carousel-inner {
+  border-radius: 4px;
+}
+
+.carousel-indicators {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 4px;
+  width: 20%;
+  height: 10%;
+  margin: 0;
+  bottom: 0;
+  left: 40%;
+}
+
+.carousel-indicators li {
+  position: relative;
+  top: -9px;
+} 
+
+.carousel-control {
+  width: 6%;
+}
+
+#refineDots, #previewDots {
+  position: relative;
+  top: -10px;
+}
+
+.refineDots, .previewDots {
+  height: 12px;
+  width: 12px;
+  border: 1px solid white;
+  border-radius: 6px;
+  background: none;
+  display: inline-block;
+  margin-left: 3px;
+  margin-right: 3px;
+  cursor: pointer;
+}
+
+.refineDots.active, .previewDots.active {
+  background: white;
 }
 
 #outputPreview {
-  width: 1000px;
-  height: 487px;
+  width: 1240px;
+  //height: 487px;
   background: #16365c;
   background: linear-gradient(#1e487b, #0f243e);
   border-style: solid;
@@ -772,6 +966,154 @@ ul img {
   align-self: center;
   text-align: center;
   display: none;
+}
+
+#outPreviewDiv {
+  margin: 5px;
+  height: 578px;
+}
+
+.outPreviewDivs {
+  border: 1px solid gray;
+  border-radius: 4px 0 0 4px;
+  height: 100%;
+}
+
+.pink {
+  background: rgb(252,242,242);
+}
+
+.blue {
+  background: rgb(235,239,246);
+}
+
+.yellow {
+  background: rgb(255,254,241);
+}
+
+.mauve {
+  background: rgb(255,240,225);
+}
+
+.green {
+  background: rgb(236,241,233);
+}
+
+.prevThumbImgDiv {
+  font-size: 13px;
+  float: left;
+  height: 140px;
+  border-radius: 4px;
+  margin: 2px;
+}
+
+.prevThumbImgDiv p {
+  margin: 5px 0 2px 0;
+  color: darkslategray;
+}
+
+.prevThumbImg {
+  width: 195px;
+  margin: 3px;
+  border-radius: 4px;
+  border: 1px solid gray;
+  cursor: pointer;
+}
+
+.thumbGlyphsDiv {
+  position: relative;
+  bottom: 31px;
+  left: 126px;
+  background: rgba(255,255,255,0.3);
+  width: 36%;
+  border-radius: 4px;
+}
+
+.thumbGlyphsDiv span {
+  color: royalblue;
+  font-size: 20px;
+  margin: 2px;
+  opacity: 1;
+}
+
+.thumbGlyphsDiv span:hover {
+  color: lime;
+}
+
+.prevThumbImgDiv.unselected {
+  background: rgba(211,211,211,0.9);
+}
+
+.prevThumbImgDiv.unselected p, .prevThumbImgDiv.unselected img {
+  opacity: 0.6;
+  color: gray;
+}
+
+.prevThumbImgDiv.unselected>div>span {
+  color: darkred;
+}
+
+.prevThumbImgDiv.unselected>div>span:hover {
+  color: red;
+}
+
+#prevThumbs {
+  width: 67%;
+  height: 100%;
+  float: left;
+}
+
+#prevLarge, #prevDescribe {
+  width: 33%;
+  height: 50%;
+  float: right;
+  background: white;
+  border-bottom: 1px solid gray;
+  border-right: 1px solid gray;
+}
+
+#prevLargeImg {
+  width: calc(100% - 4px);
+  border: 1px solid gray;
+  border-radius: 4px;
+  margin: 2px;
+  display: none;
+  cursor: pointer;
+}
+
+#prevHoverImgDiv {
+  position: absolute;
+  display: none;
+  width: calc(66% + 1px);
+  height: calc(80% - 2px);
+  top: 48px;
+  left: 7px;
+  border: 1px solid gray;
+  border-radius: 4px;
+  padding: 2px;
+}
+
+#prevHoverImg {
+  width: calc(100% - 4px);
+  border: 1px solid gray;
+  border-radius: 4px;
+  margin: auto;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+#prevLargeP {
+  color: darkslategray;
+  margin-top: 10px;
+}
+
+#prevDescribeP {
+  color: darkslategray;
+  font-size: 16px;
+  margin-top: 10px;
 }
 
 .outChoice {
@@ -1525,6 +1867,33 @@ li.key:hover {
 
 #download {
   background: rgba(255, 255, 255, 0.9);
+  border-radius: 4px;
+}
+
+#preferencesDiv {
+  position: absolute;
+  top: 145px;
+  left: 400px;
+  width: 305px;
+  margin: 0px;
+  z-index: 1001;
+  border-radius: 4px;
+  box-shadow: 5px 5px 5px rgba(0,0,0,0.3);
+  display: none;
+  opacity: 0;
+}  
+
+#preferencesOptions {
+  padding: 5px;
+}
+
+#preferencesOptions label {
+  margin-left: 20px;
+}
+
+#preferencesOptions input {
+  margin-right: 5px;
+  background: white;
   border-radius: 4px;
 }
 
