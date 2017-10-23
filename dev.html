@@ -821,14 +821,29 @@
 
       //******Function to add/remove species layer
       function changeSpecies(tmpDiv, spp, filePart) {
+console.log(tmpDiv);
+console.log(spp);
+console.log(filePart);
         if(d3.select(tmpDiv).select("span").style("visibility") == "hidden") {
           d3.select(tmpDiv).select("span").style("visibility", "visible");
+          if(d3.select(tmpDiv.parentNode).attr("id") == spp + "Suboptions") {
+            d3.select(d3.select("#" + spp + "SuboptionsMap").selectAll(".sppSubopt")[0][layerExt.indexOf(filePart)]).select("span").style("visibility", "visible");
+          }
+          else {
+            d3.select(d3.select("#" + spp + "Suboptions").selectAll(".sppSubopt")[0][layerExt.indexOf(filePart)]).select("span").style("visibility", "visible");
+          }
           map.addLayer(layerNames.species[spp].values[tmpDiv.value]);
           layerNames.species[spp].values[tmpDiv.value].bringToFront();
           addLegendImg(tmpDiv.name, tmpDiv.title, layerNames.species[spp].values[tmpDiv.value], ["species",spp,filePart]);
         } 
         else {
           d3.select(tmpDiv).select("span").style("visibility", "hidden");
+          if(d3.select(tmpDiv.parentNode).attr("id") == spp + "Suboptions") {
+            d3.select(d3.select("#" + spp + "SuboptionsMap").selectAll(".sppSubopt")[0][layerExt.indexOf(filePart)]).select("span").style("visibility", "hidden");
+          }
+          else {
+            d3.select(d3.select("#" + spp + "Suboptions").selectAll(".sppSubopt")[0][layerExt.indexOf(filePart)]).select("span").style("visibility", "hidden");
+          }
           map.removeLayer(layerNames.species[spp].values[tmpDiv.value]);
           remLegendImg(tmpDiv.name);
         }
@@ -878,12 +893,24 @@
       function changeCommunity(tmpDiv) {
         if(d3.select(tmpDiv).select("span").style("visibility") == "hidden") {
           d3.select(tmpDiv).select("span").style("visibility", "visible");
+          if(d3.select(tmpDiv.parentNode).attr("id") == "allSuboptions") {
+            d3.select(d3.select("#allSuboptionsMap").selectAll(".sppSubopt")[0][tmpDiv.value]).select("span").style("visibility", "visible");
+          }
+          else {
+            d3.select(d3.select("#allSuboptions").selectAll(".sppSubopt")[0][tmpDiv.value]).select("span").style("visibility", "visible");
+          }
           map.addLayer(layerNames.community.values[tmpDiv.value]);
           layerNames.community.values[tmpDiv.value].bringToFront();
           addLegendImg(tmpDiv.name, d3.select(tmpDiv).text(), layerNames.community.values[tmpDiv.value], ["community", d3.select(tmpDiv).text()]);
         } 
         else {
           d3.select(tmpDiv).select("span").style("visibility", "hidden");
+          if(d3.select(tmpDiv.parentNode).attr("id") == "allSuboptions") {
+            d3.select(d3.select("#allSuboptionsMap").selectAll(".sppSubopt")[0][tmpDiv.value]).select("span").style("visibility", "hidden");
+          }
+          else {
+            d3.select(d3.select("#allSuboptions").selectAll(".sppSubopt")[0][tmpDiv.value]).select("span").style("visibility", "hidden");
+          }
           map.removeLayer(layerNames.community.values[tmpDiv.value]);
           remLegendImg(tmpDiv.name);
         }
@@ -1145,7 +1172,12 @@
           + '<p>Preferred naming convention for species titles:</p>' //<span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></p>'
           + '<label><input type="radio" id="outSpeciesLatin" value="latin" class="prefCheck" name="outSpecies" checked><span>Latin Names</span></label><label><input type="radio" id="outSpeciesCommon" value="common" class="prefCheck" name="outSpecies"><span>Common Names</span></label>'
           + '</div>'
+          + '<div id="showPrefDiv" style="margin-top:30px;text-align:center;"><label style="font-weight:normal;margin-left:0;" title="Checking this option will prevent this window from automatically displaying on page load"><input type="checkbox" id="showPrefCheck" style="position:relative;top:2px;"></input><span>Check to hide this window on page load</span></label></div>'
         );
+
+      d3.select("#showPrefCheck")
+        .property("checked", function() { if(localStorage.getItem("showPref") == "true") { return true; } })
+        .on("click", function() { localStorage.setItem('showPref', d3.select(this).property("checked")); });
 
       d3.select("#prefOptDivUnit").selectAll("input")
         .on("change", function() { localStorage.setItem('outUnit', document.querySelector('input[name=outUnit]:checked').value); outUnit = document.querySelector('input[name=outUnit]:checked').value; if(d3.select("#outputQuestions").style("display") == "block") {refineHTML();} })
@@ -1915,6 +1947,11 @@
 
       d3.select("#outDiv")
         .append("span")
+        .attr("class", "outputInfo")
+        .html('<span class="glyphicon glyphicon-info-sign help-tooltip" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Output Type</center></b></u></p><p>Choose an option to determine initial output selections to produce.<br><br>All options eventually proceed to a preview window where output selections can be modified before being produced.</p>"></span>');
+
+      d3.select("#outDiv")
+        .append("span")
         .attr("class", "glyphicon glyphicon-remove pull-right minimize-button outDivSpan")
         .attr("data-toggle", "modal")
         .attr("data-target", "#outputDiv")
@@ -1936,8 +1973,8 @@
         .append("div")
         .attr("id","outOptButton")
         .attr("class", "outButton")
-        .text("Continue with Selected Output Type")
-        .property("title", "Continue with selected output type")
+        .text("Proceed with Selected Output Type")
+        .property("title", "Proceed with output selection using the chosen output type")
         .on("click", function() { 
           d3.select("#outputOptions").style("display", "none");
           if(document.querySelector('input[name=outRadio]:checked').value == "tail") {
@@ -1963,6 +2000,11 @@
         .attr("id", "outTailorChoice")
         .attr("class", "outChoice")
         .html('<div id="outDivTailor" class="choiceHeader outputHeader">Tailored Output Screening Questions</div>');
+
+      d3.select("#outDivTailor")
+        .append("span")
+        .attr("class", "outputInfo")
+        .html('<span class="glyphicon glyphicon-info-sign help-tooltip" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Screening Questions</center></b></u></p><p>These initial creening questions are used to determine which output best match your interests.<br><br>Depending on your answers, as you proceed to the next screen some figures might be excluded and/or some questions may be disabled. Your answers can always be changed by using the <b>Back Arrow</b> located in the lower left corner to return to this screen.</p>"></span>');
 
       d3.select("#outDivTailor")
         .append("span")
@@ -2014,7 +2056,7 @@
         .attr("id", "outButtonTailor")
         .attr("class", "outButton disabledButton")
         .property("title", "Answer above questions to enable button")
-        .text("Continue to Select Outputs");
+        .text("Proceed to Output Refinement");
 
 
       //******Function to assess if all questions are answered
@@ -2022,7 +2064,7 @@
         if($("input[name=outScreen1]:checked").length > 0 && $("input[name=outScreen2]:checked").length > 0 && $("input[name=outScreen3]:checked").length > 0) {
           d3.select("#outButtonTailor")
             .classed("disabledButton", false)
-            .property("title", "Click to proceed with the above answers")
+            .property("title", "Proceed to further refine output based on the above selections")
             .on("click", function() {
               refineHTML();
               localStorage.setItem('outArray', [document.querySelector('input[name=outScreen1]:checked').id, document.querySelector('input[name=outScreen2]:checked').id, document.querySelector('input[name=outScreen3]:checked').id])
@@ -2049,6 +2091,11 @@
 
       d3.select("#outDivQuestions")
         .append("span")
+        .attr("class", "outputInfo")
+        .html('<span class="glyphicon glyphicon-info-sign help-tooltip" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Refining Questions</center></b></u></p><p>Refining questions further determine which output best match your interests. Please note that there are four pages of questions which are accessed through the <b><i>Page x</i></b> options below the question panel.<br><br>All but one question have example figures associated with them that will be selected for production if checked. For questions with multiple figures (multiple dots at the bottom of the figure), the additional figures can be viewed by clicking on either of the arrows at the edges of the figure or by clicking on a dot.<br><br>Disabled questions (slightly transparent, no mouse interaction) are the result of your answers to the screening questions on the previous window (use the <b>Back Arrow</b> to return to that window).</p>"></span>');
+
+      d3.select("#outDivQuestions")
+        .append("span")
         .attr("class", "glyphicon glyphicon-remove pull-right minimize-button outDivSpan")
         .attr("data-toggle", "modal")
         .attr("data-target", "#outputDiv")
@@ -2066,20 +2113,21 @@
         });
 
         if(outUnit == "hectares") {
-          var offsetPix = 68;
+          var offsetPix = 37;
         }
         else {
-          var offsetPix = 94;
+          var offsetPix = 63;
         }
         
         d3.select("#outRefineDiv").html('' 
+          + '<div id="exampleFigs">Example Figures</div>'
           + '<div id="questionsExc" class="outRefineDivs" style="display:block;">'
             + '<div class="refQuestCatDiv" style="background:rgb(252,242,242);border-radius:4px 4px 0 0;">'
               + '<label><input type="checkbox" class="refCheck" value="0"><span>Is there exceedance in the area?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
             + '</div>'
             + '<div class="refQuestCatDiv" style="background:rgb(252,242,242);">'
-              + '<label style="margin-left:70px;"><input type="checkbox" class="refCheck" value="1"><span>What percentage of my area is exceeded?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
-              + '<div id="refCarousel1" class="carousel slide" data-ride="carousel" style="margin-left:73px">'
+              + '<label style="margin-left:50px;"><input type="checkbox" class="refCheck" value="1"><span>What percentage of my area is exceeded?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
+              + '<div id="refCarousel1" class="carousel slide" data-ride="carousel" style="margin-left:44px">'
                 + '<ol class="carousel-indicators">'
                   + '<li data-target="#refCarousel1" data-slide-to="0" class="active"></li>'
                 + '</ol>'
@@ -2099,7 +2147,7 @@
               + '</div>'
             + '</div>'
             + '<div class="refQuestCatDiv" style="background:rgb(252,242,242);">'
-              + '<label style="margin-left:70px;"><input type="checkbox" class="refCheck" value="2"><span>How many ' + outUnit + ' have CL exceedance?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
+              + '<label style="margin-left:50px;"><input type="checkbox" class="refCheck" value="2"><span>How many ' + outUnit + ' have CL exceedance?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
               + '<div id="refCarousel2" class="carousel slide" data-ride="carousel" style="margin-left:' + offsetPix + 'px">'
                 + '<ol class="carousel-indicators">'
                   + '<li data-target="#refCarousel2" data-slide-to="0" class="active"></li>'
@@ -2125,7 +2173,7 @@
             + '</div>'
             + '<div class="refQuestCatDiv" style="background:rgb(252,242,242);border-radius:0 0 4px 4px;">'
               + '<label><input type="checkbox" class="refCheck" value="3"><span>Which species have the most exceedance?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
-              + '<div id="refCarousel3" class="carousel slide" data-ride="carousel" style="margin-left:130px">'
+              + '<div id="refCarousel3" class="carousel slide" data-ride="carousel" style="margin-left:78px">'
                 + '<ol class="carousel-indicators">'
                   + '<li data-target="#refCarousel3" data-slide-to="0" class="active"></li>'
                   + '<li data-target="#refCarousel3" data-slide-to="1"></li>'
@@ -2156,9 +2204,10 @@
 
 
           + '<div id="questionsExcEM" class="outRefineDivs" style="display:none;">'
-            + '<div class="refQuestCatDiv" style="background:rgb(235,239,246);border-radius:4px 4px 0 0;height:34%;">'
+            + '<div class="refQuestCatDiv" style="background:rgb(235,239,246);border-radius:4px 4px 0 0;height:39px;"></div>'
+            + '<div class="refQuestCatDiv" style="background:rgb(235,239,246);">'
               + '<label><input type="checkbox" class="refCheck" value="4"><span>What is the extent and magnitude of exceedance<br>in my area?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
-              + '<div id="refCarousel4" class="carousel slide" data-ride="carousel" style="margin-left:116px">'
+              + '<div id="refCarousel4" class="carousel slide" data-ride="carousel" style="margin-left:49px">'
                 + '<ol class="carousel-indicators">'
                   + '<li data-target="#refCarousel4" data-slide-to="0" class="active"></li>'
                   + '<li data-target="#refCarousel4" data-slide-to="1"></li>'
@@ -2185,9 +2234,9 @@
                 + '</a>'
               + '</div>'
             + '</div>'
-            + '<div class="refQuestCatDiv" style="background:rgb(235,239,246);height:33%;">'
+            + '<div class="refQuestCatDiv" style="background:rgb(235,239,246);">'
               + '<label><input type="checkbox" class="refCheck" value="5"><span>What is the extent and magnitude of exceedance<br>by species?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
-              + '<div id="refCarousel5" class="carousel slide" data-ride="carousel" style="margin-left:117px">'
+              + '<div id="refCarousel5" class="carousel slide" data-ride="carousel" style="margin-left:49px">'
                 + '<ol class="carousel-indicators">'
                   + '<li data-target="#refCarousel5" data-slide-to="0" class="active"></li>'
                   + '<li data-target="#refCarousel5" data-slide-to="1"></li>'
@@ -2214,9 +2263,9 @@
                 + '</a>'
               + '</div>'
             + '</div>'
-            + '<div class="refQuestCatDiv" style="background:rgb(255,254,241);border-radius:0 0 4px 4px;height:33%;">'
+            + '<div class="refQuestCatDiv" style="background:rgb(255,254,241);border-radius:0 0 4px 4px;">'
               + '<label><input type="checkbox" class="refCheck" value="6"><span>How sensitive is my area to N deposition based<br>on site conditions?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
-              + '<div id="refCarousel6" class="carousel slide" data-ride="carousel" style="margin-left:129px">'
+              + '<div id="refCarousel6" class="carousel slide" data-ride="carousel" style="margin-left:65px">'
                 + '<ol class="carousel-indicators">'
                   + '<li data-target="#refCarousel6" data-slide-to="0" class="active"></li>'
                   + '<li data-target="#refCarousel6" data-slide-to="1"></li>'
@@ -2243,9 +2292,10 @@
 
 
           + '<div id="questionsNdepExc" class="outRefineDivs" style="display:none;">'
-            + '<div class="refQuestCatDiv" style="background:rgb(255,240,225);border-radius:4px 4px 0 0;height:34%;">'
-              + '<label><input type="checkbox" class="refCheck" value="7"><span>What percent of my area is <b>exceeded</b> at a given N<br>deposition level?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
-              + '<div id="refCarousel7" class="carousel slide" data-ride="carousel" style="margin-left:103px">'
+            + '<div class="refQuestCatDiv" style="background:rgb(255,240,225);border-radius:4px 4px 0 0;height:39px;"></div>'
+            + '<div class="refQuestCatDiv" style="background:rgb(255,240,225);">'
+              + '<label><input type="checkbox" class="refCheck" value="7"><span>What percent of my area is <b>exceeded</b> at a given<br>N deposition level?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
+              + '<div id="refCarousel7" class="carousel slide" data-ride="carousel" style="margin-left:56px">'
                 + '<ol class="carousel-indicators">'
                   + '<li data-target="#refCarousel7" data-slide-to="0" class="active"></li>'
                   + '<li data-target="#refCarousel7" data-slide-to="1"></li>'
@@ -2272,9 +2322,9 @@
                 + '</a>'
               + '</div>'
             + '</div>'
-            + '<div class="refQuestCatDiv" style="background:rgb(255,240,225);height:33%;">'
-              + '<label><input type="checkbox" class="refCheck" value="8"><span>What percent of my area is <b>exceeded</b> for each species<br>at a given N deposition level?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
-              + '<div id="refCarousel8" class="carousel slide" data-ride="carousel" style="margin-left:69px">'
+            + '<div class="refQuestCatDiv" style="background:rgb(255,240,225);">'
+              + '<label><input type="checkbox" class="refCheck" value="8"><span>What percent of my area is <b>exceeded</b> for each<br>species at a given N deposition level?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
+              + '<div id="refCarousel8" class="carousel slide" data-ride="carousel" style="margin-left:73px">'
                 + '<ol class="carousel-indicators">'
                   + '<li data-target="#refCarousel8" data-slide-to="0" class="active"></li>'
                   + '<li data-target="#refCarousel8" data-slide-to="1"></li>'
@@ -2297,9 +2347,9 @@
                 + '</a>'
               + '</div>'
             + '</div>'
-            + '<div class="refQuestCatDiv" style="background:rgb(255,240,225);border-radius:0 0 4px 4px;height:33%;">'
-              + '<label><input type="checkbox" class="refCheck" value="9"><span>How does the percentage of my area that is <b>exceeded</b><br>at a given N deposition level compare to other<br>areas of the same type?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
-              + '<div id="refCarousel9" class="carousel slide" data-ride="carousel" style="margin-left:72px">'
+            + '<div class="refQuestCatDiv" style="background:rgb(255,240,225);border-radius:0 0 4px 4px;">'
+              + '<label><input type="checkbox" class="refCheck" value="9"><span>How does the percentage of my area that is<br><b>exceeded</b> at a given N deposition level<br>compared to other areas of the same<br>type?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
+              + '<div id="refCarousel9" class="carousel slide" data-ride="carousel" style="margin-left:106px">'
                 + '<ol class="carousel-indicators">'
                   + '<li data-target="#refCarousel9" data-slide-to="0" class="active"></li>'
                 + '</ol>'
@@ -2322,9 +2372,10 @@
 
 
           + '<div id="questionsNdepPro" class="outRefineDivs" style="display:none;">'
-            + '<div class="refQuestCatDiv" style="background:rgb(236,241,233);border-radius:4px 4px 0 0;height:34%;">'
-              + '<label><input type="checkbox" class="refCheck" value="10"><span>What percent of my area is <b>protected</b> at a given N<br>deposition level?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
-              + '<div id="refCarousel10" class="carousel slide" data-ride="carousel" style="margin-left:103px">'
+            + '<div class="refQuestCatDiv" style="background:rgb(236,241,233);border-radius:4px 4px 0 0;height:39px;"></div>'
+            + '<div class="refQuestCatDiv" style="background:rgb(236,241,233);">'
+              + '<label><input type="checkbox" class="refCheck" value="10"><span>What percent of my area is <b>protected</b> at a given<br>N deposition level?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
+              + '<div id="refCarousel10" class="carousel slide" data-ride="carousel" style="margin-left:56px">'
                 + '<ol class="carousel-indicators">'
                   + '<li data-target="#refCarousel10" data-slide-to="0" class="active"></li>'
                   + '<li data-target="#refCarousel10" data-slide-to="1"></li>'
@@ -2351,9 +2402,9 @@
                 + '</a>'
               + '</div>'
             + '</div>'
-            + '<div class="refQuestCatDiv" style="background:rgb(236,241,233);height:33%;">'
-              + '<label><input type="checkbox" class="refCheck" value="11"><span>What percent of my area is <b>protected</b> for each species<br>at a given N deposition level?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
-              + '<div id="refCarousel11" class="carousel slide" data-ride="carousel" style="margin-left:69px">'
+            + '<div class="refQuestCatDiv" style="background:rgb(236,241,233);">'
+              + '<label><input type="checkbox" class="refCheck" value="11"><span>What percent of my area is <b>protected</b> for each<br>species at a given N deposition level?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
+              + '<div id="refCarousel11" class="carousel slide" data-ride="carousel" style="margin-left:73px">'
                 + '<ol class="carousel-indicators">'
                   + '<li data-target="#refCarousel11" data-slide-to="0" class="active"></li>'
                   + '<li data-target="#refCarousel11" data-slide-to="1"></li>'
@@ -2376,9 +2427,9 @@
                 + '</a>'
               + '</div>'
             + '</div>'
-            + '<div class="refQuestCatDiv" style="background:rgb(236,241,233);border-radius:0 0 4px 4px;height:33%;">'
-              + '<label><input type="checkbox" class="refCheck" value="12"><span>How does the percentage of my area that is <b>protected</b><br>at a given N deposition level compare to other<br>areas of the same type?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
-              + '<div id="refCarousel12" class="carousel slide" data-ride="carousel" style="margin-left:72px">'
+            + '<div class="refQuestCatDiv" style="background:rgb(236,241,233);border-radius:0 0 4px 4px;">'
+              + '<label><input type="checkbox" class="refCheck" value="12"><span>How does the percentage of my area that is<br><b>protected</b> at a given N deposition level<br>compare to other areas of the same<br>type?</span></input><span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></label>'
+              + '<div id="refCarousel12" class="carousel slide" data-ride="carousel" style="margin-left:106px">'
                 + '<ol class="carousel-indicators">'
                   + '<li data-target="#refCarousel12" data-slide-to="0" class="active"></li>'
                 + '</ol>'
@@ -2448,7 +2499,7 @@
    
         //***Set slide change time
         $('.carousel').carousel({
-          interval: 2000
+          interval: false
         })
       }
 
@@ -2456,7 +2507,7 @@
       d3.select("#outQuestionsChoice")
         .append("div")
         .attr("id", "refineDots")
-        .html('<div id="dotExc" class="refineDots active" value="questionsExc" title="Exceedance by area and species"></div><div id="dotExcEM" class="refineDots" value="questionsExcEM" title="Exceedance extent, magnitude, and sensitivity by area, species, and site conditions"></div><div id="dotNdepExc" class="refineDots" value="questionsNdepExc" title="Area exceedance for a given N deposition level"></div><div id="dotNdepPro" class="refineDots" value="questionsNdepPro" title="Area protection for a given N deposition level"></div>');
+        .html('<div id="dotExc" class="refineDots active" value="questionsExc" title="Exceedance by area and species">Page 1</div><div id="dotExcEM" class="refineDots" value="questionsExcEM" title="Exceedance extent, magnitude, and sensitivity by area, species, and site conditions">Page 2</div><div id="dotNdepExc" class="refineDots" value="questionsNdepExc" title="Area exceedance for a given N deposition level">Page 3</div><div id="dotNdepPro" class="refineDots" value="questionsNdepPro" title="Area protection for a given N deposition level">Page 4</div>');
 
       d3.selectAll(".refineDots")
         .on("click", function() { 
@@ -2482,8 +2533,8 @@
         .attr("id", "outButtonQuestions")
         .attr("class", "outButton")
         .style("margin-top", "0")
-        .property("title", "Continue with above selections")
-        .text("Continue with Above Selections")
+        .property("title", "Proceed to preview examples of outputs based on the above selections")
+        .text("Proceed to Output Preview")
         .on("click", function() {
           setFigChecks("tail");
           d3.select("#outputQuestions").style("display", "none");
@@ -2605,7 +2656,12 @@
         .append("div")
         .attr("id", "outPreviewChoice")
         .attr("class", "outChoice")
-        .html('<div id="outDivPreview" class="choiceHeader outputHeader">Preview Selected Output</div>');
+        .html('<div id="outDivPreview" class="choiceHeader outputHeader">Preview Examples of Selected Output</div>');
+
+      d3.select("#outDivPreview")
+        .append("span")
+        .attr("class", "outputInfo")
+        .html('<span class="glyphicon glyphicon-info-sign help-tooltip" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Example Output Preview</center></b></u></p><p>This window provides thumbnails of example output figures and serves as a summary of which ones are currently selected to be produced for your data. Selected figures have a blue checkmark symbol in their lower right corner, while unselected figures have a red no symbol. To alternate a figure&#39;s selection status click on this symbol.<br><br>More information about a figure is accessed by clicking on the figure. This will place a copy of the figure in the upper right panel and a text description in the lower right panel. To zoom in on the figure further scroll over it with the cursor.<br><br>Please note that there are two pages of figures which are accessed by clicking on the <b><i>Page x</i></b> option below the thumbnail panel.</p>"></span>');
 
       d3.select("#outDivPreview")
         .append("span")
@@ -2617,7 +2673,7 @@
       d3.select("#outPreviewChoice")
         .append("div")
         .attr("id", "outPreviewDiv")
-        .html('<div id="prevThumbs"></div><div id="prevLarge" style="border-radius:0 4px 0 0;border-top:1px solid gray;"><p id="prevLargeP">Click on an image to view here</p><img id="prevLargeImg"></img></div><div id="prevDescribe" style="border-radius:0 0 4px 0;"><p id="prevDescribeP"></p></div>');
+        .html('<div id="prevThumbs"></div><div id="prevLarge" style="border-radius:0 4px 0 0;border-top:1px solid gray;"><p id="prevLargeP">Click on an image to view here</p><img id="prevLargeImg"></img><p id="prevZoomP">Mouseover above figure to zoom in</p></div><div id="prevDescribe" style="border-radius:0 0 4px 0;"><p id="prevDescribeP"></p></div>');
 
       d3.select("#prevThumbs")
         .html('<div id="prevExc" class="outPreviewDivs" style="display:block;"></div><div id="prevNdep" class="outPreviewDivs" style="display:none;"></div><div id="prevHoverImgDiv"><img id="prevHoverImg"></img></div>');
@@ -2674,6 +2730,7 @@
               .style("display", "block")
               .on("mouseover", function() { d3.select("#prevHoverImgDiv").style("display", "block"); })
               .on("mouseout", function() { d3.select("#prevHoverImgDiv").style("display", "none"); });
+            d3.select("#prevZoomP").style("display", "block");
             d3.select("#prevDescribeP").text(figDescArrayExc[tmpVals[0]][tmpVals[1]]);
             d3.select("#prevHoverImgDiv").attr("class", colorArrayExc[tmpVals[0]][tmpVals[1]]);
             d3.select("#prevHoverImg").attr("src", "images/" + thumbArrayExc[tmpVals[0]][tmpVals[1]] + ".jpg");
@@ -2755,7 +2812,7 @@
       d3.select("#outPreviewChoice")
         .append("div")
         .attr("id", "previewDots")
-        .html('<div id="prevDotExc" class="previewDots active" value="prevExc" title="Exceedance by area and species"></div><div id="prevDotNdep" class="previewDots" value="prevNdep" title="Area exceedance/protection for a given N deposition level"></div>');
+        .html('<div id="prevDotExc" class="previewDots active" value="prevExc" title="Exceedance by area and species">Page 1</div><div id="prevDotNdep" class="previewDots" value="prevNdep" title="Area exceedance/protection for a given N deposition level">Page 2</div>');
 
       d3.selectAll(".previewDots")
         .on("click", function() { 
@@ -2785,6 +2842,7 @@
         .attr("class", "outButton")
         .style("margin-top", "0")
         .text("Generate Results")
+        .property("title", "Produce the selected figures and their associated tables for your data")
         .on("click", function() { 
           get_output();
           d3.select("#waitingDiv").style("display", "block");
@@ -2813,7 +2871,7 @@
 
         switch(document.querySelector('input[name=outRadio]:checked').value) {
           case "basic":
-            var tmpVals = {"type":"basic", "area": d3.select("#areaList").attr("value"), "areas": tmpAreas, "species": tmpSpp};
+            var tmpVals = {"type":"comp", "area": d3.select("#areaList").attr("value"), "areas": tmpAreas, "species": tmpSpp};
             socket.emit('get_output', tmpVals);
             break;
           case "tail":
@@ -2841,19 +2899,47 @@
         .style("display", "block")
         .append("div")
         .attr("id", "resHeader")
-        .html('<div class="choiceHeader" style="background:rgb(255,192,0);">Results</div><ul id="ulRes" class="nav nav-pills"><li id="resFigs" class="active"><a href="#">Graphs</a></li><li id="resTabs"><a href="#">Tables</a></li><li id="resMaps"><a href="#">Maps</a></li></ul><hr style="margin-top:5px;margin-bottom:5px;">'); //<div id="resFigsDiv" class="results"></div><div id="resTabsDiv" class="results"></div>');
+        .html('<div class="choiceHeader" style="background:rgb(255,192,0);">Results</div><ul id="ulRes" class="nav nav-pills"><li id="resFigs" class="active"><a href="#">Graphs</a></li><li id="resTabs"><a href="#">Tables</a></li><li id="resMaps"><a href="#">Maps</a></li></ul><hr style="margin:0;">');
+
+      d3.select("#resChoice")
+        .append("div")
+        .attr("id", "resSubHeader")
+        .html('<div><ul id="ulResSub" class="nav nav-pills"><li id="resFigsCurrent" class="active"><a href="#">Current Condition</a></li><li id="resFigsResponse"><a href="#">Response to N Dep</a></li></ul></div><hr style="margin:0;"><div id="resSubSubCurrent" class="resSubSub"><ul id="ulResSubSubCurrent" class="nav nav-pills"></ul></div><div id="resSubSubResponse" class="resSubSub"><ul id="ulResSubSubResponse" class="nav nav-pills"></ul></div><hr style="margin:0;">');
+
+      d3.select("#ulResSubSubCurrent")
+        .html('<li id="ExAreaPill" class="li3 active"><a href="#">EX Area</a></li><li id="ExMagPill" class="li3"><a href="#">EX Magnitude</a></li><li id="CLPill" class="li3"><a href="#">CL</a></li>')
+        .selectAll("li")
+          .on("click", function() {
+            d3.select("#ulResSubSubCurrent").selectAll("li").classed("active", false);
+            d3.select(this).classed("active", true);
+            setSubHeader();
+          });
+
+      d3.select("#ulResSubSubResponse")
+        .html('<li id="ExcPill" class="li2 active"><a href="#">Area Exceeded</a></li><li id="ProPill" class="li2"><a href="#">Area Protected</a></li>')
+        .selectAll("li")
+          .on("click", function() {
+            d3.select("#ulResSubSubResponse").selectAll("li").classed("active", false);
+            d3.select(this).classed("active", true);
+            setSubHeader();
+          });
 
       d3.select("#resChoice")
         .append("div")
         .attr("id", "resOptions")
-        .html('<div id="resFigsDiv" class="results"></div><div id="resTabsDiv" class="results"></div>');
+        .html('<div id="resFigsDiv" class="results"><div id="resFigsExArea"></div><div id="resFigsExMag"></div><div id="resFigsCL"></div><div id="resFigsExc"></div><div id="resFigsPro"></div></div><div id="resTabsDiv" class="results"><div id="resTabsExArea"></div><div id="resTabsExMag"></div><div id="resTabsCL"></div><div id="resTabsExc"></div><div id="resTabsPro"></div></div><div id="resMapsDiv" class="results"></div>');
       
+      d3.select("#resFigsDiv").selectAll("div").attr("class", "resFigsSub");
+      d3.select("#resTabsDiv").selectAll("div").attr("class", "resTabsSub");
+
       //******Add pill functionality
       d3.select("#resFigs")
         .on("click", function() {
           d3.select("#ulRes").selectAll("li").classed("active", false);
           d3.select(this).classed("active", true);
-          d3.select("#resTabsDiv").style("display", "none");
+          setSubHeader();
+          d3.selectAll(".results").style("display", "none");
+          d3.select("#resOptions").style("max-height", "calc(100% - 166px");
           d3.select("#resFigsDiv").style("display", "block");
         });
 
@@ -2861,7 +2947,9 @@
         .on("click", function() {
           d3.select("#ulRes").selectAll("li").classed("active", false);
           d3.select(this).classed("active", true);
-          d3.select("#resFigsDiv").style("display", "none");
+          setSubHeader();
+          d3.selectAll(".results").style("display", "none");
+          d3.select("#resOptions").style("max-height", "calc(100% - 166px");
           d3.select("#resTabsDiv").style("display", "block");
           setTimeout(function() {
             d3.select("#resTabsDiv").selectAll("canvas")[0].forEach(function(tmpCan) {
@@ -2877,40 +2965,83 @@
         .on("click", function() {
           d3.select("#ulRes").selectAll("li").classed("active", false);
           d3.select(this).classed("active", true);
-          d3.select("#speciesListDropdown").style("display", "inline-block");
+          d3.selectAll(".results").style("display", "none");
+          d3.select("#resOptions").style("max-height", "calc(100% - 87px");
+          d3.select("#resMapsDiv").style("display", "block");
+          setSubHeader();
+          //d3.select("#speciesListDropdown").style("display", "inline-block");
           d3.select("#container-results").style("display", "none");
-          if(d3.select("#left_collapse_glyph").classed("glyphicon-triangle-left")) {
-            toggleSelections("left_collapse");
-          }
-
+          //if(d3.select("#left_collapse_glyph").classed("glyphicon-triangle-left")) {
+          //  toggleSelections("left_collapse");
+          //}
         });
+
+
+      //***Subhead pill functionality
+      d3.select("#resFigsCurrent")
+        .on("click", function() {
+          d3.select("#ulResSub").selectAll("li").classed("active", false);
+          d3.select(this).classed("active", true);
+          setSubHeader();
+        });
+
+      d3.select("#resFigsResponse")
+        .on("click", function() {
+          d3.select("#ulResSub").selectAll("li").classed("active", false);
+          d3.select(this).classed("active", true);
+          setSubHeader();
+        });
+
 
 
       //******Add procedural steps action
       d3.select("#selRes").on("click", function() { stepAction(this); });
 
-      //******Temporary way to add graphs and tables
-/*
-      var figs = ["Slide1", "Slide2", "Slide3", "Slide4", "Slide1_new", "Slide2_new", "Slide3_new", "Slide5", "Slide4_new", "Slide5_new", "Slide6_new", "Slide7_new", "Slide8_new", "Slide9_new", "Slide10_new", "Slide11_new", "Slide1_newest", "Slide2_newest", "Slide3_newest", "Slide4_newest", "Slide5_newest", "Slide6_newest", "Slide7_newest", "Slide8_newest"]
-      figs.forEach(function(fig) {
-        d3.select("#resFigsDiv")
-          .append("img")
-          .property("src", "images/" + fig + ".JPG")
-          .on("click", function() {addFigure(this.src);});
-      });
-*/
-
+      //*****Initialize display
+      setSubHeader();
       d3.select("#resFigsDiv").style("display", "block");
-/*
-      //******Temporary way to add graphs and tables
-      var tabs = ["table1_new", "table3_new", "table5_new", "table7_new", "table9_new", "table11_new", "table14_new", "table16_new", "table18_new", "table19_new", "table22_new", "table33_new", "table34_new", "table36_new", "table38_new"]
-      tabs.forEach(function(tab) {
-        d3.select("#resTabsDiv")
-          .append("img")
-          .property("src", "images/" + tab + ".jpg")
-          .on("click", function() {addFigure(this.src);});
-      });
-*/
+
+
+
+
+      //*******Function to change which output is displayed
+      function setSubHeader() {
+        if(d3.select("#ulRes").select(".active").attr("id") == "resFigs") {
+          d3.select("#resSubHeader").style("display", "block");
+          d3.selectAll(".resSubSub").style("display", "none");
+          d3.selectAll(".resFigsSub").style("display", "none");
+
+          if(d3.select("#ulResSub").select(".active").attr("id") == "resFigsCurrent") {
+            d3.select("#resSubSubCurrent").style("display", "block");
+            d3.select("#resFigs" + d3.select("#ulResSubSubCurrent").select(".active").attr("id").replace("Pill","")).style("display", "block");              
+          }
+          else if(d3.select("#ulResSub").select(".active").attr("id") == "resFigsResponse") {
+            d3.select("#resSubSubResponse").style("display", "block");
+            d3.select("#resFigs" + d3.select("#ulResSubSubResponse").select(".active").attr("id").replace("Pill","")).style("display", "block");
+          }
+        }
+        else if(d3.select("#ulRes").select(".active").attr("id") == "resTabs") {
+          d3.select("#resSubHeader").style("display", "block");          
+          d3.selectAll(".resSubSub").style("display", "none");
+          d3.selectAll(".resTabsSub").style("display", "none");
+
+          if(d3.select("#ulResSub").select(".active").attr("id") == "resFigsCurrent") {
+            d3.select("#resSubSubCurrent").style("display", "block");
+            d3.select("#resTabs" + d3.select("#ulResSubSubCurrent").select(".active").attr("id").replace("Pill","")).style("display", "block");              
+          }
+          else if(d3.select("#ulResSub").select(".active").attr("id") == "resFigsResponse") {
+            d3.select("#resSubSubResponse").style("display", "block");
+            d3.select("#resTabs" + d3.select("#ulResSubSubResponse").select(".active").attr("id").replace("Pill","")).style("display", "block");
+          }
+        }
+        else if(d3.select("#ulRes").select(".active").attr("id") == "resMaps") {
+          d3.select("#resSubHeader").style("display", "none");
+        }
+
+      }
+
+
+
 
       function addFigure(src) {
         d3.select("#resImg").property("src", src);
@@ -3342,6 +3473,11 @@
         //******Set map view
         map.on("viewreset", reset);
         reset();
+
+        //******Display preferences window if first time or not checked
+        if(localStorage.getItem("showPref") != "true") {
+          toolWindowToggle("preferences");
+        }
 
         //******Run splash and intro for first time users
         d3.select("#disableSplash").property("checked", function() { if(localStorage.getItem('disableSplash') == "true") { return true; } else { return false; } });

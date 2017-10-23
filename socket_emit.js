@@ -15,72 +15,244 @@ function socket_emit() {
     console.log(tmpData);
     //******Remove old graphs
     d3.select("#resFigsDiv")
-      .selectAll(".canvasChartSmall")
+      .selectAll("div")
+      .selectAll("*")
       .remove();
 
     d3.select("#resTabsDiv")
-      .selectAll(".canvasChartSmall")
+      .selectAll("div")
+      .selectAll("*")
       .remove();
 
+    d3.select("#resMapsDiv")
+      .selectAll("*")
+      .remove();
 
-    switch (document.querySelector('input[name=outRadio]:checked').value) {
-      case "basic":
-        //***tmpData is 0: fig15 data, 1: fig2 data
-        fig15a(tmpData[0]);
-        fig15b(tmpData[0]);
-        fig2a(tmpData[1]);
+    //******Add in divs for areas
+    var tmpRegions = ["Combined Areas"];
+    d3.selectAll(".remCheck")[0].forEach(function(d) { if(d.checked) { tmpRegions.push(d.value); } });
 
-        tab3b([tmpData[2],tmpData[3]]);
-        tab3c([tmpData[2],tmpData[3]]);                
-        break;
-      case "tail":
-        
-        break;
-      case "comp":
-        //***tmpData is 0: fig15 data, 1: fig2 data
-        fig15a(tmpData[0]);
-        fig15b(tmpData[0]);
-        fig15bi([tmpData[0],tmpData[1]]);
-        fig2a(tmpData[2]);
-        fig2b(tmpData[2]);
-        fig2bi([tmpData[2],tmpData[3]]);
-        fig11a(tmpData[4]);
-        fig12a(tmpData[4]);
-        fig12b(tmpData[4]);
-        fig3a(tmpData[5]);
-        fig4a(tmpData[5]);
-        fig4c(tmpData[5]);
-        fig1a(tmpData[6]);
-        fig1b(tmpData[6]);
-        fig9a(tmpData[7]);
-        fig9b(tmpData[7]);
-        fig13e(tmpData[7]);
-        fig13h(tmpData[7]);
-        fig13g(tmpData[7]);
-        fig6c(tmpData[8]);
-        fig13f(tmpData[7]);
-        fig13a(tmpData[7]);
-        fig13d(tmpData[7]);
-        fig13c(tmpData[7]);
-        fig6a(tmpData[8]);
-        fig13b(tmpData[7]);
+    var idArray = ["ExArea", "ExMag", "CL", "Exc", "Pro"];
+    var classArray = ["pink", "blue", "yellow", "mauve", "green"];
 
-        tab3b([tmpData[8],tmpData[9]]);
-        tab3c([tmpData[8],tmpData[9]]);
-        tab2c([tmpData[8],tmpData[2], tmpData[9],tmpData[10], tmpData[11]]);
-        tab2a([tmpData[8],tmpData[2],tmpData[9],tmpData[10], tmpData[11]]);
-        tab1c([tmpData[8],tmpData[2],tmpData[9],tmpData[10], tmpData[11]]);
-        tab1a([tmpData[8],tmpData[2],tmpData[9],tmpData[10], tmpData[11]]);
+    idArray.forEach(function(tmpID, j) {
+      tmpRegions.forEach(function(reg, i) {
+        //Figures
+        d3.selectAll("#resFigs" + tmpID)
+          .append("div")
+          .attr("id", "resRegFig" + tmpID + (i-1))
+          .attr("class", "resReg")
+          .style("top", 18 * i + "px")
+          .html('<label style="margin-bottom:0;cursor:pointer;" data-toggle="collapse" data-target="#resRegFig' + tmpID + 'Canvas' + (i-1) + '">' + reg + '<span class="glyphicon glyphicon-triangle-bottom pull-right" style="margin-right:5px;"></span></label>');
+        d3.selectAll("#resFigs" + tmpID)
+          .append("div")
+          .attr("id", "resRegFig" + tmpID + "Canvas" + (i-1))
+          .attr("class", classArray[j] + " collapse")
+          .style("padding", "5px 0");
 
-        break;
+        //***Tables
+        d3.selectAll("#resTabs" + tmpID)
+          .append("div")
+          .attr("id", "resRegTab" + tmpID + (i-1))
+          .attr("class", "resReg")
+          .style("top", 18 * i + "px")
+          .html('<label style="margin-bottom:0;cursor:pointer;" data-toggle="collapse" data-target="#resRegTab' + tmpID + 'Canvas' + (i-1) + '">' + reg + '<span class="glyphicon glyphicon-triangle-bottom pull-right" style="margin-right:5px;"></span></label>');
+        d3.selectAll("#resTabs" + tmpID)
+          .append("div")
+          .attr("id", "resRegTab" + tmpID + "Canvas" + (i-1))
+          .attr("class", classArray[j] + " collapse")
+          .style("padding", "5px 0");
+
+        $("#resRegTab" + tmpID + "Canvas" + (i-1)).on("shown.bs.collapse", function() {
+          d3.select("#resRegTab" + tmpID + "Canvas" + (i-1)).selectAll("canvas")[0].forEach(function(tmpCan) {
+            chartCanvas[tmpCan.id + "Small"].update();
+            var tmpPrint = chartCanvas[tmpCan.id + "Small"];
+            var tmpRect = document.getElementById(tmpCan.id).getBoundingClientRect();
+            addInfo(tmpPrint, chartOpts[tmpCan.id].small.cl[0], tmpRect, "small", 1, tmpCan.id);
+          });
+        });
+      });
+    });
+
+
+
+
+
+    //******Add in links to community and species maps
+    //***Community
+    d3.select("#resMapsDiv")
+      //.append("div")
+      .html(d3.select("#speciesListDropdown").selectAll("*").html());
+
+    //***Species
+    var tmpSpecies = [];
+    d3.selectAll(".sppCheck")[0].forEach(function(d) { if(d.checked) { tmpSpecies.push(speciesID[d.value]); } });
+
+    d3.select("#indSppDiv").selectAll(".indSpp")[0].forEach(function(tmpDiv,i) {
+      if(tmpSpecies.indexOf(d3.select(tmpDiv).attr("name")) > -1) {
+        d3.select("#resMapsDiv")
+          //.append("div")
+          .html(d3.select("#resMapsDiv").html() + d3.select(tmpDiv.parentNode).html());
+      }
+    });
+
+
+    //***Add on click functionality
+    d3.select("#resMapsDiv").select(".layerName")
+      .attr("data-target", "#allSuboptionsMap")
+      .style("top", "0px");
+
+    d3.select("#resMapsDiv").select(".sppSuboptDiv")
+      .attr("id", "allSuboptionsMap")
+      .selectAll(".sppSubopt")
+        .property("value", function(d,i) { return i; })
+        .property("name", function(d,i) { return commID[i]; })
+        .on("click", function() { changeCommunity(this); });
+
+    d3.select("#resMapsDiv").selectAll(".indSpp")[0].forEach(function(tmpSppDiv, j) {
+      var tmpSpp = d3.select(tmpSppDiv).attr("name");
+      d3.select(tmpSppDiv)
+        .attr("data-target", "#" + tmpSpp + "SuboptionsMap")
+        .style({"padding-left":"5px","top":(18 * (j+1)) + "px"});            
+      d3.select(tmpSppDiv.parentNode).selectAll(".sppSuboptDiv")[0].forEach(function(tmpSppLayerDiv) {
+        if(d3.select(tmpSppLayerDiv).attr("name") == tmpSpp) {
+          d3.select(tmpSppLayerDiv)
+            .attr("id", tmpSpp + "SuboptionsMap")
+            .selectAll(".sppSubopt")
+              .property("value", function(d,i) { return i; })
+              .property("name", function(d,i) { return tmpSpp + layerExt[i]; })
+              .on("click", function(d,i) { changeSpecies(this, tmpSpp, layerExt[i]); });
+        }
+      });
+    });  
+
+    d3.select("#resMapsDiv").selectAll(".activeSpecies").style("font-size", "15px");
+
+
+
+
+    //******Determine which figures to produce
+    var figArray = [];
+    var figChecks = d3.selectAll(".figCheck")[0];
+    figChecks.forEach(function(fig) {
+      if(d3.select(fig).classed("glyphicon-ok-sign")) {
+        var tmpVal = d3.select(fig).attr("value");
+        if(tmpVal.includes("_")) {
+          var i = tmpVal.indexOf("_");
+          var tmpVal = tmpVal.slice(0,i);
+        }
+        figChecks.push(tmpVal);
+      }
+    });
+
+
+    if(figChecks.indexOf("fig15a") > -1) {
+      fig15a(tmpData[0]);
+    }
+    if(figChecks.indexOf("fig15b") > -1) {
+      fig15b(tmpData[0]);
+    }
+    if(figChecks.indexOf("fig15bi") > -1) {
+      fig15bi([tmpData[0],tmpData[1]]);
+    }
+    if(figChecks.indexOf("fig2a") > -1) {
+      fig2a(tmpData[2]);
+    }
+    if(figChecks.indexOf("fig2b") > -1) {
+      fig2b(tmpData[2]);
+    }
+    if(figChecks.indexOf("fig2bi") > -1) {
+      fig2bi([tmpData[2],tmpData[3]]);
+    }
+    if(figChecks.indexOf("fig11a") > -1) {
+      fig11a(tmpData[4]);
+    }
+    if(figChecks.indexOf("fig12a") > -1) {
+      fig12a(tmpData[4]);
+    }
+    if(figChecks.indexOf("fig12b") > -1) {
+      fig12b(tmpData[4]);
+    }
+    if(figChecks.indexOf("fig3a") > -1) {
+      fig3a(tmpData[5]);
+    }
+    if(figChecks.indexOf("fig4a") > -1) {
+      fig4a(tmpData[5]);
+    }
+    if(figChecks.indexOf("fig4c") > -1) {
+      fig4c(tmpData[5]);
+    }
+    if(figChecks.indexOf("fig1a") > -1) {
+      fig1a(tmpData[6]);
+    }
+    if(figChecks.indexOf("fig1b") > -1) {
+      fig1b(tmpData[6]);
+    }
+    if(figChecks.indexOf("fig9a") > -1) {
+      fig9a(tmpData[7]);
+    }
+    if(figChecks.indexOf("fig9b") > -1) {
+      fig9b(tmpData[7]);
+    }
+    if(figChecks.indexOf("fig13e") > -1) {
+      fig13e(tmpData[7]);
+    }
+    if(figChecks.indexOf("fig13h") > -1) {
+      fig13h(tmpData[7]);
+    }
+    if(figChecks.indexOf("fig13g") > -1) {
+      fig13g(tmpData[7]);
+    }
+    if(figChecks.indexOf("fig6c") > -1) {
+      fig6c(tmpData[8]);
+    }
+    if(figChecks.indexOf("fig13f") > -1) {
+      fig13f(tmpData[7]);
+    }
+    if(figChecks.indexOf("fig13a") > -1) {
+      fig13a(tmpData[7]);
+    }
+    if(figChecks.indexOf("fig13d") > -1) {
+      fig13d(tmpData[7]);
+    }
+    if(figChecks.indexOf("fig13c") > -1) {
+      fig13c(tmpData[7]);
+    }
+    if(figChecks.indexOf("fig6a") > -1) {
+      fig6a(tmpData[8]);
+    }
+    if(figChecks.indexOf("fig13b") > -1) {
+      fig13b(tmpData[7]);
     }
 
+
+    if(figChecks.indexOf("tab3b") > -1) {
+      tab3b([tmpData[8],tmpData[9]]);
+    }
+    if(figChecks.indexOf("tab3b") > -1) {
+      tab3c([tmpData[8],tmpData[9]]);
+    }
+    if(figChecks.indexOf("fig15b") > -1 || figChecks.indexOf("fig15bi") > -1) {
+      tab2c([tmpData[8],tmpData[2],tmpData[9],tmpData[10], tmpData[11]]);
+    }
+    if(figChecks.indexOf("fig2a") > -1 || figChecks.indexOf("fig2b") > -1 || figChecks.indexOf("fig2bi") > -1) {
+      tab2a([tmpData[8],tmpData[2],tmpData[9],tmpData[10], tmpData[11]]);
+    }
+    if(figChecks.indexOf("fig1a") > -1 || figChecks.indexOf("fig1b") > -1) {
+      tab1c([tmpData[8],tmpData[2],tmpData[9],tmpData[10], tmpData[11]]);
+      tab1a([tmpData[8],tmpData[2],tmpData[9],tmpData[10], tmpData[11]]);
+    }
+
+
+
+    //***Display appropriate windows
     $('#outputDiv').modal('hide')
     d3.select("#waitingDiv").style("display", "none");
     d3.select("#outputPreview").style("display", "none");
     d3.select("#outputOptions").style("display", "block");
     d3.selectAll(".choice").style("display", "none");
     d3.select("#resChoice").style("display", "block");
+    $("#resFigs").click();
   });
 
 
@@ -484,9 +656,8 @@ function getDivide(tmpVal) {
 
 function fig15a(tmpData) {
   //******Figure 15A
-  d3.select("#resFigsDiv")
-    .append("div")
-    .attr("class", "canvasChartSmall")
+  d3.select("#resRegFigExAreaCanvas-1")
+    .append("div")    .attr("class", "canvasChartSmall")
     .html('<canvas id="fig15a" class="canvasChart" value="' + d3.select("#areaList").attr("value") + '">');
 
   var tmpCF = crossfilter(tmpData);
@@ -540,9 +711,8 @@ function fig15a(tmpData) {
 
 function fig15b(tmpData) {
   //******Figure 15B
-  d3.select("#resFigsDiv")
-    .append("div")
-    .attr("class", "canvasChartSmall")
+  d3.select("#resRegFigExAreaCanvas-1")
+    .append("div")    .attr("class", "canvasChartSmall")
     .html('<canvas id="fig15b" class="canvasChart" value="' + d3.select("#areaList").attr("value") + '">');
 
   var tmpCF = crossfilter(tmpData);
@@ -612,9 +782,8 @@ function fig15b(tmpData) {
 
 function fig15bi(tmpData) {
   //******Figure 15BI
-  d3.select("#resFigsDiv")
-    .append("div")
-    .attr("class", "canvasChartSmall")
+  d3.select("#resRegFigExAreaCanvas-1")
+    .append("div")    .attr("class", "canvasChartSmall")
     .html('<canvas id="fig15bi" class="canvasChart" value="' + d3.select("#areaList").attr("value") + '">');
 
   //***Exceedance
@@ -754,7 +923,7 @@ function fig2a(tmpData) {
     var tmpSpp = filtData.map(function(d) { if(outSpecies == "latin") {return d.species;} else {return speciesJSON[d.species];} });
 
 
-    d3.select("#resFigsDiv")
+    d3.select("#resRegFigExAreaCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="fig2a-' + i + '" class="canvasChart" value="Species">');
@@ -843,7 +1012,7 @@ function fig2b(tmpData) {
       tmpAcres[j] = (d/tmpDivide).toFixed(5);
     });
 
-    d3.select("#resFigsDiv")
+    d3.select("#resRegFigExAreaCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="fig2b-' + i + '" class="canvasChart" value="Species">');
@@ -962,7 +1131,7 @@ function fig2bi(tmpData) {
       excNoAcres[j] = (excNoAcres[j]/tmpDivide).toFixed(5);
     });
 
-    d3.select("#resFigsDiv")
+    d3.select("#resRegFigExAreaCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="fig2bi-' + i + '" class="canvasChart" value="Species">');
@@ -1052,7 +1221,7 @@ function fig11a(tmpData) {
     });
 
 
-    d3.select("#resFigsDiv")
+    d3.select("#resRegFigExMagCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="fig11a-' + i + '" class="canvasChart" value="Numbers">');
@@ -1128,7 +1297,7 @@ function fig12a(tmpData) {
     });
 
 
-    d3.select("#resFigsDiv")
+    d3.select("#resRegFigExMagCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="fig12a-' + i + '" class="canvasChart" value="Numbers">');
@@ -1218,7 +1387,7 @@ function fig12b(tmpData) {
       exc.filter.cl_category.filterAll();
     });
 
-    d3.select("#resFigsDiv")
+    d3.select("#resRegFigExMagCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="fig12b-' + i + '" class="canvasChart" value="Numbers">');
@@ -1327,7 +1496,7 @@ function fig3a(tmpData) {
       });
 
 
-      d3.select("#resFigsDiv")
+    d3.select("#resRegFigExMagCanvas" + i)
         .append("div")
         .attr("class", "canvasChartSmall")
         .html('<canvas id="fig3a-' + i + k + '" class="canvasChart" value="Numbers">');
@@ -1418,7 +1587,7 @@ function fig4a(tmpData) {
       });
 
 
-      d3.select("#resFigsDiv")
+    d3.select("#resRegFigExMagCanvas" + i)
         .append("div")
         .attr("class", "canvasChartSmall")
         .html('<canvas id="fig4a-' + i + k + '" class="canvasChart" value="Numbers">');
@@ -1523,7 +1692,7 @@ function fig4c(tmpData) {
       });
     });
     
-    d3.select("#resFigsDiv")
+    d3.select("#resRegFigExMagCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="fig4c-' + i + '" class="canvasChart" value="Numbers">');
@@ -1622,7 +1791,7 @@ function fig1a(tmpData) {
     var tmpSpp = filtData.map(function(d) { if(outSpecies == "latin") {return d.species;} else {return speciesJSON[d.species];} });
 
 
-    d3.select("#resFigsDiv")
+    d3.select("#resRegFigCLCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="fig1a-' + i + '" class="canvasChart" value="Species">');
@@ -1710,7 +1879,7 @@ function fig1b(tmpData) {
       hiAcres[j] = (hiAcres[j]/tmpDivide).toFixed(5);
     });
 
-    d3.select("#resFigsDiv")
+    d3.select("#resRegFigCLCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="fig1b-' + i + '" class="canvasChart" value="Species">');
@@ -1821,7 +1990,7 @@ function fig9a(tmpData) {
       }
     }
 
-    d3.select("#resFigsDiv")
+    d3.select("#resRegFigCLCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="fig9a-' + i + '" class="canvasChart" value="Numbers">');
@@ -1954,7 +2123,7 @@ function fig9b(tmpData) {
       }
     });
 
-    d3.select("#resFigsDiv")
+    d3.select("#resRegFigCLCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="fig9b-' + i + '" class="canvasChart" value="Numbers">');
@@ -2096,7 +2265,7 @@ function fig13e(tmpData) {
       return tmpBi == 1;
     });
 
-    d3.select("#resFigsDiv")
+    d3.select("#resRegFigExcCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="fig13e-' + i + '" class="canvasChart" value="Numbers">');
@@ -2240,7 +2409,7 @@ function fig13h(tmpData) {
 
 
 
-    d3.select("#resFigsDiv")
+    d3.select("#resRegFigExcCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="fig13h-' + i + '" class="canvasChart" value="Numbers">');
@@ -2405,7 +2574,7 @@ function fig13g(tmpData) {
 
 
 
-    d3.select("#resFigsDiv")
+    d3.select("#resRegFigExcCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="fig13g-' + i + '" class="canvasChart" value="Numbers">');
@@ -2522,7 +2691,7 @@ function fig6c(tmpData) {
       }
     });
 
-    d3.select("#resFigsDiv")
+    d3.select("#resRegFigExcCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="fig6c-' + i + '" class="canvasChart" value="' + d3.select("#areaList").attr("value") + '">');
@@ -2686,7 +2855,7 @@ function fig13f(tmpData) {
   });
 
 
-  d3.select("#resFigsDiv")
+  d3.select("#resRegFigExcCanvas-1")
     .append("div")
     .attr("class", "canvasChartSmall")
     .html('<canvas id="fig13f" class="canvasChart" value="' + d3.select("#areaList").attr("value") + '">');
@@ -2825,7 +2994,7 @@ function fig13a(tmpData) {
       return tmpBi == 1;
     });
 
-    d3.select("#resFigsDiv")
+    d3.select("#resRegFigProCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="fig13a-' + i + '" class="canvasChart" value="Numbers">');
@@ -2967,7 +3136,7 @@ function fig13d(tmpData) {
       });
     });
 
-    d3.select("#resFigsDiv")
+    d3.select("#resRegFigProCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="fig13d-' + i + '" class="canvasChart" value="Numbers">');
@@ -3128,7 +3297,7 @@ function fig13c(tmpData) {
       });
     });
 
-    d3.select("#resFigsDiv")
+    d3.select("#resRegFigProCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="fig13c-' + i + '" class="canvasChart" value="Numbers">');
@@ -3246,7 +3415,7 @@ function fig6a(tmpData) {
       }
     });
 
-    d3.select("#resFigsDiv")
+    d3.select("#resRegFigProCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="fig6a-' + i + '" class="canvasChart" value="' + d3.select("#areaList").attr("value") + '">');
@@ -3411,7 +3580,7 @@ function fig13b(tmpData) {
   });
 
 
-  d3.select("#resFigsDiv")
+  d3.select("#resRegFigProCanvas-1")
     .append("div")
     .attr("class", "canvasChartSmall")
     .html('<canvas id="fig13b" class="canvasChart" value="' + d3.select("#areaList").attr("value") + '">');
@@ -3584,7 +3753,7 @@ function tab3b(tmpData) {
       tmpXLabels.push(j);
     }
     
-    d3.select("#resTabsDiv")
+    d3.select("#resRegTabExcCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="tab3b-' + i + '" class="canvasChart" value="Tables">');
@@ -3625,7 +3794,7 @@ function tab3b(tmpData) {
         }
 
         this.data.datasets.forEach(function (dataset, i) {
-          if(i > 1) {
+          if(i > 0) {
             var meta = chartInstance.controller.getDatasetMeta(i);
             meta.data.forEach(function (bar, index) {
               var data = dataset.data[index];                            
@@ -3661,10 +3830,11 @@ function tab3b(tmpData) {
     chartOpts["tab3b-" + i].small.options.scales.yAxes[0].categoryPercentage = 1;
     chartOpts["tab3b-" + i].small.options.scales.xAxes[0].position = 'top';
     chartOpts["tab3b-" + i].small.options.scales.xAxes[0].gridLines.offsetGridLines = 'true';
-    chartOpts["tab3b-" + i].small.options.scales.xAxes[0].ticks.min = 1;
+    chartOpts["tab3b-" + i].small.options.scales.xAxes[0].ticks.min = 0;
     chartOpts["tab3b-" + i].small.options.scales.xAxes[0].ticks.max = maxCL - 1;
     chartOpts["tab3b-" + i].small.options.scales.xAxes[0].type = 'category';
     chartOpts["tab3b-" + i].small.options.scales.xAxes[0].ticks.fontSize = setFontSizeSmall("Tables", "tab3b");
+    chartOpts["tab3b-" + i].small.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return value + 1; };
     chartOpts["tab3b-" + i].small.options.scales.xAxes[0].gridLines.display = true;
     chartOpts["tab3b-" + i].small.options.scales.xAxes[0].scaleLabel = {
       display: true,
@@ -3677,6 +3847,7 @@ function tab3b(tmpData) {
     //***Large graph
     chartOpts["tab3b-" + i].large = JSON.parse(JSON.stringify(chartOpts["tab3b-" + i].small));
     //chartOpts["tab3b-" + i].large.options.onResize = function(inst, newSize) { console.log(newSize); addInfo(chartCanvas["tab3b-" + i + "Large"], chartOpts["tab3b-" + i].large.cl[0], newSize, "large", 0.75, "tab3b-" + i); },
+    chartOpts["tab3b-" + i].large.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return value + 1; };
     chartOpts["tab3b-" + i].large.options.events = false;
     chartOpts["tab3b-" + i].large.options.animation.onComplete = function () {
       var chartInstance = this.chart;
@@ -3690,7 +3861,7 @@ function tab3b(tmpData) {
       }
 
       this.data.datasets.forEach(function (dataset, i) {
-        if(i > 1) {
+        if(i > 0) {
           var meta = chartInstance.controller.getDatasetMeta(i);
           meta.data.forEach(function (bar, index) {
             var data = dataset.data[index];                            
@@ -3704,6 +3875,7 @@ function tab3b(tmpData) {
     //***Print graph
     chartOpts["tab3b-" + i].print = JSON.parse(JSON.stringify(chartOpts["tab3b-" + i].large));
     //chartOpts["tab3b-" + i].print.options.layout.padding.top = 20;
+    chartOpts["tab3b-" + i].print.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return value + 1; };
     chartOpts["tab3b-" + i].print.options.animation.onComplete = function () {
       var chartInstance = this.chart;
       var ctx = chartInstance.ctx;
@@ -3716,7 +3888,7 @@ function tab3b(tmpData) {
       }
 
       this.data.datasets.forEach(function (dataset, i) {
-        if(i > 1) {
+        if(i > 0) {
           var meta = chartInstance.controller.getDatasetMeta(i);
           meta.data.forEach(function (bar, index) {
             var data = dataset.data[index];                            
@@ -3833,8 +4005,8 @@ function tab3c(tmpData) {
       }
       tmpXLabels.push(j);
     }
-    
-    d3.select("#resTabsDiv")
+
+    d3.select("#resRegTabProCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
       //.html('<canvas id="tab3c-' + i + '" class="canvasChart" value="' + d3.select("#areaList").attr("value") + '">');
@@ -3876,7 +4048,7 @@ function tab3c(tmpData) {
         }
 
         this.data.datasets.forEach(function (dataset, i) {
-          if(i > 1) {
+          if(i > 0) {
             var meta = chartInstance.controller.getDatasetMeta(i);
             meta.data.forEach(function (bar, index) {
               //var data = dataset.data[index];                            
@@ -3913,8 +4085,9 @@ function tab3c(tmpData) {
     chartOpts["tab3c-" + i].small.options.scales.yAxes[0].categoryPercentage = 1;
     chartOpts["tab3c-" + i].small.options.scales.xAxes[0].position = 'top';
     chartOpts["tab3c-" + i].small.options.scales.xAxes[0].gridLines.offsetGridLines = 'true';
-    chartOpts["tab3c-" + i].small.options.scales.xAxes[0].ticks.min = 1;
+    chartOpts["tab3c-" + i].small.options.scales.xAxes[0].ticks.min = 0;
     chartOpts["tab3c-" + i].small.options.scales.xAxes[0].ticks.max = maxCL - 1;
+    chartOpts["tab3c-" + i].small.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return value + 1; };
     chartOpts["tab3c-" + i].small.options.scales.xAxes[0].type = 'category';
     chartOpts["tab3c-" + i].small.options.scales.xAxes[0].ticks.fontSize = setFontSizeSmall("Tables", "tab3c");
     chartOpts["tab3c-" + i].small.options.scales.xAxes[0].gridLines.display = true;
@@ -3931,6 +4104,7 @@ function tab3c(tmpData) {
     //***Large graph
     chartOpts["tab3c-" + i].large = JSON.parse(JSON.stringify(chartOpts["tab3c-" + i].small));
     //chartOpts["tab3c-" + i].large.options.onResize = function(inst, newSize) { console.log(newSize); addInfo(chartCanvas["tab3c-" + i + "Large"], chartOpts["tab3c-" + i].large.cl[0], newSize, "large", 0.75, "tab3c-" + i); },
+    chartOpts["tab3c-" + i].large.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return value + 1; };
     chartOpts["tab3c-" + i].large.options.events = false;
     chartOpts["tab3c-" + i].large.options.animation.onComplete = function () {
       var chartInstance = this.chart;
@@ -3944,7 +4118,7 @@ function tab3c(tmpData) {
       }
 
       this.data.datasets.forEach(function (dataset, i) {
-        if(i > 1) {
+        if(i > 0) {
           var meta = chartInstance.controller.getDatasetMeta(i);
           meta.data.forEach(function (bar, index) {
             var data = dataset.data[index];                            
@@ -3957,6 +4131,7 @@ function tab3c(tmpData) {
     //***Print graph
     chartOpts["tab3c-" + i].print = JSON.parse(JSON.stringify(chartOpts["tab3c-" + i].large));
     //chartOpts["tab3c-" + i].print.options.layout.padding.top = 20;
+    chartOpts["tab3c-" + i].print.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return value + 1; };
     chartOpts["tab3c-" + i].print.options.animation.onComplete = function () {
       var chartInstance = this.chart;
       var ctx = chartInstance.ctx;
@@ -3969,7 +4144,7 @@ function tab3c(tmpData) {
       }
 
       this.data.datasets.forEach(function (dataset, i) {
-        if(i > 1) {
+        if(i > 0) {
           var meta = chartInstance.controller.getDatasetMeta(i);
           meta.data.forEach(function (bar, index) {
             var data = dataset.data[index];                            
@@ -4129,7 +4304,7 @@ function tab2c(tmpData) {
       }
     }
     
-    d3.select("#resTabsDiv")
+    d3.select("#resRegTabExAreaCanvas-1")
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="tab2c-' + i + '" class="canvasChart" value="Tables">');
@@ -4436,7 +4611,7 @@ function tab2a(tmpData) {
       }
     }
     
-    d3.select("#resTabsDiv")
+    d3.select("#resRegTabExAreaCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="tab2a-' + i + '" class="canvasChart" value="Tables">');
@@ -4775,7 +4950,7 @@ function tab1c(tmpData) {
       }
     }
     
-    d3.select("#resTabsDiv")
+    d3.select("#resRegTabCLCanvas-1")
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="tab1c-' + i + '" class="canvasChart" value="Tables">');
@@ -5093,7 +5268,7 @@ function tab1a(tmpData) {
       }
     }
     
-    d3.select("#resTabsDiv")
+    d3.select("#resRegTabCLCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="tab1a-' + i + '" class="canvasChart" value="Tables">');
