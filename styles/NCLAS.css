@@ -138,6 +138,15 @@ body {
   font-weight: bold;
 }
 
+#preferences a:focus {
+  color: #9d9d9d;
+}
+
+#preferences a:hover {
+  color: #fff;
+}
+
+
 #printDownload>span {
     color: white;
     //opacity: 1;
@@ -154,6 +163,7 @@ body {
   padding: 1px 9px;
   z-index: 1001;
   position: absolute;
+  top: 0px;
   cursor: default;
 }
 
@@ -358,6 +368,22 @@ body {
   width: 100%;
 }
 
+#resHeader li.active>a, #resHeader li.active>a:hover, #resSubHeader li.active>a, #resSubHeader li.active>a:hover {
+  background-color: #337ab7 !important;
+}
+
+#resHeader li>a {
+  color: #33adff;
+}
+
+#resHeader li.active>a {
+  color: white;
+}
+
+#resHeader li>a:hover, #resSubHeader li>a:hover {
+  background-color: #66ff66 !important;
+}
+
 #resFigsDiv, #resTabsDiv, #resMapDiv {
   width: 100%;
 }
@@ -409,6 +435,10 @@ body {
   margin-bottom: 2px;
 }
 
+#resMapsDiv .layerName:hover {
+  color: aqua;
+}
+
 #resMapsDiv .sppSuboptDiv {
   color: #666666;
   font-size: 13px;
@@ -441,6 +471,7 @@ body {
 .sppSubopt span {
   font-size: 11px;
   margin-right: 20px;
+  margin-left: 10px;
 }
 
 .layerName {
@@ -448,7 +479,7 @@ body {
 }
 
 .layerName:hover {
-  color: aqua;
+  color: black;
   background: #f2f2f2;
   cursor: pointer;
   border-radius: 0px 0px 4px 4px;
@@ -592,31 +623,6 @@ body {
 
 #ulResSub li {
   font-size: 14px;
-  //opacity: 0.5;
-}
-
-#ulResSub>li:hover {
-  //opacity: 1;
-}
-
-#ulResSub li.active {
-  //opacity: 1;
-}
-
-#ulResSub>li>a:hover {
-  //background: white;
-}
-
-#ulResSub>li.active>a:hover {
-  //background: rgb(211,211,211);
-}
-
-#ulResSub>li.active>a:hover {
-  //color: white;
-}
-
-#ulResSub>li>a {
-   //background:rgb(211,211,211);
 }
 
 #ulResSubSubCurrent li, #ulResSubSubResponse li {
@@ -624,7 +630,7 @@ body {
 }
 
 #ulResSubSubCurrent .li3 {
-  width: 32%;
+  width: 31%;
 }
 
 #ulResSubSubResponse .li2 {
@@ -698,10 +704,11 @@ body {
 #map, #oldGraph {
   width: 100%;
   margin-top: 107px;
+  padding-top: 37px;
   position: absolute;
   //left: 15px;
   height: calc(100% - 107px);
-  min-height: 487px;
+  min-height: 643px;
   min-width: 1280px;
   top: 0px;
 }
@@ -712,10 +719,11 @@ body {
   position: absolute;
   //left: 165px;
   height: calc(100% - 107px);
-  min-height: 450px;
+  min-height: 643px;
   min-width: 1280px;
   top: 0px;
   background: beige;
+  background: radial-gradient(#ffffcc 50%, #e6e6e6);
   padding: 30px;
   z-index: 1003;
   overflow-y: auto;
@@ -732,7 +740,7 @@ body {
   width: calc(100% - 530px);
   margin-top: 107px;
   position: absolute;
-  min-height: 450px;
+  min-height: 606px;
   min-width: 750px;
   background: rgba(0,0,0,0.8);
   overflow-y: auto;
@@ -806,6 +814,11 @@ ul img {
   stroke: navy;
   fill: navy;
 }
+
+.state.inactive, .state.inactive:hover, .eco.inactive, .eco.inactive:hover, .eco2.inactive, .eco2.inactive:hover, .eco3.inactive, .eco3.inactive:hover, .fs_wild.inactive, .fs_wild.inactive:hover, .fs.inactive, .fs.inactive:hover, .class1.inactive, .class1.inactive:hover  {
+  fill-opacity: 0 !important;
+  cursor: default !important;
+}  
 
 #loadingDiv {
   width: 100%;
@@ -957,6 +970,25 @@ ul img {
 #outRefineDiv {
   margin: 5px;
   height: 587px;
+}
+
+#exampleFigsPageDiv {
+  position: absolute;
+  left: 456px;
+  top: 60px;
+  color: black;
+  font-size: 16px;
+  z-index: 1001;
+}  
+
+#currentPage {
+  cursor: pointer;
+  font-weight: bold;
+  color: white;
+  background: rgb(54,96,146);
+  border: 1px solid black;
+  border-radius: 4px;
+  padding: 3px;
 }
 
 #exampleFigs {
@@ -1144,6 +1176,7 @@ ul img {
   color: darkslategray;
   display: block;
   margin-top: 5px;
+  text-align: center;
 }
 
 .thumbGlyphsDiv {
@@ -1176,11 +1209,11 @@ ul img {
 }
 
 .prevThumbImgDiv.unselected>div>span {
-  color: darkred;
+  color: slategray;
 }
 
 .prevThumbImgDiv.unselected>div>span:hover {
-  color: red;
+  color: black;
 }
 
 #prevThumbs {
@@ -1196,6 +1229,12 @@ ul img {
   background: white;
   border-bottom: 1px solid gray;
   border-right: 1px solid gray;
+}
+
+#prevDescribe {
+  text-align: left;
+  padding: 0 5px;
+  overflow-y: auto;
 }
 
 #prevLargeImg {
@@ -1250,7 +1289,7 @@ ul img {
 }
 
 #waitingDiv {
-  background: rgba(0,255,0,0.5);
+  background: rgba(0,255,0,0.9);
   width: 208px;
   height: 237px;
   padding: 30px;
@@ -1588,7 +1627,17 @@ table {
   margin: auto;
   margin-top: 5px;
   margin-bottom: 10px;
-  display: block;
+  margin-right: 10px;
+  display: inline-block;
+}
+
+#downloadJPEGData {
+  width: 150px;
+  padding: 0px;
+  margin: auto;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  display: inline-block;
 }
 
 #downloadButton:active, #downloadJPEG:active {
@@ -1601,7 +1650,7 @@ table {
   opacity: 0.6;
 }
 
-#dlLink, #dlJPEGLink {
+#dlLink, #dlJPEGLink, #dlJPEGDataLink {
   color: #666666;
   width: 100%;
   height: 100%;
@@ -1609,10 +1658,15 @@ table {
   padding: 3px;
 }
 
-#dlLink:focus, #dlLink:hover, #dlJPEGLink:focus, #dlJPEGLink:hover {
+#dlLink:focus, #dlLink:hover, #dlJPEGLink:hover, #dlJPEGDataLink:hover {
   text-decoration: none;
-  color: black;
+  color: black !important;
 }
+
+#dlJPEGLink:focus, #dlJPEGDataLink:focus {
+  text-decoration: none;
+  color: #666666;
+}  
 
 input[type="checkbox"]  {
   margin: 0px 2px 0px 2px;
@@ -1713,11 +1767,19 @@ input[type="checkbox"]  {
   visibility: hidden;
 }
 
-.legendImg {
-  border: 1px solid #333333;
-  display: block;
+.legImgDiv {
+  overflow: hidden;
   margin: auto;
+  border: 1px solid black;
   border-radius: 4px;
+}
+
+.legendImg {
+  //border: 1px solid #333333;
+  display: block;
+  //margin: auto;
+  //border-radius: 4px;
+  position: relative;
 }
 
 .legendTitle {
@@ -2046,8 +2108,8 @@ li.key:hover {
 //    right: 5px;
   }
 
-  #toolbar, #left_panel, #right_panel, .leaflet-control-mouseposition, .leaflet-control-maxExtent, .leaflet-control-zoom, .leaflet-control-navbar, .leaflet-top.leaflet-left, .leaflet-control-attribution {
-    display: none; 
+  #toolbar, #left_panel, #right_panel, #container-results, .leaflet-control-mouseposition, .leaflet-control-maxExtent, .leaflet-control-zoom, .leaflet-control-navbar, .leaflet-top.leaflet-left, .leaflet-control-attribution {
+    display: none !important; 
   }
 
   a {

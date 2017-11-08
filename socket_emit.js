@@ -28,6 +28,8 @@ function socket_emit() {
       .selectAll("*")
       .remove();
 
+
+
     //******Add in divs for areas
     var tmpRegions = ["Combined Areas"];
     d3.selectAll(".remCheck")[0].forEach(function(d) { if(d.checked) { tmpRegions.push(d.value); } });
@@ -35,9 +37,9 @@ function socket_emit() {
     var idArray = ["ExArea", "ExMag", "CL", "Exc", "Pro"];
     var classArray = ["pink", "blue", "yellow", "mauve", "green"];
 
+    //***Figures
     idArray.forEach(function(tmpID, j) {
       tmpRegions.forEach(function(reg, i) {
-        //Figures
         d3.selectAll("#resFigs" + tmpID)
           .append("div")
           .attr("id", "resRegFig" + tmpID + (i-1))
@@ -49,8 +51,15 @@ function socket_emit() {
           .attr("id", "resRegFig" + tmpID + "Canvas" + (i-1))
           .attr("class", classArray[j] + " collapse")
           .style("padding", "5px 0");
+      });
+    });
 
-        //***Tables
+
+
+    //***Tables
+    var idArray = ["Current", "Response"];
+    idArray.forEach(function(tmpID, j) {
+      tmpRegions.forEach(function(reg, i) {
         d3.selectAll("#resTabs" + tmpID)
           .append("div")
           .attr("id", "resRegTab" + tmpID + (i-1))
@@ -64,15 +73,18 @@ function socket_emit() {
           .style("padding", "5px 0");
 
         $("#resRegTab" + tmpID + "Canvas" + (i-1)).on("shown.bs.collapse", function() {
-          d3.select("#resRegTab" + tmpID + "Canvas" + (i-1)).selectAll("canvas")[0].forEach(function(tmpCan) {
-            chartCanvas[tmpCan.id + "Small"].update();
-            var tmpPrint = chartCanvas[tmpCan.id + "Small"];
-            var tmpRect = document.getElementById(tmpCan.id).getBoundingClientRect();
-            addInfo(tmpPrint, chartOpts[tmpCan.id].small.cl[0], tmpRect, "small", 1, tmpCan.id);
-          });
+          setTimeout(function() {
+            d3.select("#resRegTab" + tmpID + "Canvas" + (i-1)).selectAll("canvas")[0].forEach(function(tmpCan) {
+              chartCanvas[tmpCan.id + "Small"].update();
+              var tmpPrint = chartCanvas[tmpCan.id + "Small"];
+              var tmpRect = document.getElementById(tmpCan.id).getBoundingClientRect();
+              addInfo(tmpPrint, chartOpts[tmpCan.id].small.cl[0], tmpRect, "small", 1, tmpCan.id);
+            });
+          }, 300);
         });
       });
     });
+
 
 
 
@@ -91,7 +103,6 @@ function socket_emit() {
     d3.select("#indSppDiv").selectAll(".indSpp")[0].forEach(function(tmpDiv,i) {
       if(tmpSpecies.indexOf(d3.select(tmpDiv).attr("name")) > -1) {
         d3.select("#resMapsDiv")
-          //.append("div")
           .html(d3.select("#resMapsDiv").html() + d3.select(tmpDiv.parentNode).html());
       }
     });
@@ -130,12 +141,43 @@ function socket_emit() {
 
 
 
+    //******Shorten names when appropriate
+    areaShortName = {};
+    tmpLength = 28;
+    var tmpNames = d3.selectAll(".remCheck")[0].map(function(d) { return d3.select(d).attr("Value"); });
+
+    switch(d3.select("#areaList").attr("value")) {
+      case "Class I Areas":
+        tmpNames.forEach(function(d) { areaShortName[d] = d.replace(" Wilderness",""); });
+        break;
+      case "Forest Service Admin Areas":
+        tmpNames.forEach(function(d) { areaShortName[d] = d.replace("National Forests","NFs").replace("National Forest", "NF"); });
+        break;
+      case "Forest Service Wilderness Areas":
+        tmpNames.forEach(function(d) { areaShortName[d] = d.replace(" Wilderness",""); });
+        break;
+      case "Ecoregions Level 3":
+        tmpNames.forEach(function(d) { areaShortName[d] = d.replace("",""); });
+        tmpLength = 27;
+        break;
+      case "Ecoregions Level 2":
+        tmpNames.forEach(function(d) { areaShortName[d] = d.replace("",""); });
+        break;
+      case "Ecoregions Combined":
+        tmpNames.forEach(function(d) { areaShortName[d] = d.replace("",""); });
+        break;
+      case "States":
+        tmpNames.forEach(function(d) { areaShortName[d] = d.replace("",""); });
+        break;
+    }
+
+
 
     //******Determine which figures to produce
     var figArray = [];
     var figChecks = d3.selectAll(".figCheck")[0];
     figChecks.forEach(function(fig) {
-      if(d3.select(fig).classed("glyphicon-ok-sign")) {
+      if(d3.select(fig).style("color") == "rgb(65, 105, 225)" || d3.select(fig).style("color") == "rgb(0, 255, 0)") {
         var tmpVal = d3.select(fig).attr("value");
         if(tmpVal.includes("_")) {
           var i = tmpVal.indexOf("_");
@@ -232,6 +274,9 @@ function socket_emit() {
     if(figChecks.indexOf("tab3b") > -1) {
       tab3c([tmpData[8],tmpData[9]]);
     }
+    if(figChecks.indexOf("fig15a") > -1) {
+      tab4a([tmpData[12],tmpData[0],tmpData[9]]);
+    }
     if(figChecks.indexOf("fig15b") > -1 || figChecks.indexOf("fig15bi") > -1) {
       tab2c([tmpData[8],tmpData[2],tmpData[9],tmpData[10], tmpData[11]]);
     }
@@ -244,14 +289,27 @@ function socket_emit() {
     }
 
 
+    //***Zoom to selected areas
+    var tmpCoords = {"ll":{"lat":[],"lng":[]},"ur":{"lat":[],"lng":[]}};
+    d3.selectAll(".remLabel")[0].forEach(function(tmpLab,i) {
+      if(d3.select(tmpLab).select("input").property("checked") == true && tmpLab.id != "areaAllLabel") {
+        tmpCoords.ll.lat.push(parseFloat(d3.select(tmpLab).attr("data-llLat")));
+        tmpCoords.ll.lng.push(parseFloat(d3.select(tmpLab).attr("data-llLng")));
+        tmpCoords.ur.lat.push(parseFloat(d3.select(tmpLab).attr("data-urLat")));
+        tmpCoords.ur.lng.push(parseFloat(d3.select(tmpLab).attr("data-urLng")));
+      }
+    });
+    map.fitBounds([[Math.min(...tmpCoords.ll.lat), Math.min(...tmpCoords.ll.lng)],[Math.max(...tmpCoords.ur.lat), Math.max(...tmpCoords.ur.lng)]]);
+
 
     //***Display appropriate windows
     $('#outputDiv').modal('hide')
     d3.select("#waitingDiv").style("display", "none");
     d3.select("#outputPreview").style("display", "none");
     d3.select("#outputOptions").style("display", "block");
-    d3.selectAll(".choice").style("display", "none");
-    d3.select("#resChoice").style("display", "block");
+    //d3.selectAll(".choice").style("display", "none");
+    //d3.select("#resChoice").style("display", "block");
+    $("#selRes").click();
     $("#resFigs").click();
   });
 
@@ -271,7 +329,7 @@ function socket_emit() {
 //******View large version of figure/table in center window
 function viewFig(tmpID) {
   d3.select("#container-results")
-    .selectAll("#canvasChartsLargeDiv,#downloadJPEG")
+    .selectAll("#canvasChartsLargeDiv,#downloadJPEG,#downloadJPEGData")
     .remove();
 
   //***Make button to save graph as JPEG
@@ -279,8 +337,15 @@ function viewFig(tmpID) {
     .append("div")
     .attr("id", "downloadJPEG")
     .attr("class", "cl_select")
-    .property("title", "Click to download graph as a JPEG")
-    .html('<a id="dlJPEGLink" href="#" download="' + tmpID + ".jpg" + '"><span> Download Graph </span></a>');
+    .property("title", function() { if(d3.select("#resFigs").classed("active")) { return "Click to download graph as a JPEG"; } else { return "Click to download table as a JPEG"; } })
+    .html(function() { if(d3.select("#resFigs").classed("active")) { return '<a id="dlJPEGLink" href="#" download="' + tmpID + ".jpg" + '"><span> Download Graph Image </span></a>'; } else { return '<a id="dlJPEGLink" href="#" download="' + tmpID + ".jpg" + '"><span> Download Table Image </span></a>'; } });
+
+  d3.select("#container-results")
+    .append("div")
+    .attr("id", "downloadJPEGData")
+    .attr("class", "cl_select")
+    .property("title", function() { if(d3.select("#resFigs").classed("active")) { return "Click to download graph data as a CSV file"; } else { return "Click to download table data as a CSV file"; } })
+    .html(function() { if(d3.select("#resFigs").classed("active")) { return '<a id="dlJPEGDataLink" href="#" download="' + tmpID + ".csv" + '"><span> Download Graph Data </span></a>'; } else { return '<a id="dlJPEGDataLink" href="#" download="' + tmpID + ".csv" + '"><span> Download Table Data </span></a>'; } });
 
   d3.select("#container-results")
     .append("div")
@@ -306,7 +371,7 @@ function viewFig(tmpID) {
     .attr("id", "canvasPrint")
     .html('<canvas id="' + tmpID + 'Print"></canvas>');
 
-  if(!tmpID.includes("fig12") && !tmpID.includes("fig4") && !tmpID.includes("fig9") && !tmpID.includes("fig13") && !tmpID.includes("fig6") && !tmpID.includes("tab2") && !tmpID.includes("tab1")) {
+  if(!tmpID.includes("fig12") && !tmpID.includes("fig4") && !tmpID.includes("fig9") && !tmpID.includes("fig13") && !tmpID.includes("fig6") && !tmpID.includes("tab4") && !tmpID.includes("tab2") && !tmpID.includes("tab1")) {
     for (i = 0; i < chartOpts[tmpID].print.data.datasets.length; i++) {
       chartOpts[tmpID].print.data.datasets[i].borderColor = 'black';
     }
@@ -316,6 +381,14 @@ function viewFig(tmpID) {
     chartOpts[tmpID].print.options.layout.padding = {top: 105, right: 15, bottom: 40, left: 15};
     chartOpts[tmpID].print.options.scales.xAxes[0].ticks.fontSize = setFontSizePrint("Numbers", tmpID);          
     chartOpts[tmpID].print.options.scales.yAxes[0].ticks.fontSize = 20;          
+  }
+  else if(tmpID.includes("tab4")) {
+    chartOpts[tmpID].print.options.layout.padding = {top: 15, right: 0, bottom: 40, left: 0};
+    chartOpts[tmpID].print.options.scales.xAxes[0].ticks.fontSize = setFontSizePrint("Tables", tmpID);
+  }
+  else if(tmpID.includes("tab2c")) {
+    chartOpts[tmpID].print.options.layout.padding = {top: 70, right: 0, bottom: 40, left: 0};
+    chartOpts[tmpID].print.options.scales.xAxes[0].ticks.fontSize = setFontSizePrint("Tables", tmpID);
   }
   else if(tmpID.includes("tab")) {
     chartOpts[tmpID].print.options.layout.padding = {top: 105, right: 0, bottom: 40, left: 0};
@@ -359,6 +432,8 @@ function viewFig(tmpID) {
 
 
 
+
+
 //******Function to add Table title and info to canvas
 function addInfo(tmpPrint, tmpInfo, tmpRect, type, tmpWidth, id) {
   var t = tmpInfo.table;
@@ -370,9 +445,14 @@ function addInfo(tmpPrint, tmpInfo, tmpRect, type, tmpWidth, id) {
       var fontX = [3, 3 + 125, 3 + 225];
       break;
     case "large":
-      var fontSizes = [(22 + (22 * (tmpWidth * 0.15))), (18 + (18 * (tmpWidth * 0.15)))];
-      var fontY = [(7 + (7 * (tmpWidth * 0.15))), (42 + (42 * (tmpWidth * 0.15))), (67 + (67 * (tmpWidth * 0.15))), (92 + (92 * (tmpWidth * 0.15))), (117 + (117 * (tmpWidth * 0.15)))];
-      var fontX = [(7 + (7 * (tmpWidth * 0.15))), (7 + (7 * (tmpWidth * 0.15))) + 500, (7 + (7 * (tmpWidth * 0.15))) + 900];
+      //var tmpDiv = document.getElementById("canvasChartsLargeDiv");
+      //var tmpCan = tmpDiv.getElementsByTagName("canvas")[0];
+      //var tmpRect = tmpCan.getBoundingClientRect();
+      var tmpRect = document.getElementById("container-results").getBoundingClientRect();
+
+      var fontSizes = [(14 + (14 * (tmpWidth))), (10 + (10 * (tmpWidth)))];
+      var fontY = [(7 + (7 * (tmpWidth))), (25 + (25 * (tmpWidth))), (37 + (37 * (tmpWidth))), (49 + (49 * (tmpWidth))), (61 + (61 * (tmpWidth)))];
+      var fontX = [(7 + (7 * (tmpWidth))), (7 + (7 * (tmpWidth))) + (tmpRect.width * 0.36), (7 + (7 * (tmpWidth))) + (tmpRect.width * 0.64)];
       break;
     case "print":
       var fontSizes = [29, 23];
@@ -411,16 +491,19 @@ function addInfo(tmpPrint, tmpInfo, tmpRect, type, tmpWidth, id) {
           ctx.drawImage(legImg[t],(tmpRect.width - ((legImg[t].width * 0.2) + 3)),3, (legImg[t].width * 0.2), (legImg[t].height * 0.2));
           break;
         case "large":
-          legWidth = legImg[t].width/1.5;
-          legHeight = legImg[t].height/1.5;
-          var canRect = document.getElementById("canvasChartsLargeDiv").getBoundingClientRect();
-          ctx.drawImage(legImg[t],(canRect.width - (legWidth + (legWidth * (tmpWidth * 0.5)) + 10)),(7 + (7 * (tmpWidth * 0.5))), (legWidth + (legWidth * (tmpWidth * 0.5))), (legHeight + (legHeight * (tmpWidth * 0.5))));
+          var tmpCan = document.getElementById("canvasChartsLargeDiv").getElementsByTagName("canvas")[0].getBoundingClientRect();
+          var legWidth = tmpRect.width * 0.233;
+          var legHeight = (tmpRect.width / 2) * 0.233;
+          ctx.drawImage(legImg[t],((tmpRect.width - 20) - (legWidth + 10)),(7 + (7 * (tmpWidth))), legWidth, legHeight);
           break;
         case "print":
           ctx.drawImage(legImg[t],(tmpRect.width - (legImg[t].width + 10)),15);
           break;
       }
     }
+  }
+  else if(id.includes("tab4a")) {
+    ctx.fillText(tmpInfo.subtitle, fontX[0], fontY[1]);
   }
   else if(id.includes("tab2c") || id.includes("tab1c")) {
     ctx.fillText("Area: ", fontX[0], fontY[1]);
@@ -431,16 +514,134 @@ function addInfo(tmpPrint, tmpInfo, tmpRect, type, tmpWidth, id) {
     ctx.font = "normal " + fontSizes[1] + "px Arial";
     ctx.fillText("(" + tmpInfo.common + ")", fontX[2], fontY[2]);
 
-    ctx.fillText("CL for N sensitive sites (kg/ha/yr):", fontX[0], fontY[3]);
+    ctx.fillText("CL for N more sensitive sites (kg/ha/yr):", fontX[0], fontY[3]);
     ctx.fillText("Most protective CL: " + tmpInfo.minCL.toFixed(1), fontX[1], fontY[3]);
     ctx.fillText("CL range: " + tmpInfo.minCL.toFixed(1) + " to " + (tmpInfo.minCL + tmpInfo.range).toFixed(1), fontX[2], fontY[3]);
 
-    ctx.fillText("CL for N robust sites (kg/ha/yr):", fontX[0], fontY[4]);
+    ctx.fillText("CL for N less sensitive sites (kg/ha/yr):", fontX[0], fontY[4]);
     ctx.fillText("Most protective CL: " + tmpInfo.maxCL.toFixed(1), fontX[1], fontY[4]);
     ctx.fillText("CL range: " + tmpInfo.maxCL.toFixed(1) + " to " + (tmpInfo.maxCL + tmpInfo.range).toFixed(1), fontX[2], fontY[4]);
   }
 }
 
+
+
+
+
+//******Function to set link to csv file containing data used to make graph/table
+function setDataDL(tmpID, tmpVals, tmpLabels) {
+  var tmpCSV = "";
+  if(tmpID.includes("tab")) {
+    tmpCSV = chartOpts[tmpID].small.cl[0].title + "\n";
+    if(tmpID.includes("tab4")) {
+      tmpCSV += chartOpts[tmpID].small.cl[0].subtitle + "\n";
+    }
+    else if(tmpID.includes("tab1a") || tmpID.includes("tab2a") || tmpID.includes("tab3b") || tmpID.includes("tab3c")) {
+      tmpCSV += "Area:," + chartOpts[tmpID].small.cl[0].region + "\n";
+      tmpCSV += "Site:," + chartOpts[tmpID].small.cl[0].region_name + "\n";
+      if(outUnit == "hectares") {
+        tmpCSV += "Size (ha):," + chartOpts[tmpID].small.cl[0].area_ha + "\n";
+      }
+      else {
+        tmpCSV += "Size (ac):," + chartOpts[tmpID].small.cl[0].area_acres + "\n";
+      }
+      tmpCSV += "N Deposition (kg/ha/yr):," + chartOpts[tmpID].small.cl[0].min.toFixed(1) + " to " + chartOpts[tmpID].small.cl[0].max.toFixed(1) + "\n";
+    }
+    else if(tmpID.includes("tab1c") || tmpID.includes("tab2c")) {
+      tmpCSV += "Area:," + chartOpts[tmpID].small.cl[0].region + "\n";
+      tmpCSV += "Species:," + chartOpts[tmpID].small.cl[0].latin + "," + chartOpts[tmpID].small.cl[0].common + "\n";
+      tmpCSV += "CL for N more sensitive sites (kg/ha/yr):," + "Most protective CL: " + chartOpts[tmpID].small.cl[0].minCL.toFixed(1) + "," + "CL Range: " + chartOpts[tmpID].small.cl[0].minCL.toFixed(1) + " to " + (chartOpts[tmpID].small.cl[0].minCL + chartOpts[tmpID].small.cl[0].range).toFixed(1) + "\n";
+      tmpCSV += "CL for N less sensitive sites (kg/ha/yr):," + "Most protective CL: " + chartOpts[tmpID].small.cl[0].maxCL.toFixed(1) + "," + "CL Range: " + chartOpts[tmpID].small.cl[0].maxCL.toFixed(1) + " to " + (chartOpts[tmpID].small.cl[0].maxCL + chartOpts[tmpID].small.cl[0].range).toFixed(1) + "\n";
+    }
+
+    if(tmpID.includes("tab3")) {
+      tmpCSV += ",";
+    }
+
+    tmpLabels.forEach(function(lab) {
+      if (Array.isArray(lab)) {
+        tmpCSV += lab.join(" ") + ",";
+      }
+      else {
+        tmpCSV += lab + ",";
+      }
+    });
+    tmpCSV = tmpCSV.slice(0,-1) + "\n";
+
+    var cols = chartOpts[tmpID].small.data.datasets.length;
+    var rows = chartOpts[tmpID].small.data.datasets[0].data.length;
+
+    for(var i=0; i<rows; i++) {
+      if(tmpID.includes("tab3")) {
+        tmpCSV += chartOpts[tmpID].small.data.yLabels[i] + ",";
+      }
+      for(var j=0; j<cols; j ++) {
+        tmpCSV += tmpVals[i][j].toString().replace(/,/g, '') + ",";
+      };
+      tmpCSV = tmpCSV.slice(0,-1) + "\n";
+    };
+  }
+  else if(tmpID.includes("fig")) {
+    tmpCSV = chartOpts[tmpID].small.options.title.text + "\n";
+    tmpCSV += chartOpts[tmpID].small.options.scales.xAxes[1].scaleLabel.labelString + "\n";
+
+    if(!tmpID.includes("fig6")) {
+      tmpLabels.forEach(function(lab) {
+        tmpCSV += lab + ",";
+      });
+      tmpCSV = tmpCSV.slice(0,-1) + "\n";
+
+      var tmpX = chartOpts[tmpID].small.data.labels;
+      var tmpPrev = [];
+      for(var i = 0; i < chartOpts[tmpID].small.data.datasets.length; i++) {
+        tmpPrev.push(0);
+      }
+
+      for(var i = 0; i < tmpX.length; i++) {
+        tmpCSV += tmpX[i] + ",";
+        chartOpts[tmpID].small.data.datasets.forEach(function(set, a) {
+          if(set.data[i]) {
+            tmpCSV += set.data[i] + ",";
+            tmpPrev[a] = set.data[i];
+          }
+          else {
+            if(tmpID.includes("fig9") || tmpID.includes("fig13")) {
+              tmpCSV += tmpPrev[a] + ",";
+            }
+            else {
+              tmpCSV += "0,";
+            }
+          }
+        });
+        tmpCSV = tmpCSV.slice(0,-1) + "\n";
+      }
+    }
+    else {  //***For fig6a & fig6c
+      tmpLabels.forEach(function(lab) {
+        tmpCSV += lab + ",,";
+      });
+      tmpCSV = tmpCSV.slice(0,-1) + "\n";
+      tmpLabels.forEach(function(lab) {
+        tmpCSV += "N Deposition (kg/ha/yr),Cumulative % Area,";
+      });
+      tmpCSV = tmpCSV.slice(0,-1) + "\n";
+
+      for(var i = 0; i < 6; i++) {
+        chartOpts[tmpID].small.data.datasets.forEach(function(set, a) {
+          if(set.data.length >= (i + 1)) {
+            tmpCSV += set.data[i].x + "," + set.data[i].y + ",";
+          }
+          else {
+            tmpCSV += ",,";
+          }
+        });
+        tmpCSV = tmpCSV.slice(0,-1) + "\n";
+      }
+    }
+  }
+
+  d3.select("#dlJPEGDataLink").attr("href", "data:attachment/csv," +   encodeURIComponent(tmpCSV));
+}
 
 
 //******Function to adjust font size for each area in large graph
@@ -465,7 +666,7 @@ function setFontSizePrint(tmpArea, tmpID) {
       var tmpSize = 17;
       break;
     case "Class I Areas":
-      var tmpSize = 22;
+      var tmpSize = 20;
       break;
     case "Species":
       var tmpSize = 20;
@@ -552,7 +753,7 @@ function setFontSizeSmall(tmpArea, tmpID) {
       var tmpSize = 2;
       break;
     case "Class I Areas":
-      var tmpSize = 3;
+      var tmpSize = 2;
       break;
     case "Species":
       var tmpSize = 3;
@@ -678,7 +879,7 @@ function fig15a(tmpData) {
   //***Split area titles if more than 5 are present
   tmpAreas.forEach(function(d,i) {
     if(tmpAreas.length > 5) {
-      tmpAreas[i] = formatLabel(d,13);
+      tmpAreas[i] = formatLabel(areaShortName[d],12);
     }
   });
 
@@ -690,7 +891,12 @@ function fig15a(tmpData) {
 
   chartOpts.fig15a.small.data.labels = tmpAreas;
   chartOpts.fig15a.small.data.datasets[0].data = tmpPercent;
-  chartOpts.fig15a.small.options.onClick = function(evt, tmpArray) { viewFig("fig15a"); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig15a").classed("selected", true);};
+  chartOpts.fig15a.small.options.onClick = function(evt, tmpArray) {
+    viewFig("fig15a"); 
+    setDataDL("fig15a", 0, [d3.select("#areaList").attr("value"), chartOpts.fig15a.small.options.scales.yAxes[0].scaleLabel.labelString]);
+    d3.selectAll(".canvasChart").classed("selected", false);
+    d3.select("#fig15a").classed("selected", true);
+  };
   chartOpts.fig15a.small.options.title.text = "Exceedance of Most Protective Critical Load";
   chartOpts.fig15a.small.options.scales.yAxes[0].scaleLabel.labelString = "% Area in Exceedance of CL";
   chartOpts.fig15a.small.options.scales.xAxes[0].ticks.fontSize = setFontSizeSmall(d3.select("#areaList").attr("value"), "fig15a");
@@ -733,7 +939,7 @@ function fig15b(tmpData) {
   //***Split area titles if more than 5 are present
   tmpAreas.forEach(function(d,i) {
     if(tmpAreas.length > 5) {
-      tmpAreas[i] = formatLabel(d,13);
+      tmpAreas[i] = formatLabel(areaShortName[d],12);
     }
   });
 
@@ -763,7 +969,12 @@ function fig15b(tmpData) {
 
   chartOpts.fig15b.small.data.labels = tmpAreas;
   chartOpts.fig15b.small.data.datasets[0].data = tmpAcres;
-  chartOpts.fig15b.small.options.onClick = function(evt, tmpArray) { viewFig("fig15b"); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig15b").classed("selected", true);};
+  chartOpts.fig15b.small.options.onClick = function(evt, tmpArray) { 
+    viewFig("fig15b");
+    setDataDL("fig15b", 0, [d3.select("#areaList").attr("value"), chartOpts.fig15b.small.options.scales.yAxes[0].scaleLabel.labelString]);
+    d3.selectAll(".canvasChart").classed("selected", false);
+    d3.select("#fig15b").classed("selected", true);
+  };
   chartOpts.fig15b.small.options.title.text = "Exceedance of Most Protective Critical Load";
   chartOpts.fig15b.small.options.scales.yAxes[0].scaleLabel.labelString = tmpAreaLabel + " in Exceedance of CL " + tmpDivideLabel;
   chartOpts.fig15b.small.options.scales.xAxes[0].ticks.fontSize = setFontSizeSmall(d3.select("#areaList").attr("value"), "fig15b");
@@ -826,7 +1037,7 @@ function fig15bi(tmpData) {
   //***Split area titles if more than 5 are present
   excAreas.forEach(function(d,i) {
     if(excAreas.length > 5) {
-      excAreas[i] = formatLabel(d,13);
+      excAreas[i] = formatLabel(areaShortName[d],12);
     }
   });
 
@@ -873,7 +1084,12 @@ function fig15bi(tmpData) {
   chartOpts.fig15bi.small.options.legend.position = 'bottom';
   chartOpts.fig15bi.small.options.legend.labels.fontSize = 6;
   chartOpts.fig15bi.small.options.legend.labels.boxWidth = 6;
-  chartOpts.fig15bi.small.options.onClick = function(evt, tmpArray) { viewFig("fig15bi"); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig15bi").classed("selected", true);};
+  chartOpts.fig15bi.small.options.onClick = function(evt, tmpArray) { 
+    viewFig("fig15bi");
+    setDataDL("fig15bi", 0, [d3.select("#areaList").attr("value"), tmpAreaLabel + " in Exceedance of CL " + tmpDivideLabel, tmpAreaLabel + " not in Exceedance of CL " + tmpDivideLabel]);
+    d3.selectAll(".canvasChart").classed("selected", false);
+    d3.select("#fig15bi").classed("selected", true);
+  };
   chartOpts.fig15bi.small.options.title.text = "Exceedance of Most Protective Critical Load";
   chartOpts.fig15bi.small.options.scales.yAxes[0].scaleLabel.labelString = tmpAreaLabel + " in Exceedance of CL " + tmpDivideLabel;
   chartOpts.fig15bi.small.options.scales.yAxes[0].stacked = true;
@@ -934,7 +1150,12 @@ function fig2a(tmpData) {
 
     chartOpts["fig2a-" + i].small.data.labels = tmpSpp;
     chartOpts["fig2a-" + i].small.data.datasets[0].data = tmpPercent;
-    chartOpts["fig2a-" + i].small.options.onClick = function(evt, tmpArray) { viewFig("fig2a-" + i); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig2a-" + i).classed("selected", true);};
+    chartOpts["fig2a-" + i].small.options.onClick = function(evt, tmpArray) {
+      viewFig("fig2a-" + i);
+      setDataDL("fig2a-" + i, 0, ["Species", chartOpts["fig2a-" + i].small.options.scales.yAxes[0].scaleLabel.labelString]);
+      d3.selectAll(".canvasChart").classed("selected", false);
+      d3.select("#fig2a-" + i).classed("selected", true);
+    };
     chartOpts["fig2a-" + i].small.options.title.text = "Exceedance of Most Protective Critical Load";
     chartOpts["fig2a-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "% Area in Exceedance of CL";
     if(outSpecies == "latin") {
@@ -1023,7 +1244,12 @@ function fig2b(tmpData) {
 
     chartOpts["fig2b-" + i].small.data.labels = tmpSpp;
     chartOpts["fig2b-" + i].small.data.datasets[0].data = tmpAcres;
-    chartOpts["fig2b-" + i].small.options.onClick = function(evt, tmpArray) { viewFig("fig2b-" + i); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig2b-" + i).classed("selected", true);};
+    chartOpts["fig2b-" + i].small.options.onClick = function(evt, tmpArray) {
+      viewFig("fig2b-" + i);
+      setDataDL("fig2b-" + i, 0, ["Species", chartOpts["fig2b-" + i].small.options.scales.yAxes[0].scaleLabel.labelString]);
+      d3.selectAll(".canvasChart").classed("selected", false);
+      d3.select("#fig2b-" + i).classed("selected", true);
+    };
     chartOpts["fig2b-" + i].small.options.title.text = "Exceedance of Most Protective Critical Load";
     chartOpts["fig2b-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = tmpAreaLabel + " in Exceedance of CL " + tmpDivideLabel;
     if(outSpecies == "latin") {
@@ -1101,13 +1327,11 @@ function fig2bi(tmpData) {
     var excNoAcres = [];
     excSpp.forEach(function(spp,j) {
       for(obj in filtData) {
-        if(filtData[obj].species == spp) {
+        if(filtData[obj].species == spp || speciesJSON[filtData[obj].species] == spp) {
          excNoAcres[j] = filtData[obj].count * 0.2223945;
         } 
       }
     });
-
-
 
 
     //***Check to see if hectares has been selected as preferred unit
@@ -1156,7 +1380,12 @@ function fig2bi(tmpData) {
     chartOpts["fig2bi-" + i].small.options.legend.position = 'bottom';
     chartOpts["fig2bi-" + i].small.options.legend.labels.fontSize = 6;
     chartOpts["fig2bi-" + i].small.options.legend.labels.boxWidth = 6;
-    chartOpts["fig2bi-" + i].small.options.onClick = function(evt, tmpArray) { viewFig("fig2bi-" + i); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig2bi-" + i).classed("selected", true);};
+    chartOpts["fig2bi-" + i].small.options.onClick = function(evt, tmpArray) { 
+      viewFig("fig2bi-" + i);
+      setDataDL("fig2bi-" + i, 0, ["Species", tmpAreaLabel + " in Exceedance of CL " + tmpDivideLabel, tmpAreaLabel + " not in Exceedance of CL " + tmpDivideLabel]);
+      d3.selectAll(".canvasChart").classed("selected", false);
+      d3.select("#fig2bi-" + i).classed("selected", true);
+    };
     chartOpts["fig2bi-" + i].small.options.title.text = "Exceedance of Most Protective Critical Load";
     chartOpts["fig2bi-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = tmpAreaLabel + " in Exceedance of CL " + tmpDivideLabel;
     chartOpts["fig2bi-" + i].small.options.scales.yAxes[0].stacked = true;
@@ -1235,7 +1464,12 @@ function fig11a(tmpData) {
     chartOpts["fig11a-" + i].small.data.datasets[0].borderColor = 'rgba(255,102,0,1)';
     chartOpts["fig11a-" + i].small.data.datasets[0].hoverBackgroundColor = 'rgba(255,102,0,0.8)';
     chartOpts["fig11a-" + i].small.data.datasets[0].data = tmpPercent;
-    chartOpts["fig11a-" + i].small.options.onClick = function(evt, tmpArray) { viewFig("fig11a-" + i); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig11a-" + i).classed("selected", true);};
+    chartOpts["fig11a-" + i].small.options.onClick = function(evt, tmpArray) {
+      viewFig("fig11a-" + i);
+      setDataDL("fig11a-" + i, 0, [chartOpts["fig11a-" + i].small.options.scales.xAxes[0].scaleLabel.labelString, chartOpts["fig11a-" + i].small.options.scales.yAxes[0].scaleLabel.labelString]);
+      d3.selectAll(".canvasChart").classed("selected", false);
+      d3.select("#fig11a-" + i).classed("selected", true);
+    };
     chartOpts["fig11a-" + i].small.options.title.text = "Level of Exceedance of Most Protective Critical Load";
     chartOpts["fig11a-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "% Area in Exceedance of CL";
     //chartOpts["fig11a-" + i].small.options.scales.yAxes[0].ticks.max = 100;
@@ -1289,6 +1523,10 @@ function fig12a(tmpData) {
     var tmpPercent = filtData.map(function(d) { return d.percentage; });
     var tmpExc = filtData.map(function(d) { return d.exc; });
 
+    //***Add initial zeros
+    tmpPercent.splice(0,0,0);
+    tmpExc.splice(0,0,0);
+
     var maxLength = 0;
     tmpPercent.forEach(function(val,j) {
       if(val > 0 && j > maxLength) {
@@ -1315,7 +1553,12 @@ function fig12a(tmpData) {
     chartOpts["fig12a-" + i].small.data.datasets[0].pointRadius = 0;
     chartOpts["fig12a-" + i].small.data.datasets[0].pointHitRadius = 20;
     chartOpts["fig12a-" + i].small.data.datasets[0].lineTension = 0;
-    chartOpts["fig12a-" + i].small.options.onClick = function(evt, tmpArray) { viewFig("fig12a-" + i); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig12a-" + i).classed("selected", true);};
+    chartOpts["fig12a-" + i].small.options.onClick = function(evt, tmpArray) {
+      viewFig("fig12a-" + i); 
+      setDataDL("fig12a-" + i, 0, [chartOpts["fig12a-" + i].small.options.scales.xAxes[0].scaleLabel.labelString, chartOpts["fig12a-" + i].small.options.scales.yAxes[0].scaleLabel.labelString]);
+      d3.selectAll(".canvasChart").classed("selected", false);
+      d3.select("#fig12a-" + i).classed("selected", true);
+    };
     chartOpts["fig12a-" + i].small.options.title.text = "Level of Exceedance of Most Protective Critical Load";
     chartOpts["fig12a-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "% Area in Exceedance of CL";
     //chartOpts["fig12a-" + i].small.options.scales.yAxes[0].ticks.max = 100;
@@ -1376,6 +1619,10 @@ function fig12b(tmpData) {
       tmpPercent[j] = filtData.map(function(d) { return d.percentage; });
       tmpExc[j] = filtData.map(function(d) { return d.exc; });
 
+      //***Add initial zeros
+      tmpPercent[j].splice(0,0,0);
+      tmpExc[j].splice(0,0,0);
+
       //***Find greatest non-zero length
       tmpPercent[j].forEach(function(val,k) {
         if(val > 0 && k > maxLength) {
@@ -1417,7 +1664,14 @@ function fig12b(tmpData) {
     chartOpts["fig12b-" + i].small.options.legend.position = 'bottom';
     chartOpts["fig12b-" + i].small.options.legend.labels.fontSize = 5;
     chartOpts["fig12b-" + i].small.options.legend.labels.boxWidth = 5;
-    chartOpts["fig12b-" + i].small.options.onClick = function(evt, tmpArray) { viewFig("fig12b-" + i); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig12b-" + i).classed("selected", true);};
+    chartOpts["fig12b-" + i].small.options.onClick = function(evt, tmpArray) {
+      viewFig("fig12b-" + i);
+      var tmpLegend = chartOpts["fig12b-" + i].small.data.datasets.map(function(d) { return d.label; });
+      tmpLegend.splice(0,0,chartOpts["fig12b-" + i].small.options.scales.xAxes[0].scaleLabel.labelString);
+      setDataDL("fig12b-" + i, 0, tmpLegend);
+      d3.selectAll(".canvasChart").classed("selected", false);
+      d3.select("#fig12b-" + i).classed("selected", true);
+    };
     chartOpts["fig12b-" + i].small.options.title.text = "Level of Exceedance of Protective Critical Load Levels";
     chartOpts["fig12b-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "% Area in Exceedance of CL";
     //chartOpts["fig12b-" + i].small.options.scales.yAxes[0].ticks.max = 100;
@@ -1510,7 +1764,12 @@ function fig3a(tmpData) {
       chartOpts["fig3a-" + i + k].small.data.datasets[0].borderColor = 'rgba(68,114,196,1)';
       chartOpts["fig3a-" + i + k].small.data.datasets[0].hoverBackgroundColor = 'rgba(68,114,196,0.8)';
       chartOpts["fig3a-" + i + k].small.data.datasets[0].data = tmpPercent;
-      chartOpts["fig3a-" + i + k].small.options.onClick = function(evt, tmpArray) { viewFig("fig3a-" + i + k); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig3a-" + i + k).classed("selected", true);};
+      chartOpts["fig3a-" + i + k].small.options.onClick = function(evt, tmpArray) {
+        viewFig("fig3a-" + i + k);
+        setDataDL("fig3a-" + i + k, 0, [chartOpts["fig3a-" + i + k].small.options.scales.xAxes[0].scaleLabel.labelString, chartOpts["fig3a-" + i + k].small.options.scales.yAxes[0].scaleLabel.labelString]);
+        d3.selectAll(".canvasChart").classed("selected", false);
+        d3.select("#fig3a-" + i + k).classed("selected", true);
+      };
       chartOpts["fig3a-" + i + k].small.options.title.text = "Exceedance of Most Protective Critical Load";
       chartOpts["fig3a-" + i + k].small.options.scales.yAxes[0].scaleLabel.labelString = "% of Area with Level of Exceedance";
       //chartOpts["fig3a-" + i + k].small.options.scales.yAxes[0].ticks.max = 100;
@@ -1605,7 +1864,12 @@ function fig4a(tmpData) {
       chartOpts["fig4a-" + i + k].small.data.datasets[0].pointHitRadius = 20;
       chartOpts["fig4a-" + i + k].small.data.datasets[0].lineTension = 0;
       chartOpts["fig4a-" + i + k].small.data.datasets[0].data = tmpPercent;
-      chartOpts["fig4a-" + i + k].small.options.onClick = function(evt, tmpArray) { viewFig("fig4a-" + i + k); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig4a-" + i + k).classed("selected", true);};
+      chartOpts["fig4a-" + i + k].small.options.onClick = function(evt, tmpArray) {
+        viewFig("fig4a-" + i + k);
+        setDataDL("fig4a-" + i + k, 0, [chartOpts["fig4a-" + i + k].small.options.scales.xAxes[0].scaleLabel.labelString, chartOpts["fig4a-" + i + k].small.options.scales.yAxes[0].scaleLabel.labelString]);
+        d3.selectAll(".canvasChart").classed("selected", false);
+        d3.select("#fig4a-" + i + k).classed("selected", true);
+      };
       chartOpts["fig4a-" + i + k].small.options.title.text = "Exceedance of Most Protective Critical Load";
       chartOpts["fig4a-" + i + k].small.options.scales.yAxes[0].scaleLabel.labelString = "% of Area with Level of Exceedance";
       //chartOpts["fig4a-" + i + k].small.options.scales.yAxes[0].ticks.max = 100;
@@ -1729,7 +1993,14 @@ function fig4c(tmpData) {
     }
     chartOpts["fig4c-" + i].small.options.legend.labels.boxWidth = 4;
     chartOpts["fig4c-" + i].small.options.legend.labels.padding = 3;
-    chartOpts["fig4c-" + i].small.options.onClick = function(evt, tmpArray) { viewFig("fig4c-" + i); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig4c-" + i).classed("selected", true);};
+    chartOpts["fig4c-" + i].small.options.onClick = function(evt, tmpArray) {
+      viewFig("fig4c-" + i);
+      var tmpLegend = chartOpts["fig4c-" + i].small.data.datasets.map(function(d) { return d.label; });
+      tmpLegend.splice(0,0,chartOpts["fig4c-" + i].small.options.scales.xAxes[0].scaleLabel.labelString);
+      setDataDL("fig4c-" + i, 0, tmpLegend);
+      d3.selectAll(".canvasChart").classed("selected", false);
+      d3.select("#fig4c-" + i).classed("selected", true);
+    };
     chartOpts["fig4c-" + i].small.options.title.text = "Exceedance of Most Protective Critical Load";
     chartOpts["fig4c-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "% of Area with Level of Exceedance";
     //chartOpts["fig4c-" + i].small.options.scales.yAxes[0].ticks.max = 100;
@@ -1805,9 +2076,14 @@ function fig1a(tmpData) {
     chartOpts["fig1a-" + i].small.data.datasets[0].borderColor = 'rgba(153,153,255,1)';
     chartOpts["fig1a-" + i].small.data.datasets[0].hoverBackgroundColor = 'rgba(153,153,255,0.8)';
     chartOpts["fig1a-" + i].small.data.datasets[0].data = tmpLoPercent;
-    chartOpts["fig1a-" + i].small.options.onClick = function(evt, tmpArray) { viewFig("fig1a-" + i); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig1a-" + i).classed("selected", true);};
-    chartOpts["fig1a-" + i].small.options.title.text = "Percent Area Sensitive to N Deposition Based on Site Conditions";
-    chartOpts["fig1a-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "% of Area Sensitive to N Deposition";
+    chartOpts["fig1a-" + i].small.options.onClick = function(evt, tmpArray) {
+      viewFig("fig1a-" + i);
+      setDataDL("fig1a-" + i, 0, ["Species", chartOpts["fig1a-" + i].small.options.scales.yAxes[0].scaleLabel.labelString]);
+      d3.selectAll(".canvasChart").classed("selected", false);
+      d3.select("#fig1a-" + i).classed("selected", true);
+    };
+    chartOpts["fig1a-" + i].small.options.title.text = "Percent Area More Sensitive to N Deposition Based on Site Conditions";
+    chartOpts["fig1a-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "% of Area";
     if(outSpecies == "latin") {
       chartOpts["fig1a-" + i].small.options.scales.xAxes[0].ticks.fontStyle = 'italic';
     }
@@ -1907,9 +2183,17 @@ function fig1b(tmpData) {
     chartOpts["fig1b-" + i].small.options.legend.position = 'bottom';
     chartOpts["fig1b-" + i].small.options.legend.labels.fontSize = 6;
     chartOpts["fig1b-" + i].small.options.legend.labels.boxWidth = 6;
-    chartOpts["fig1b-" + i].small.options.onClick = function(evt, tmpArray) { viewFig("fig1b-" + i); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig1b-" + i).classed("selected", true);};
+    chartOpts["fig1b-" + i].small.options.onClick = function(evt, tmpArray) {
+      viewFig("fig1b-" + i);
+      var tmpLegend = chartOpts["fig1b-" + i].small.data.datasets.map(function(d) { return d.label; });
+      tmpLegend.forEach(function(leg, a) { tmpLegend[a] = chartOpts["fig1b-" + i].small.options.scales.yAxes[0].scaleLabel.labelString + " " + leg; });
+      tmpLegend.splice(0,0,"Species");
+      setDataDL("fig1b-" + i, 0, tmpLegend);
+      d3.selectAll(".canvasChart").classed("selected", false);
+      d3.select("#fig1b-" + i).classed("selected", true);
+    };
     chartOpts["fig1b-" + i].small.options.title.text = "Sensitivity of Area to N Deposition Based on Site Conditions";
-    chartOpts["fig1b-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = tmpAreaLabel + " with Level of Sensitivity " + tmpDivideLabel;
+    chartOpts["fig1b-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = tmpAreaLabel + " " + tmpDivideLabel;
     chartOpts["fig1b-" + i].small.options.scales.yAxes[0].stacked = true;
     if(outSpecies == "latin") {
       chartOpts["fig1b-" + i].small.options.scales.xAxes[0].ticks.fontStyle = 'italic';
@@ -2008,7 +2292,12 @@ function fig9a(tmpData) {
     chartOpts["fig9a-" + i].small.data.datasets[0].pointHitRadius = 20;
     chartOpts["fig9a-" + i].small.data.datasets[0].lineTension = 0.4;
     chartOpts["fig9a-" + i].small.data.datasets[0].spanGaps = true;
-    chartOpts["fig9a-" + i].small.options.onClick = function(evt, tmpArray) { viewFig("fig9a-" + i); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig9a-" + i).classed("selected", true);};
+    chartOpts["fig9a-" + i].small.options.onClick = function(evt, tmpArray) {
+      viewFig("fig9a-" + i);
+      setDataDL("fig9a-" + i, 0, [chartOpts["fig9a-" + i].small.options.scales.xAxes[0].scaleLabel.labelString, chartOpts["fig9a-" + i].small.options.scales.yAxes[0].scaleLabel.labelString]);
+      d3.selectAll(".canvasChart").classed("selected", false);
+      d3.select("#fig9a-" + i).classed("selected", true);
+    };
     chartOpts["fig9a-" + i].small.options.title.text = "Percent Area With Most Protective Critical Load";
     chartOpts["fig9a-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "Cumulative % Area";
     chartOpts["fig9a-" + i].small.options.scales.yAxes[0].ticks.max = 102;
@@ -2155,7 +2444,14 @@ function fig9b(tmpData) {
     chartOpts["fig9b-" + i].small.options.legend.position = 'bottom';
     chartOpts["fig9b-" + i].small.options.legend.labels.fontSize = 5;
     chartOpts["fig9b-" + i].small.options.legend.labels.boxWidth = 5;
-    chartOpts["fig9b-" + i].small.options.onClick = function(evt, tmpArray) { viewFig("fig9b-" + i); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig9b-" + i).classed("selected", true);};
+    chartOpts["fig9b-" + i].small.options.onClick = function(evt, tmpArray) {
+      viewFig("fig9b-" + i);
+      var tmpLegend = chartOpts["fig9b-" + i].small.data.datasets.map(function(d) { return d.label; });
+      tmpLegend.splice(0,0,chartOpts["fig9b-" + i].small.options.scales.xAxes[0].scaleLabel.labelString);
+      setDataDL("fig9b-" + i, 0, tmpLegend);
+      d3.selectAll(".canvasChart").classed("selected", false);
+      d3.select("#fig9b-" + i).classed("selected", true);
+    };
     chartOpts["fig9b-" + i].small.options.title.text = "Percent Area With Critical Loads";
     chartOpts["fig9b-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "Cumulative % Area";
     chartOpts["fig9b-" + i].small.options.scales.yAxes[0].ticks.max = 102;
@@ -2283,7 +2579,12 @@ function fig13e(tmpData) {
     chartOpts["fig13e-" + i].small.data.datasets[0].pointHitRadius = 20;
     chartOpts["fig13e-" + i].small.data.datasets[0].lineTension = 0;
     chartOpts["fig13e-" + i].small.data.datasets[0].spanGaps = true;
-    chartOpts["fig13e-" + i].small.options.onClick = function(evt, tmpArray) { viewFig("fig13e-" + i); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig13e-" + i).classed("selected", true);};
+    chartOpts["fig13e-" + i].small.options.onClick = function(evt, tmpArray) {
+      viewFig("fig13e-" + i);
+      setDataDL("fig13e-" + i, 0, [chartOpts["fig13e-" + i].small.options.scales.xAxes[0].scaleLabel.labelString, chartOpts["fig13e-" + i].small.options.scales.yAxes[0].scaleLabel.labelString]);
+      d3.selectAll(".canvasChart").classed("selected", false);
+      d3.select("#fig13e-" + i).classed("selected", true);
+    };
     chartOpts["fig13e-" + i].small.options.title.text = "Area in Exceedance of Most Protective CL at Each N Deposition Level";
     chartOpts["fig13e-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "Cumulative % Area in Exceedance of CL";
     chartOpts["fig13e-" + i].small.options.scales.yAxes[0].ticks.max = 102;
@@ -2442,7 +2743,14 @@ function fig13h(tmpData) {
     chartOpts["fig13h-" + i].small.options.legend.position = 'bottom';
     chartOpts["fig13h-" + i].small.options.legend.labels.fontSize = 5;
     chartOpts["fig13h-" + i].small.options.legend.labels.boxWidth = 5;
-    chartOpts["fig13h-" + i].small.options.onClick = function(evt, tmpArray) { viewFig("fig13h-" + i); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig13h-" + i).classed("selected", true);};
+    chartOpts["fig13h-" + i].small.options.onClick = function(evt, tmpArray) {
+      viewFig("fig13h-" + i);
+      var tmpLegend = chartOpts["fig13h-" + i].small.data.datasets.map(function(d) { return d.label; });
+      tmpLegend.splice(0,0,chartOpts["fig13h-" + i].small.options.scales.xAxes[0].scaleLabel.labelString);
+      setDataDL("fig13h-" + i, 0, tmpLegend);
+      d3.selectAll(".canvasChart").classed("selected", false);
+      d3.select("#fig13h-" + i).classed("selected", true);
+    };
     chartOpts["fig13h-" + i].small.options.title.text = "Area in Exceedance at Each N Deposition Level";
     chartOpts["fig13h-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "Cumulative % Area in Exceedance of CL";
     chartOpts["fig13h-" + i].small.options.scales.yAxes[0].ticks.max = 102;
@@ -2606,7 +2914,14 @@ function fig13g(tmpData) {
     chartOpts["fig13g-" + i].small.options.legend.position = 'bottom';
     chartOpts["fig13g-" + i].small.options.legend.labels.fontSize = 5;
     chartOpts["fig13g-" + i].small.options.legend.labels.boxWidth = 5;
-    chartOpts["fig13g-" + i].small.options.onClick = function(evt, tmpArray) { viewFig("fig13g-" + i); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig13g-" + i).classed("selected", true);};
+    chartOpts["fig13g-" + i].small.options.onClick = function(evt, tmpArray) {
+      viewFig("fig13g-" + i);
+      var tmpLegend = chartOpts["fig13g-" + i].small.data.datasets.map(function(d) { return d.label; });
+      tmpLegend.splice(0,0,chartOpts["fig13g-" + i].small.options.scales.xAxes[0].scaleLabel.labelString);
+      setDataDL("fig13g-" + i, 0, tmpLegend);
+      d3.selectAll(".canvasChart").classed("selected", false);
+      d3.select("#fig13g-" + i).classed("selected", true);
+    };
     chartOpts["fig13g-" + i].small.options.title.text = "Area in Exceedance at Each N Deposition Level";
     chartOpts["fig13g-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "Cumulative % Area in Exceedance of CL";
     chartOpts["fig13g-" + i].small.options.scales.yAxes[0].ticks.max = 102;
@@ -2694,7 +3009,7 @@ function fig6c(tmpData) {
     d3.select("#resRegFigExcCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
-      .html('<canvas id="fig6c-' + i + '" class="canvasChart" value="' + d3.select("#areaList").attr("value") + '">');
+      .html('<canvas id="fig6c-' + i + '" class="canvasChart" value="Numbers">');
 
     chartOpts["fig6c-" + i] = {};
     //***Small graph
@@ -2728,7 +3043,14 @@ function fig6c(tmpData) {
     else {
       chartOpts["fig6c-" + i].small.options.legend.labels.fontStyle = 'normal';
     }
-    chartOpts["fig6c-" + i].small.options.onClick = function(evt, tmpArray) { viewFig("fig6c-" + i); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig6c-" + i).classed("selected", true);};
+    chartOpts["fig6c-" + i].small.options.onClick = function(evt, tmpArray) {
+      viewFig("fig6c-" + i);
+      var tmpLegend = chartOpts["fig6c-" + i].small.data.datasets.map(function(d) { return d.label; });
+      //tmpLegend.splice(0,0,chartOpts["fig6c-" + i].small.options.scales.xAxes[0].scaleLabel.labelString);
+      setDataDL("fig6c-" + i, 0, tmpLegend);
+      d3.selectAll(".canvasChart").classed("selected", false);
+      d3.select("#fig6c-" + i).classed("selected", true);
+    };
     chartOpts["fig6c-" + i].small.options.title.text = "% Area in Exceedance of Most Protective CL at Each N Deposition Level";
     chartOpts["fig6c-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "Cumulative % Area in Exceedance of CL";
     chartOpts["fig6c-" + i].small.options.scales.yAxes[0].ticks.max = 102;
@@ -2736,6 +3058,7 @@ function fig6c(tmpData) {
     chartOpts["fig6c-" + i].small.options.scales.yAxes[0].afterBuildTicks = function(options) { options.ticks = options.ticks.filter(function(val) { return parseInt(val) <= 100; }); return; };
     chartOpts["fig6c-" + i].small.options.scales.xAxes[0].type = 'linear';
     chartOpts["fig6c-" + i].small.options.scales.xAxes[0].ticks.fontSize = setFontSizeSmall("Numbers", "fig6c");
+    chartOpts["fig6c-" + i].small.options.scales.xAxes[0].ticks.callback = function(value, index, values) { if(value % 2 == 0) {return value;} else {return "";} };
     chartOpts["fig6c-" + i].small.options.scales.xAxes[0].gridLines.display = true;
     chartOpts["fig6c-" + i].small.options.scales.xAxes[0].scaleLabel = {
       display: true,
@@ -2752,6 +3075,7 @@ function fig6c(tmpData) {
     });
     chartOpts["fig6c-" + i].large.options.legend.labels.padding = 12;
     chartOpts["fig6c-" + i].large.options.scales.yAxes[0].afterBuildTicks = function(options) { options.ticks = options.ticks.filter(function(val) { return parseInt(val) <= 100; }); return; };
+    chartOpts["fig6c-" + i].large.options.scales.xAxes[0].ticks.callback = function(value, index, values) { if(value % 2 == 0) {return value;} else {return "";} };
   
     //***Print graph
     chartOpts["fig6c-" + i].print = JSON.parse(JSON.stringify(chartOpts["fig6c-" + i].large));
@@ -2759,6 +3083,7 @@ function fig6c(tmpData) {
     chartOpts["fig6c-" + i].print.options.legend.labels.padding = 20;
     chartOpts["fig6c-" + i].print.options.legend.labels.fontSize = 20;
     chartOpts["fig6c-" + i].print.options.scales.yAxes[0].afterBuildTicks = function(options) { options.ticks = options.ticks.filter(function(val) { return parseInt(val) <= 100; }); return; };
+    chartOpts["fig6c-" + i].print.options.scales.xAxes[0].ticks.callback = function(value, index, values) { if(value % 2 == 0) {return value;} else {return "";} };
     chartOpts["fig6c-" + i].print.options.animation = {"duration": 0};
 
     var fig6c_ctx = document.getElementById("fig6c-" + i).getContext('2d');
@@ -2877,7 +3202,7 @@ function fig13f(tmpData) {
       pointHitRadius: 20,
       lineTension: 0,
       spanGaps: true,
-      label: reg
+      label: areaShortName[reg]
     }
   });
 
@@ -2886,7 +3211,14 @@ function fig13f(tmpData) {
   chartOpts["fig13f"].small.options.legend.labels.fontSize = 3;
   chartOpts["fig13f"].small.options.legend.labels.boxWidth = 3;
   chartOpts["fig13f"].small.options.legend.labels.padding = 3;
-  chartOpts["fig13f"].small.options.onClick = function(evt, tmpArray) { viewFig("fig13f"); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig13f").classed("selected", true);};
+  chartOpts["fig13f"].small.options.onClick = function(evt, tmpArray) {
+    viewFig("fig13f");
+    var tmpLegend = chartOpts["fig13f"].small.data.datasets.map(function(d) { return d.label; });
+    tmpLegend.splice(0,0,chartOpts["fig13f"].small.options.scales.xAxes[0].scaleLabel.labelString);
+    setDataDL("fig13f", 0, tmpLegend);
+    d3.selectAll(".canvasChart").classed("selected", false);
+    d3.select("#fig13f").classed("selected", true);
+  };
   chartOpts["fig13f"].small.options.title.text = "% Area in Exceedance of Most Protective CL at Each N Deposition Level";
   chartOpts["fig13f"].small.options.scales.yAxes[0].scaleLabel.labelString = "Cumulative % Area in Exceedance of CL";
   chartOpts["fig13f"].small.options.scales.yAxes[0].ticks.max = 102;
@@ -3012,7 +3344,12 @@ function fig13a(tmpData) {
     chartOpts["fig13a-" + i].small.data.datasets[0].pointHitRadius = 20;
     chartOpts["fig13a-" + i].small.data.datasets[0].lineTension = 0;
     chartOpts["fig13a-" + i].small.data.datasets[0].spanGaps = true;
-    chartOpts["fig13a-" + i].small.options.onClick = function(evt, tmpArray) { viewFig("fig13a-" + i); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig13a-" + i).classed("selected", true);};
+    chartOpts["fig13a-" + i].small.options.onClick = function(evt, tmpArray) {
+      viewFig("fig13a-" + i);
+      setDataDL("fig13a-" + i, 0, [chartOpts["fig13a-" + i].small.options.scales.xAxes[0].scaleLabel.labelString, chartOpts["fig13a-" + i].small.options.scales.yAxes[0].scaleLabel.labelString]);
+      d3.selectAll(".canvasChart").classed("selected", false);
+      d3.select("#fig13a-" + i).classed("selected", true);
+    };
     chartOpts["fig13a-" + i].small.options.title.text = "Area Protected at Most Protective CL at Each N Deposition Level";
     chartOpts["fig13a-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "Cumulative % Area Protected";
     chartOpts["fig13a-" + i].small.options.scales.yAxes[0].ticks.max = 102;
@@ -3169,7 +3506,14 @@ function fig13d(tmpData) {
     chartOpts["fig13d-" + i].small.options.legend.position = 'bottom';
     chartOpts["fig13d-" + i].small.options.legend.labels.fontSize = 5;
     chartOpts["fig13d-" + i].small.options.legend.labels.boxWidth = 5;
-    chartOpts["fig13d-" + i].small.options.onClick = function(evt, tmpArray) { viewFig("fig13d-" + i); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig13d-" + i).classed("selected", true);};
+    chartOpts["fig13d-" + i].small.options.onClick = function(evt, tmpArray) {
+      viewFig("fig13d-" + i);
+      var tmpLegend = chartOpts["fig13d-" + i].small.data.datasets.map(function(d) { return d.label; });
+      tmpLegend.splice(0,0,chartOpts["fig13d-" + i].small.options.scales.xAxes[0].scaleLabel.labelString);
+      setDataDL("fig13d-" + i, 0, tmpLegend);
+      d3.selectAll(".canvasChart").classed("selected", false);
+      d3.select("#fig13d-" + i).classed("selected", true);
+    };
     chartOpts["fig13d-" + i].small.options.title.text = "Area Protected at Each N Deposition Level";
     chartOpts["fig13d-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "Cumulative % Area Protected";
     chartOpts["fig13d-" + i].small.options.scales.yAxes[0].ticks.max = 102;
@@ -3329,7 +3673,14 @@ function fig13c(tmpData) {
     chartOpts["fig13c-" + i].small.options.legend.position = 'bottom';
     chartOpts["fig13c-" + i].small.options.legend.labels.fontSize = 5;
     chartOpts["fig13c-" + i].small.options.legend.labels.boxWidth = 5;
-    chartOpts["fig13c-" + i].small.options.onClick = function(evt, tmpArray) { viewFig("fig13c-" + i); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig13c-" + i).classed("selected", true);};
+    chartOpts["fig13c-" + i].small.options.onClick = function(evt, tmpArray) {
+      viewFig("fig13c-" + i);
+      var tmpLegend = chartOpts["fig13c-" + i].small.data.datasets.map(function(d) { return d.label; });
+      tmpLegend.splice(0,0,chartOpts["fig13c-" + i].small.options.scales.xAxes[0].scaleLabel.labelString);
+      setDataDL("fig13c-" + i, 0, tmpLegend);
+      d3.selectAll(".canvasChart").classed("selected", false);
+      d3.select("#fig13c-" + i).classed("selected", true);
+    };
     chartOpts["fig13c-" + i].small.options.title.text = "Area Protected at Each N Deposition Level";
     chartOpts["fig13c-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "Cumulative % Area Protected";
     chartOpts["fig13c-" + i].small.options.scales.yAxes[0].ticks.max = 102;
@@ -3418,7 +3769,7 @@ function fig6a(tmpData) {
     d3.select("#resRegFigProCanvas" + i)
       .append("div")
       .attr("class", "canvasChartSmall")
-      .html('<canvas id="fig6a-' + i + '" class="canvasChart" value="' + d3.select("#areaList").attr("value") + '">');
+      .html('<canvas id="fig6a-' + i + '" class="canvasChart" value="Numbers">');
 
     chartOpts["fig6a-" + i] = {};
     //***Small graph
@@ -3452,7 +3803,14 @@ function fig6a(tmpData) {
     else {
       chartOpts["fig6a-" + i].small.options.legend.labels.fontStyle = 'normal';
     }
-    chartOpts["fig6a-" + i].small.options.onClick = function(evt, tmpArray) { viewFig("fig6a-" + i); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig6a-" + i).classed("selected", true);};
+    chartOpts["fig6a-" + i].small.options.onClick = function(evt, tmpArray) {
+      viewFig("fig6a-" + i);
+      var tmpLegend = chartOpts["fig6a-" + i].small.data.datasets.map(function(d) { return d.label; });
+      //tmpLegend.splice(0,0,chartOpts["fig6a-" + i].small.options.scales.xAxes[0].scaleLabel.labelString);
+      setDataDL("fig6a-" + i, 0, tmpLegend);
+      d3.selectAll(".canvasChart").classed("selected", false);
+      d3.select("#fig6a-" + i).classed("selected", true);
+    };
     chartOpts["fig6a-" + i].small.options.title.text = "Area Protected at Most Protective CL at Each N Deposition Level";
     chartOpts["fig6a-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "Cumulative % Area Protected";
     chartOpts["fig6a-" + i].small.options.scales.yAxes[0].ticks.max = 102;
@@ -3460,6 +3818,7 @@ function fig6a(tmpData) {
     chartOpts["fig6a-" + i].small.options.scales.yAxes[0].afterBuildTicks = function(options) { options.ticks = options.ticks.filter(function(val) { return parseInt(val) <= 100; }); return; };
     chartOpts["fig6a-" + i].small.options.scales.xAxes[0].type = 'linear';
     chartOpts["fig6a-" + i].small.options.scales.xAxes[0].ticks.fontSize = setFontSizeSmall("Numbers", "fig6a");
+    chartOpts["fig6a-" + i].small.options.scales.xAxes[0].ticks.callback = function(value, index, values) { if(value % 2 == 0) {return value;} else {return "";} };
     chartOpts["fig6a-" + i].small.options.scales.xAxes[0].gridLines.display = true;
     chartOpts["fig6a-" + i].small.options.scales.xAxes[0].scaleLabel = {
       display: true,
@@ -3476,6 +3835,7 @@ function fig6a(tmpData) {
     });
     chartOpts["fig6a-" + i].large.options.legend.labels.padding = 12;
     chartOpts["fig6a-" + i].large.options.scales.yAxes[0].afterBuildTicks = function(options) { options.ticks = options.ticks.filter(function(val) { return parseInt(val) <= 100; }); return; };
+    chartOpts["fig6a-" + i].large.options.scales.xAxes[0].ticks.callback = function(value, index, values) { if(value % 2 == 0) {return value;} else {return "";} };
   
     //***Print graph
     chartOpts["fig6a-" + i].print = JSON.parse(JSON.stringify(chartOpts["fig6a-" + i].large));
@@ -3483,6 +3843,7 @@ function fig6a(tmpData) {
     chartOpts["fig6a-" + i].print.options.legend.labels.padding = 20;
     chartOpts["fig6a-" + i].print.options.legend.labels.fontSize = 20;
     chartOpts["fig6a-" + i].print.options.scales.yAxes[0].afterBuildTicks = function(options) { options.ticks = options.ticks.filter(function(val) { return parseInt(val) <= 100; }); return; };
+    chartOpts["fig6a-" + i].print.options.scales.xAxes[0].ticks.callback = function(value, index, values) { if(value % 2 == 0) {return value;} else {return "";} };
     chartOpts["fig6a-" + i].print.options.animation = {"duration": 0};
 
     var fig6a_ctx = document.getElementById("fig6a-" + i).getContext('2d');
@@ -3602,7 +3963,7 @@ function fig13b(tmpData) {
       pointHitRadius: 20,
       lineTension: 0,
       spanGaps: true,
-      label: reg
+      label: areaShortName[reg]
     }
   });
 
@@ -3611,7 +3972,14 @@ function fig13b(tmpData) {
   chartOpts["fig13b"].small.options.legend.labels.fontSize = 3;
   chartOpts["fig13b"].small.options.legend.labels.boxWidth = 3;
   chartOpts["fig13b"].small.options.legend.labels.padding = 3;
-  chartOpts["fig13b"].small.options.onClick = function(evt, tmpArray) { viewFig("fig13b"); d3.selectAll(".canvasChart").classed("selected", false); d3.select("#fig13b").classed("selected", true);};
+  chartOpts["fig13b"].small.options.onClick = function(evt, tmpArray) {
+    viewFig("fig13b");
+    var tmpLegend = chartOpts["fig13b"].small.data.datasets.map(function(d) { return d.label; });
+    tmpLegend.splice(0,0,chartOpts["fig13b"].small.options.scales.xAxes[0].scaleLabel.labelString);
+    setDataDL("fig13b", 0, tmpLegend);
+    d3.selectAll(".canvasChart").classed("selected", false);
+    d3.select("#fig13b").classed("selected", true);
+  };
   chartOpts["fig13b"].small.options.title.text = "Area Protected at Most Protective CL at Each N Deposition Level";
   chartOpts["fig13b"].small.options.scales.yAxes[0].scaleLabel.labelString = "Cumulative % Area Protected";
   chartOpts["fig13b"].small.options.scales.yAxes[0].ticks.max = 102;
@@ -3696,96 +4064,175 @@ function tab3b(tmpData) {
     var tmpCL = filtData.map(function(d) { return [d.min, d.max]; });
     var minCL = Math.min(...filtData.map(function(d) { return d.min; }));
     var maxCL = Math.max(...filtData.map(function(d) { return d.max; }));
-    regData[0].minCL = minCL;
-    regData[0].maxCL = maxCL;
-    regData[0].title = "% Area in Exceedance of Most Protective CL at Each N Deposition Level";
-    regData[0].table = 0;
 
-    if(maxCL % 1 != 0) {
-      maxCL = parseInt(maxCL) + 1;
-    }
+    if(tmpSpecies.length > 0) {
+      regData[0].minCL = minCL;
+      regData[0].maxCL = maxCL;
+      regData[0].title = "% Area in Exceedance of Most Protective CL at Each N Deposition Level";
+      regData[0].table = 0;
 
-    var tmpCLFull = [];
-    tmpSpecies.forEach(function(spp,k) {
-      tmpCLFull.push([]);
-      var tmpInt = 0;
-      var tmpVal = 0;
+      if(maxCL % 1 != 0) {
+        maxCL = parseInt(maxCL) + 1;
+      }
+
+      var tmpCLFull = [];
+      tmpSpecies.forEach(function(spp,k) {
+        tmpCLFull.push([]);
+        var tmpInt = 0;
+        var tmpVal = 0;
+        for(var j = 0; j <= maxCL; j++) {
+          if(tmpCL[k][tmpInt] <= j) {
+            tmpVal = tmpPercent[k][tmpInt]
+            tmpInt = 1;
+          }
+          tmpCLFull[k].push(tmpVal)
+        }
+      });
+
+      var tmpCLFullInvert = [];
+      var tmpCLFullMod = [];
+      var tmpColors = [];
+      var tmpXLabels = [];
       for(var j = 0; j <= maxCL; j++) {
-        if(tmpCL[k][tmpInt] <= j) {
-          tmpVal = tmpPercent[k][tmpInt]
-          tmpInt = 1;
+        tmpCLFullInvert.push([]);
+        tmpCLFullMod.push([]);
+        tmpColors.push([]);
+        for(var k = 0; k < tmpSpecies.length; k++) {
+          tmpCLFullInvert[j].push(tmpCLFull[k][j]);
+          tmpCLFullMod[j].push(j);
+          if(tmpCLFull[k][j] == 0) {
+            tmpColors[j].push("lightgray");
+          }
+          else if(tmpCLFull[k][j] <= 25) {
+            tmpColors[j].push("#ffddcc");
+          }
+          else if(tmpCLFull[k][j] <= 50) {
+            tmpColors[j].push("#ffaa80");
+          }
+          else if(tmpCLFull[k][j] <= 75) {
+            tmpColors[j].push("#ff7733");
+          }
+          else if(tmpCLFull[k][j] < 100) {
+            tmpColors[j].push("#e64d00");
+          }
+          else {
+            tmpColors[j].push("#993300");
+          }
         }
-        tmpCLFull[k].push(tmpVal)
+        tmpXLabels.push(j);
       }
-    });
-
-    var tmpCLFullInvert = [];
-    var tmpCLFullMod = [];
-    var tmpColors = [];
-    var tmpXLabels = [];
-    for(var j = 0; j <= maxCL; j++) {
-      tmpCLFullInvert.push([]);
-      tmpCLFullMod.push([]);
-      tmpColors.push([]);
-      for(var k = 0; k < tmpSpecies.length; k++) {
-        tmpCLFullInvert[j].push(tmpCLFull[k][j]);
-        tmpCLFullMod[j].push(j);
-        if(tmpCLFull[k][j] == 0) {
-          tmpColors[j].push("lightgray");
-        }
-        else if(tmpCLFull[k][j] <= 25) {
-          tmpColors[j].push("#ffddcc");
-        }
-        else if(tmpCLFull[k][j] <= 50) {
-          tmpColors[j].push("#ffaa80");
-        }
-        else if(tmpCLFull[k][j] <= 75) {
-          tmpColors[j].push("#ff7733");
-        }
-        else if(tmpCLFull[k][j] < 100) {
-          tmpColors[j].push("#e64d00");
-        }
-        else {
-          tmpColors[j].push("#993300");
-        }
-
-      }
-      tmpXLabels.push(j);
-    }
     
-    d3.select("#resRegTabExcCanvas" + i)
-      .append("div")
-      .attr("class", "canvasChartSmall")
-      .html('<canvas id="tab3b-' + i + '" class="canvasChart" value="Tables">');
+      d3.select("#resRegTabResponseCanvas" + i)
+        .append("div")
+        .attr("class", "canvasChartSmall")
+        .html('<canvas id="tab3b-' + i + '" class="canvasChart" value="Tables">');
 
-    d3.select("#tab3b-" + i).property("title", reg + " - Species Exceedance");
+      d3.select("#tab3b-" + i).property("title", reg + " - Species Exceedance");
 
-    chartOpts["tab3b-" + i] = {};
-    //***Small graph
-    chartOpts["tab3b-" + i].small = JSON.parse(JSON.stringify(chartOpts.default.bar));
-    chartOpts["tab3b-" + i].small.cl = regData;
-    chartOpts["tab3b-" + i].small.type = 'horizontalBar';
-    chartOpts["tab3b-" + i].small.data.yLabels = tmpSpecies;
-    chartOpts["tab3b-" + i].small.data.xLabels = tmpXLabels;
+      chartOpts["tab3b-" + i] = {};
+      //***Small graph
+      chartOpts["tab3b-" + i].small = JSON.parse(JSON.stringify(chartOpts.default.bar));
+      chartOpts["tab3b-" + i].small.cl = regData;
+      chartOpts["tab3b-" + i].small.type = 'horizontalBar';
+      chartOpts["tab3b-" + i].small.data.yLabels = tmpSpecies;
+      chartOpts["tab3b-" + i].small.data.xLabels = tmpXLabels;
 
-    tmpColors.forEach(function(color,j) {
-      chartOpts["tab3b-" + i].small.data.datasets[j] = {
-        backgroundColor: tmpColors[j],
-        borderColor: 'black',
-        borderWidth: 1,
-        data: tmpCLFullMod[j],
-        label: ""
+      tmpColors.forEach(function(color,j) {
+        chartOpts["tab3b-" + i].small.data.datasets[j] = {
+          backgroundColor: tmpColors[j],
+          borderColor: 'black',
+          borderWidth: 1,
+          data: tmpCLFullMod[j],
+          label: ""
+        }
+      });
+
+      chartOpts["tab3b-" + i].small.options.tooltips = {"enabled": false};
+      chartOpts["tab3b-" + i].small.options.animation = {
+        duration: 1,
+        hover: {"animationDuration": 0},
+        onComplete: function () {
+          var chartInstance = this.chart;
+          var ctx = chartInstance.ctx;
+          ctx.font = (3 + ((19 - maxCL)/8)) + "px Arial";
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+
+          if(this.data.datasets.length > 1) {
+            var binWidth = (chartInstance.controller.getDatasetMeta(1).data[0]._model.x - chartInstance.controller.getDatasetMeta(0).data[0]._model.x) / 2
+          }
+
+          this.data.datasets.forEach(function (dataset, i) {
+            if(i > 0) {
+              var meta = chartInstance.controller.getDatasetMeta(i);
+              meta.data.forEach(function (bar, index) {
+                var data = dataset.data[index];
+                if(tmpCLFull[bar._index][bar._datasetIndex] % 1 > 0) {
+                  ctx.fillText((Math.round(tmpCLFull[bar._index][bar._datasetIndex]) + 1) + "%", bar._model.x - binWidth, bar._model.y);
+                }
+                else {
+                  ctx.fillText(Math.round(tmpCLFull[bar._index][bar._datasetIndex]) + "%", bar._model.x - binWidth, bar._model.y);
+                }
+              });
+            }
+          });
+        }
       }
-    });
+      chartOpts["tab3b-" + i].small.options.animation.duration = 0;
+      chartOpts["tab3b-" + i].small.options.events = ["click"];
+      chartOpts["tab3b-" + i].small.options.onClick = function(evt, tmpArray) {
+        chartCanvas["tab3b-" + i + "Small"].clear();
+        chartCanvas["tab3b-" + i + "Small"].render();
+        viewFig("tab3b-" + i); 
+        setDataDL("tab3b-" + i, tmpCLFull, tmpXLabels);
+        d3.selectAll(".canvasChart").classed("selected", false); 
+        d3.select("#tab3b-" + i).classed("selected", true);
+        setTimeout(function() {
+          addInfo(chartCanvas["tab3b-" + i + "Small"], chartOpts["tab3b-" + i].small.cl[0], document.getElementById("tab3b-" + i).getBoundingClientRect(), "small", 1, "tab3b-" + i);
+        }, 30);
+      };
+      //chartOpts["tab3b-" + i].small.options.title.text = "% Area in Exceedance of Most Protective CL at Each N Deposition Level";
+      chartOpts["tab3b-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "Species";
+      chartOpts["tab3b-" + i].small.options.scales.yAxes[0].ticks.fontSize = 4;
+      if(outSpecies == "latin") {
+        chartOpts["tab3b-" + i].small.options.scales.yAxes[0].ticks.fontStyle = "italic";
+      }
+      else {
+        chartOpts["tab3b-" + i].small.options.scales.yAxes[0].ticks.fontStyle = "normal";
+      }
+      chartOpts["tab3b-" + i].small.options.scales.yAxes[0].stacked = true;
+      chartOpts["tab3b-" + i].small.options.scales.yAxes[0].barPercentage = 1;
+      chartOpts["tab3b-" + i].small.options.scales.yAxes[0].categoryPercentage = 1;
+      chartOpts["tab3b-" + i].small.options.scales.xAxes[0].position = 'top';
+      chartOpts["tab3b-" + i].small.options.scales.xAxes[0].gridLines.offsetGridLines = 'true';
+      chartOpts["tab3b-" + i].small.options.scales.xAxes[0].ticks.min = 0;
+      chartOpts["tab3b-" + i].small.options.scales.xAxes[0].ticks.max = maxCL - 1;
+      chartOpts["tab3b-" + i].small.options.scales.xAxes[0].type = 'category';
+      chartOpts["tab3b-" + i].small.options.scales.xAxes[0].ticks.fontSize = setFontSizeSmall("Tables", "tab3b");
+      chartOpts["tab3b-" + i].small.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return value + 1; };
+      chartOpts["tab3b-" + i].small.options.scales.xAxes[0].gridLines.display = true;
+      chartOpts["tab3b-" + i].small.options.scales.xAxes[0].scaleLabel = {
+        display: true,
+        labelString: "N Deposition (kg/ha/yr)",
+        fontSize: 8
+      }
+      //chartOpts["tab3b-" + i].small.options.scales.xAxes[1].scaleLabel.labelString = reg + ", Individual Species";
+      chartOpts["tab3b-" + i].small.options.scales.xAxes[1].gridLines.drawBorder = false;
+  
+      //***Large graph
+      chartOpts["tab3b-" + i].large = JSON.parse(JSON.stringify(chartOpts["tab3b-" + i].small));
+      //chartOpts["tab3b-" + i].large.options.onResize = function(inst, newSize) { console.log(newSize); addInfo(chartCanvas["tab3b-" + i + "Large"], chartOpts["tab3b-" + i].large.cl[0], newSize, "large", 0.75, "tab3b-" + i); },
+      chartOpts["tab3b-" + i].large.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return value + 1; };
+      chartOpts["tab3b-" + i].large.options.events = false;
+      chartOpts["tab3b-" + i].large.options.animation.onComplete = function () {
+        var tmpRect = document.getElementById("tab3b-" + i + "Large").getBoundingClientRect();
+        var initSize = (12 + ((19 - maxCL)/2)) / 2;
+        var modSize = (tmpRect.width - 730)/(1380 - 730);
+        var finalSize = initSize + (initSize * modSize);
 
-    chartOpts["tab3b-" + i].small.options.tooltips = {"enabled": false};
-    chartOpts["tab3b-" + i].small.options.animation = {
-      duration: 1,
-      hover: {"animationDuration": 0},
-      onComplete: function () {
         var chartInstance = this.chart;
         var ctx = chartInstance.ctx;
-        ctx.font = (3 + ((19 - maxCL)/8)) + "px Arial";
+        ctx.font = finalSize + "px Arial";
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
@@ -3798,111 +4245,55 @@ function tab3b(tmpData) {
             var meta = chartInstance.controller.getDatasetMeta(i);
             meta.data.forEach(function (bar, index) {
               var data = dataset.data[index];                            
-              ctx.fillText(Math.round(tmpCLFull[bar._index][bar._datasetIndex]) + "%", bar._model.x - binWidth, bar._model.y);
+              if(tmpCLFull[bar._index][bar._datasetIndex] % 1 > 0) {
+                ctx.fillText((Math.round(tmpCLFull[bar._index][bar._datasetIndex]) + 1) + "%", bar._model.x - binWidth, bar._model.y);
+              }
+              else {
+                ctx.fillText(Math.round(tmpCLFull[bar._index][bar._datasetIndex]) + "%", bar._model.x - binWidth, bar._model.y);
+              }
             });
           }
         });
       }
-    }
-    chartOpts["tab3b-" + i].small.options.animation.duration = 0;
-    chartOpts["tab3b-" + i].small.options.events = ["click"];
-    chartOpts["tab3b-" + i].small.options.onClick = function(evt, tmpArray) {
-      chartCanvas["tab3b-" + i + "Small"].clear();
-      chartCanvas["tab3b-" + i + "Small"].render();
-      viewFig("tab3b-" + i); 
-      d3.selectAll(".canvasChart").classed("selected", false); 
-      d3.select("#tab3b-" + i).classed("selected", true);
-      setTimeout(function() {
-        addInfo(chartCanvas["tab3b-" + i + "Small"], chartOpts["tab3b-" + i].small.cl[0], document.getElementById("tab3b-" + i).getBoundingClientRect(), "small", 1, "tab3b-" + i);
-      }, 30);
-    };
-    //chartOpts["tab3b-" + i].small.options.title.text = "% Area in Exceedance of Most Protective CL at Each N Deposition Level";
-    chartOpts["tab3b-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "Species";
-    chartOpts["tab3b-" + i].small.options.scales.yAxes[0].ticks.fontSize = 4;
-    if(outSpecies == "latin") {
-      chartOpts["tab3b-" + i].small.options.scales.yAxes[0].ticks.fontStyle = "italic";
-    }
-    else {
-      chartOpts["tab3b-" + i].small.options.scales.yAxes[0].ticks.fontStyle = "normal";
-    }
-    chartOpts["tab3b-" + i].small.options.scales.yAxes[0].stacked = true;
-    chartOpts["tab3b-" + i].small.options.scales.yAxes[0].barPercentage = 1;
-    chartOpts["tab3b-" + i].small.options.scales.yAxes[0].categoryPercentage = 1;
-    chartOpts["tab3b-" + i].small.options.scales.xAxes[0].position = 'top';
-    chartOpts["tab3b-" + i].small.options.scales.xAxes[0].gridLines.offsetGridLines = 'true';
-    chartOpts["tab3b-" + i].small.options.scales.xAxes[0].ticks.min = 0;
-    chartOpts["tab3b-" + i].small.options.scales.xAxes[0].ticks.max = maxCL - 1;
-    chartOpts["tab3b-" + i].small.options.scales.xAxes[0].type = 'category';
-    chartOpts["tab3b-" + i].small.options.scales.xAxes[0].ticks.fontSize = setFontSizeSmall("Tables", "tab3b");
-    chartOpts["tab3b-" + i].small.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return value + 1; };
-    chartOpts["tab3b-" + i].small.options.scales.xAxes[0].gridLines.display = true;
-    chartOpts["tab3b-" + i].small.options.scales.xAxes[0].scaleLabel = {
-      display: true,
-      labelString: "N Deposition (kg/ha/yr)",
-      fontSize: 8
-    }
-    //chartOpts["tab3b-" + i].small.options.scales.xAxes[1].scaleLabel.labelString = reg + ", Individual Species";
-    chartOpts["tab3b-" + i].small.options.scales.xAxes[1].gridLines.drawBorder = false;
-  
-    //***Large graph
-    chartOpts["tab3b-" + i].large = JSON.parse(JSON.stringify(chartOpts["tab3b-" + i].small));
-    //chartOpts["tab3b-" + i].large.options.onResize = function(inst, newSize) { console.log(newSize); addInfo(chartCanvas["tab3b-" + i + "Large"], chartOpts["tab3b-" + i].large.cl[0], newSize, "large", 0.75, "tab3b-" + i); },
-    chartOpts["tab3b-" + i].large.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return value + 1; };
-    chartOpts["tab3b-" + i].large.options.events = false;
-    chartOpts["tab3b-" + i].large.options.animation.onComplete = function () {
-      var chartInstance = this.chart;
-      var ctx = chartInstance.ctx;
-      ctx.font = (12 + ((19 - maxCL)/2)) + "px Arial";
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-
-      if(this.data.datasets.length > 1) {
-        var binWidth = (chartInstance.controller.getDatasetMeta(1).data[0]._model.x - chartInstance.controller.getDatasetMeta(0).data[0]._model.x) / 2
-      }
-
-      this.data.datasets.forEach(function (dataset, i) {
-        if(i > 0) {
-          var meta = chartInstance.controller.getDatasetMeta(i);
-          meta.data.forEach(function (bar, index) {
-            var data = dataset.data[index];                            
-            ctx.fillText(Math.round(tmpCLFull[bar._index][bar._datasetIndex]) + "%", bar._model.x - binWidth, bar._model.y);
-         });
-        }
-      });
-    }
 
   
-    //***Print graph
-    chartOpts["tab3b-" + i].print = JSON.parse(JSON.stringify(chartOpts["tab3b-" + i].large));
-    //chartOpts["tab3b-" + i].print.options.layout.padding.top = 20;
-    chartOpts["tab3b-" + i].print.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return value + 1; };
-    chartOpts["tab3b-" + i].print.options.animation.onComplete = function () {
-      var chartInstance = this.chart;
-      var ctx = chartInstance.ctx;
-      ctx.font = (18 + ((19 - maxCL)/2)) + "px Arial";
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
+      //***Print graph
+      chartOpts["tab3b-" + i].print = JSON.parse(JSON.stringify(chartOpts["tab3b-" + i].large));
+      //chartOpts["tab3b-" + i].print.options.layout.padding.top = 20;
+      chartOpts["tab3b-" + i].print.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return value + 1; };
+      chartOpts["tab3b-" + i].print.options.animation.onComplete = function () {
+        var chartInstance = this.chart;
+        var ctx = chartInstance.ctx;
+        ctx.font = (18 + ((19 - maxCL)/2)) + "px Arial";
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
 
-      if(this.data.datasets.length > 1) {
-        var binWidth = (chartInstance.controller.getDatasetMeta(1).data[0]._model.x - chartInstance.controller.getDatasetMeta(0).data[0]._model.x) / 2
+        if(this.data.datasets.length > 1) {
+          var binWidth = (chartInstance.controller.getDatasetMeta(1).data[0]._model.x - chartInstance.controller.getDatasetMeta(0).data[0]._model.x) / 2
+        }
+
+        this.data.datasets.forEach(function (dataset, i) {
+          if(i > 0) {
+            var meta = chartInstance.controller.getDatasetMeta(i);
+            meta.data.forEach(function (bar, index) {
+              var data = dataset.data[index];                            
+                if(tmpCLFull[bar._index][bar._datasetIndex] % 1 > 0) {
+                  ctx.fillText((Math.round(tmpCLFull[bar._index][bar._datasetIndex]) + 1) + "%", bar._model.x - binWidth, bar._model.y);
+                }
+                else {
+                  ctx.fillText(Math.round(tmpCLFull[bar._index][bar._datasetIndex]) + "%", bar._model.x - binWidth, bar._model.y);
+                }
+            });
+          }
+        });
       }
 
-      this.data.datasets.forEach(function (dataset, i) {
-        if(i > 0) {
-          var meta = chartInstance.controller.getDatasetMeta(i);
-          meta.data.forEach(function (bar, index) {
-            var data = dataset.data[index];                            
-            ctx.fillText(Math.round(tmpCLFull[bar._index][bar._datasetIndex]) + "%", bar._model.x - binWidth, bar._model.y);
-         });
-        }
-      });
+      var tab3b_ctx = document.getElementById("tab3b-" + i).getContext('2d');
+      chartCanvas["tab3b-" + i + "Small"] = new Chart(tab3b_ctx, chartOpts["tab3b-" + i].small);
+
+      //***Disable animation in small table so header and legend can be added
+      //chartOpts["tab3b-" + i].small.options.animation = false;
     }
-
-    var tab3b_ctx = document.getElementById("tab3b-" + i).getContext('2d');
-    chartCanvas["tab3b-" + i + "Small"] = new Chart(tab3b_ctx, chartOpts["tab3b-" + i].small);
-
-    //***Disable animation in small table so header and legend can be added
-    //chartOpts["tab3b-" + i].small.options.animation = false;
   });
 }
 
@@ -3949,97 +4340,180 @@ function tab3c(tmpData) {
     var tmpCL = filtData.map(function(d) { return [d.min, d.max]; });
     var minCL = Math.min(...filtData.map(function(d) { return d.min; }));
     var maxCL = Math.max(...filtData.map(function(d) { return d.max; }));
-    regData[0].minCL = minCL;
-    regData[0].maxCL = maxCL;
-    regData[0].title = "% Area Protected by Most Protective CL at Each N Deposition Level";
-    regData[0].table = 1;
 
-    if(maxCL % 1 != 0) {
-      maxCL = parseInt(maxCL) + 1;
-    }
+    if(tmpSpecies.length > 0) {
+      regData[0].minCL = minCL;
+      regData[0].maxCL = maxCL;
+      regData[0].title = "% Area Protected by Most Protective CL at Each N Deposition Level";
+      regData[0].table = 1;
 
-    var tmpCLFull = [];
-    tmpSpecies.forEach(function(spp,k) {
-      tmpCLFull.push([]);
-      var tmpInt = 0;
-      var tmpVal = 100;
+      if(maxCL % 1 != 0) {
+        maxCL = parseInt(maxCL) + 1;
+      }
+
+      var tmpCLFull = [];
+      tmpSpecies.forEach(function(spp,k) {
+        tmpCLFull.push([]);
+        var tmpInt = 0;
+        var tmpVal = 100;
+        for(var j = 0; j <= maxCL; j++) {
+          if(tmpCL[k][tmpInt] <= j) {
+            tmpVal = tmpPercent[k][tmpInt]
+            tmpInt = 1;
+          }
+          tmpCLFull[k].push(tmpVal)
+        }
+      });
+
+      var tmpCLFullInvert = [];
+      var tmpCLFullMod = [];
+      var tmpColors = [];
+      var tmpXLabels = [];
       for(var j = 0; j <= maxCL; j++) {
-        if(tmpCL[k][tmpInt] <= j) {
-          tmpVal = tmpPercent[k][tmpInt]
-          tmpInt = 1;
+        tmpCLFullInvert.push([]);
+        tmpCLFullMod.push([]);
+        tmpColors.push([]);
+        for(var k = 0; k < tmpSpecies.length; k++) {
+          tmpCLFullInvert[j].push(tmpCLFull[k][j]);
+          tmpCLFullMod[j].push(j);
+          if(tmpCLFull[k][j] == 0) {
+            tmpColors[j].push("#993300");
+          }
+          else if(tmpCLFull[k][j] <= 25) {
+            tmpColors[j].push("#e64d00");
+          }
+          else if(tmpCLFull[k][j] <= 50) {
+            tmpColors[j].push("#ff7733");
+          }
+          else if(tmpCLFull[k][j] <= 75) {
+            tmpColors[j].push("#ffaa80");
+          }
+          else if(tmpCLFull[k][j] < 100) {
+            tmpColors[j].push("#ffddcc");
+          }
+          else {
+            tmpColors[j].push("lightgray");
+          }
+
         }
-        tmpCLFull[k].push(tmpVal)
+        tmpXLabels.push(j);
       }
-    });
 
-    var tmpCLFullInvert = [];
-    var tmpCLFullMod = [];
-    var tmpColors = [];
-    var tmpXLabels = [];
-    for(var j = 0; j <= maxCL; j++) {
-      tmpCLFullInvert.push([]);
-      tmpCLFullMod.push([]);
-      tmpColors.push([]);
-      for(var k = 0; k < tmpSpecies.length; k++) {
-        tmpCLFullInvert[j].push(tmpCLFull[k][j]);
-        tmpCLFullMod[j].push(j);
-        if(tmpCLFull[k][j] == 0) {
-          tmpColors[j].push("#993300");
-        }
-        else if(tmpCLFull[k][j] <= 25) {
-          tmpColors[j].push("#e64d00");
-        }
-        else if(tmpCLFull[k][j] <= 50) {
-          tmpColors[j].push("#ff7733");
-        }
-        else if(tmpCLFull[k][j] <= 75) {
-          tmpColors[j].push("#ffaa80");
-        }
-        else if(tmpCLFull[k][j] < 100) {
-          tmpColors[j].push("#ffddcc");
-        }
-        else {
-          tmpColors[j].push("lightgray");
-        }
+      d3.select("#resRegTabResponseCanvas" + i)
+        .append("div")
+        .attr("class", "canvasChartSmall")
+        //.html('<canvas id="tab3c-' + i + '" class="canvasChart" value="' + d3.select("#areaList").attr("value") + '">');
+        .html('<canvas id="tab3c-' + i + '" class="canvasChart" value="Tables">');
 
+      d3.select("#tab3c-" + i).property("title", reg + " - Species Protection");
+
+      chartOpts["tab3c-" + i] = {};
+      //***Small graph
+      chartOpts["tab3c-" + i].small = JSON.parse(JSON.stringify(chartOpts.default.bar));
+      chartOpts["tab3c-" + i].small.cl = regData;
+      chartOpts["tab3c-" + i].small.type = 'horizontalBar';
+      chartOpts["tab3c-" + i].small.data.yLabels = tmpSpecies;
+      chartOpts["tab3c-" + i].small.data.xLabels = tmpXLabels;
+
+      tmpColors.forEach(function(color,j) {
+        chartOpts["tab3c-" + i].small.data.datasets[j] = {
+          backgroundColor: tmpColors[j],
+          borderColor: 'black',
+          borderWidth: 1,
+          data: tmpCLFullMod[j],
+          label: ""
+        }
+      });
+
+      chartOpts["tab3c-" + i].small.options.tooltips = {"enabled": false};
+      chartOpts["tab3c-" + i].small.options.animation = {
+        duration: 1,
+        hover: {"animationDuration": 0},
+        onComplete: function () {
+          var chartInstance = this.chart;
+          var ctx = chartInstance.ctx;
+          ctx.font = (3 + ((19 - maxCL)/8)) + "px Arial";
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+
+          if(this.data.datasets.length > 1) {
+            var binWidth = (chartInstance.controller.getDatasetMeta(1).data[0]._model.x - chartInstance.controller.getDatasetMeta(0).data[0]._model.x) / 2
+          }
+
+          this.data.datasets.forEach(function (dataset, i) {
+            if(i > 0) {
+              var meta = chartInstance.controller.getDatasetMeta(i);
+              meta.data.forEach(function (bar, index) {
+                //var data = dataset.data[index];                            
+                if(tmpCLFull[bar._index][bar._datasetIndex] % 1 > 0) {
+                  ctx.fillText(Math.floor(tmpCLFull[bar._index][bar._datasetIndex]) + "%", bar._model.x - binWidth, bar._model.y);
+                }
+                else {
+                  ctx.fillText(Math.round(tmpCLFull[bar._index][bar._datasetIndex]) + "%", bar._model.x - binWidth, bar._model.y);
+                }
+              });
+            }
+          });
+        }
       }
-      tmpXLabels.push(j);
-    }
-
-    d3.select("#resRegTabProCanvas" + i)
-      .append("div")
-      .attr("class", "canvasChartSmall")
-      //.html('<canvas id="tab3c-' + i + '" class="canvasChart" value="' + d3.select("#areaList").attr("value") + '">');
-      .html('<canvas id="tab3c-' + i + '" class="canvasChart" value="Tables">');
-
-    d3.select("#tab3c-" + i).property("title", reg + " - Species Protection");
-
-    chartOpts["tab3c-" + i] = {};
-    //***Small graph
-    chartOpts["tab3c-" + i].small = JSON.parse(JSON.stringify(chartOpts.default.bar));
-    chartOpts["tab3c-" + i].small.cl = regData;
-    chartOpts["tab3c-" + i].small.type = 'horizontalBar';
-    chartOpts["tab3c-" + i].small.data.yLabels = tmpSpecies;
-    chartOpts["tab3c-" + i].small.data.xLabels = tmpXLabels;
-
-    tmpColors.forEach(function(color,j) {
-      chartOpts["tab3c-" + i].small.data.datasets[j] = {
-        backgroundColor: tmpColors[j],
-        borderColor: 'black',
-        borderWidth: 1,
-        data: tmpCLFullMod[j],
-        label: ""
+      chartOpts["tab3c-" + i].small.options.animation.duration = 0;
+      chartOpts["tab3c-" + i].small.options.events = ["click"];
+      chartOpts["tab3c-" + i].small.options.onClick = function(evt, tmpArray) {
+        chartCanvas["tab3c-" + i + "Small"].clear();
+        chartCanvas["tab3c-" + i + "Small"].render();
+        viewFig("tab3c-" + i); 
+        setDataDL("tab3c-" + i, tmpCLFull, tmpXLabels);
+        d3.selectAll(".canvasChart").classed("selected", false); 
+        d3.select("#tab3c-" + i).classed("selected", true);
+        setTimeout(function() {
+          addInfo(chartCanvas["tab3c-" + i + "Small"], chartOpts["tab3c-" + i].small.cl[0], document.getElementById("tab3c-" + i).getBoundingClientRect(), "small", 1, "tab3c-" + i);
+        }, 30);
+      };
+      //chartOpts["tab3c-" + i].small.options.title.text = "% Area in Exceedance of Most Protective CL at Each N Deposition Level";
+      chartOpts["tab3c-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "Species";
+      chartOpts["tab3c-" + i].small.options.scales.yAxes[0].ticks.fontSize = 4;
+      if(outSpecies == "latin") {
+        chartOpts["tab3c-" + i].small.options.scales.yAxes[0].ticks.fontStyle = "italic";
       }
-    });
+      else {
+        chartOpts["tab3c-" + i].small.options.scales.yAxes[0].ticks.fontStyle = "normal";
+      }
+      chartOpts["tab3c-" + i].small.options.scales.yAxes[0].stacked = true;
+      chartOpts["tab3c-" + i].small.options.scales.yAxes[0].barPercentage = 1;
+      //chartOpts["tab3c-" + i].small.options.scales.yAxes[0].gridLines.color = 'rgba(0,0,0,1)';
+      chartOpts["tab3c-" + i].small.options.scales.yAxes[0].categoryPercentage = 1;
+      chartOpts["tab3c-" + i].small.options.scales.xAxes[0].position = 'top';
+      chartOpts["tab3c-" + i].small.options.scales.xAxes[0].gridLines.offsetGridLines = 'true';
+      chartOpts["tab3c-" + i].small.options.scales.xAxes[0].ticks.min = 0;
+      chartOpts["tab3c-" + i].small.options.scales.xAxes[0].ticks.max = maxCL - 1;
+      chartOpts["tab3c-" + i].small.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return value + 1; };
+      chartOpts["tab3c-" + i].small.options.scales.xAxes[0].type = 'category';
+      chartOpts["tab3c-" + i].small.options.scales.xAxes[0].ticks.fontSize = setFontSizeSmall("Tables", "tab3c");
+      chartOpts["tab3c-" + i].small.options.scales.xAxes[0].gridLines.display = true;
+      chartOpts["tab3c-" + i].small.options.scales.xAxes[0].gridLines.color = 'rgba(0,0,0,1)';
+      chartOpts["tab3c-" + i].small.options.scales.xAxes[0].scaleLabel = {
+        display: true,
+        labelString: "N Deposition (kg/ha/yr)",
+        fontSize: 8
+      }
+      //chartOpts["tab3c-" + i].small.options.scales.xAxes[1].scaleLabel.labelString = reg + ", Individual Species";
+      chartOpts["tab3c-" + i].small.options.scales.xAxes[1].gridLines.drawBorder = false;
 
-    chartOpts["tab3c-" + i].small.options.tooltips = {"enabled": false};
-    chartOpts["tab3c-" + i].small.options.animation = {
-      duration: 1,
-      hover: {"animationDuration": 0},
-      onComplete: function () {
+  
+      //***Large graph
+      chartOpts["tab3c-" + i].large = JSON.parse(JSON.stringify(chartOpts["tab3c-" + i].small));
+      //chartOpts["tab3c-" + i].large.options.onResize = function(inst, newSize) { console.log(newSize); addInfo(chartCanvas["tab3c-" + i + "Large"], chartOpts["tab3c-" + i].large.cl[0], newSize, "large", 0.75, "tab3c-" + i); },
+      chartOpts["tab3c-" + i].large.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return value + 1; };
+      chartOpts["tab3c-" + i].large.options.events = false;
+      chartOpts["tab3c-" + i].large.options.animation.onComplete = function () {
+        var tmpRect = document.getElementById("tab3c-" + i + "Large").getBoundingClientRect();
+        var initSize = (12 + ((19 - maxCL)/2)) / 2;
+        var modSize = (tmpRect.width - 730)/(1380 - 730);
+        var finalSize = initSize + (initSize * modSize);
+
         var chartInstance = this.chart;
         var ctx = chartInstance.ctx;
-        ctx.font = (3 + ((19 - maxCL)/8)) + "px Arial";
+        ctx.font = finalSize + "px Arial";
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
@@ -4051,114 +4525,55 @@ function tab3c(tmpData) {
           if(i > 0) {
             var meta = chartInstance.controller.getDatasetMeta(i);
             meta.data.forEach(function (bar, index) {
-              //var data = dataset.data[index];                            
-              ctx.fillText(Math.round(tmpCLFull[bar._index][bar._datasetIndex]) + "%", bar._model.x - binWidth, bar._model.y);
+              var data = dataset.data[index];                            
+              if(tmpCLFull[bar._index][bar._datasetIndex] % 1 > 0) {
+                ctx.fillText(Math.floor(tmpCLFull[bar._index][bar._datasetIndex]) + "%", bar._model.x - binWidth, bar._model.y);
+              }
+              else {
+                ctx.fillText(Math.round(tmpCLFull[bar._index][bar._datasetIndex]) + "%", bar._model.x - binWidth, bar._model.y);
+              }
             });
           }
         });
       }
-    }
-    chartOpts["tab3c-" + i].small.options.animation.duration = 0;
-    chartOpts["tab3c-" + i].small.options.events = ["click"];
-    chartOpts["tab3c-" + i].small.options.onClick = function(evt, tmpArray) {
-      chartCanvas["tab3c-" + i + "Small"].clear();
-      chartCanvas["tab3c-" + i + "Small"].render();
-      viewFig("tab3c-" + i); 
-      d3.selectAll(".canvasChart").classed("selected", false); 
-      d3.select("#tab3c-" + i).classed("selected", true);
-      setTimeout(function() {
-        addInfo(chartCanvas["tab3c-" + i + "Small"], chartOpts["tab3c-" + i].small.cl[0], document.getElementById("tab3c-" + i).getBoundingClientRect(), "small", 1, "tab3c-" + i);
-      }, 30);
-    };
-    //chartOpts["tab3c-" + i].small.options.title.text = "% Area in Exceedance of Most Protective CL at Each N Deposition Level";
-    chartOpts["tab3c-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "Species";
-    chartOpts["tab3c-" + i].small.options.scales.yAxes[0].ticks.fontSize = 4;
-    if(outSpecies == "latin") {
-      chartOpts["tab3c-" + i].small.options.scales.yAxes[0].ticks.fontStyle = "italic";
-    }
-    else {
-      chartOpts["tab3c-" + i].small.options.scales.yAxes[0].ticks.fontStyle = "normal";
-    }
-    chartOpts["tab3c-" + i].small.options.scales.yAxes[0].stacked = true;
-    chartOpts["tab3c-" + i].small.options.scales.yAxes[0].barPercentage = 1;
-    //chartOpts["tab3c-" + i].small.options.scales.yAxes[0].gridLines.color = 'rgba(0,0,0,1)';
-    chartOpts["tab3c-" + i].small.options.scales.yAxes[0].categoryPercentage = 1;
-    chartOpts["tab3c-" + i].small.options.scales.xAxes[0].position = 'top';
-    chartOpts["tab3c-" + i].small.options.scales.xAxes[0].gridLines.offsetGridLines = 'true';
-    chartOpts["tab3c-" + i].small.options.scales.xAxes[0].ticks.min = 0;
-    chartOpts["tab3c-" + i].small.options.scales.xAxes[0].ticks.max = maxCL - 1;
-    chartOpts["tab3c-" + i].small.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return value + 1; };
-    chartOpts["tab3c-" + i].small.options.scales.xAxes[0].type = 'category';
-    chartOpts["tab3c-" + i].small.options.scales.xAxes[0].ticks.fontSize = setFontSizeSmall("Tables", "tab3c");
-    chartOpts["tab3c-" + i].small.options.scales.xAxes[0].gridLines.display = true;
-    chartOpts["tab3c-" + i].small.options.scales.xAxes[0].gridLines.color = 'rgba(0,0,0,1)';
-    chartOpts["tab3c-" + i].small.options.scales.xAxes[0].scaleLabel = {
-      display: true,
-      labelString: "N Deposition (kg/ha/yr)",
-      fontSize: 8
-    }
-    //chartOpts["tab3c-" + i].small.options.scales.xAxes[1].scaleLabel.labelString = reg + ", Individual Species";
-    chartOpts["tab3c-" + i].small.options.scales.xAxes[1].gridLines.drawBorder = false;
 
-  
-    //***Large graph
-    chartOpts["tab3c-" + i].large = JSON.parse(JSON.stringify(chartOpts["tab3c-" + i].small));
-    //chartOpts["tab3c-" + i].large.options.onResize = function(inst, newSize) { console.log(newSize); addInfo(chartCanvas["tab3c-" + i + "Large"], chartOpts["tab3c-" + i].large.cl[0], newSize, "large", 0.75, "tab3c-" + i); },
-    chartOpts["tab3c-" + i].large.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return value + 1; };
-    chartOpts["tab3c-" + i].large.options.events = false;
-    chartOpts["tab3c-" + i].large.options.animation.onComplete = function () {
-      var chartInstance = this.chart;
-      var ctx = chartInstance.ctx;
-      ctx.font = (12 + ((19 - maxCL)/2)) + "px Arial";
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
+      //***Print graph
+      chartOpts["tab3c-" + i].print = JSON.parse(JSON.stringify(chartOpts["tab3c-" + i].large));
+      //chartOpts["tab3c-" + i].print.options.layout.padding.top = 20;
+      chartOpts["tab3c-" + i].print.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return value + 1; };
+      chartOpts["tab3c-" + i].print.options.animation.onComplete = function () {
+        var chartInstance = this.chart;
+        var ctx = chartInstance.ctx;
+        ctx.font = (18 + ((19 - maxCL)/2)) + "px Arial";
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
 
-      if(this.data.datasets.length > 1) {
-        var binWidth = (chartInstance.controller.getDatasetMeta(1).data[0]._model.x - chartInstance.controller.getDatasetMeta(0).data[0]._model.x) / 2
+        if(this.data.datasets.length > 1) {
+          var binWidth = (chartInstance.controller.getDatasetMeta(1).data[0]._model.x - chartInstance.controller.getDatasetMeta(0).data[0]._model.x) / 2
+        }
+
+        this.data.datasets.forEach(function (dataset, i) {
+          if(i > 0) {
+            var meta = chartInstance.controller.getDatasetMeta(i);
+            meta.data.forEach(function (bar, index) {
+              var data = dataset.data[index];                            
+              if(tmpCLFull[bar._index][bar._datasetIndex] % 1 > 0) {
+                ctx.fillText(Math.floor(tmpCLFull[bar._index][bar._datasetIndex]) + "%", bar._model.x - binWidth, bar._model.y);
+              }
+              else {
+                ctx.fillText(Math.round(tmpCLFull[bar._index][bar._datasetIndex]) + "%", bar._model.x - binWidth, bar._model.y);
+              }
+            });
+          }
+        });
       }
 
-      this.data.datasets.forEach(function (dataset, i) {
-        if(i > 0) {
-          var meta = chartInstance.controller.getDatasetMeta(i);
-          meta.data.forEach(function (bar, index) {
-            var data = dataset.data[index];                            
-            ctx.fillText(Math.round(tmpCLFull[bar._index][bar._datasetIndex]) + "%", bar._model.x - binWidth, bar._model.y);
-         });
-        }
-      });
+      var tab3c_ctx = document.getElementById("tab3c-" + i).getContext('2d');
+      chartCanvas["tab3c-" + i + "Small"] = new Chart(tab3c_ctx, chartOpts["tab3c-" + i].small);
+
+      //***Disable animation in small table so header and legend can be added
+      //chartOpts["tab3c-" + i].small.options.animation = false;
     }
-
-    //***Print graph
-    chartOpts["tab3c-" + i].print = JSON.parse(JSON.stringify(chartOpts["tab3c-" + i].large));
-    //chartOpts["tab3c-" + i].print.options.layout.padding.top = 20;
-    chartOpts["tab3c-" + i].print.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return value + 1; };
-    chartOpts["tab3c-" + i].print.options.animation.onComplete = function () {
-      var chartInstance = this.chart;
-      var ctx = chartInstance.ctx;
-      ctx.font = (18 + ((19 - maxCL)/2)) + "px Arial";
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-
-      if(this.data.datasets.length > 1) {
-        var binWidth = (chartInstance.controller.getDatasetMeta(1).data[0]._model.x - chartInstance.controller.getDatasetMeta(0).data[0]._model.x) / 2
-      }
-
-      this.data.datasets.forEach(function (dataset, i) {
-        if(i > 0) {
-          var meta = chartInstance.controller.getDatasetMeta(i);
-          meta.data.forEach(function (bar, index) {
-            var data = dataset.data[index];                            
-            ctx.fillText(Math.round(tmpCLFull[bar._index][bar._datasetIndex]) + "%", bar._model.x - binWidth, bar._model.y);
-         });
-        }
-      });
-    }
-
-    var tab3c_ctx = document.getElementById("tab3c-" + i).getContext('2d');
-    chartCanvas["tab3c-" + i + "Small"] = new Chart(tab3c_ctx, chartOpts["tab3c-" + i].small);
-
-    //***Disable animation in small table so header and legend can be added
-    //chartOpts["tab3c-" + i].small.options.animation = false;
   });
 }
 
@@ -4259,10 +4674,10 @@ function tab2c(tmpData) {
     var tmpVals = [];
     var tmpValsNums = [0,1,2,3,4,5,6];
     if(outUnit == "hectares") {
-      var tmpXLabels = ["Region Name", ["Region Area", "(ha)"], ["N Deposition", "(kg/ha/yr)"], ["Species Area", "(ha)"], ["Species Area with", "N Deposition Data", "(ha)"], ["Area in Exceedance", "of Most Protective CL", "(ha)"], ["% Exceedance of", "Most Protective CL"]];
+      var tmpXLabels = ["Region Name", ["Region Area", "(ha)"], ["N Deposition", "(kg/ha/yr)"], ["Species Area", "(ha)"], ["Species Area with", "N Deposition Data", "(ha)"], ["Area in Exceedance", "of Most Protective", "CL (ha)"], ["% Exceedance of", "Most Protective CL"]];
     }
     else {
-      var tmpXLabels = ["Region Name", ["Region Area", "(ac)"], ["N Deposition", "(kg/ha/yr)"], ["Species Area", "(ac)"], ["Species Area with", "N Deposition Data", "(ac)"], ["Area in Exceedance", "of Most Protective CL", "(ac)"], ["% Exceedance of", "Most Protective CL"]];
+      var tmpXLabels = ["Region Name", ["Region Area", "(ac)"], ["N Deposition", "(kg/ha/yr)"], ["Species Area", "(ac)"], ["Species Area with", "N Deposition Data", "(ac)"], ["Area in Exceedance", "of Most Protective", "CL (ac)"], ["% Exceedance of", "Most Protective CL"]];
     }
 
     tmpNdep.forEach(function(reg,k) {
@@ -4275,7 +4690,7 @@ function tab2c(tmpData) {
       });
 
       tmpVals.push([]);
-      tmpVals[k][0] = formatLabel(reg, 27);
+      tmpVals[k][0] = formatLabel(areaShortName[reg], tmpLength);
       tmpVals[k][2] = ndepData[tmpBi].min.toFixed(1) + " - " + ndepData[tmpBi].max.toFixed(1);
       if(outUnit == "hectares") {
         tmpVals[k][1] = Math.round(ndepData[tmpBi].shape_area_m2 * 0.0001).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -4289,7 +4704,7 @@ function tab2c(tmpData) {
         tmpVals[k][4] = Math.round(areaData[k].area_acres).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         tmpVals[k][5] = Math.round(excData[k].count * 900 * 0.000247105).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
       }
-      tmpVals[k][6] = Math.round(excData[k].percentage) + "%";
+      tmpVals[k][6] = parseFloat(excData[k].percentage).toFixed(1) + "%";
     });
 
     //***Invert data for horizontal bar graph
@@ -4304,7 +4719,7 @@ function tab2c(tmpData) {
       }
     }
     
-    d3.select("#resRegTabExAreaCanvas-1")
+    d3.select("#resRegTabCurrentCanvas-1")
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="tab2c-' + i + '" class="canvasChart" value="Tables">');
@@ -4371,6 +4786,7 @@ function tab2c(tmpData) {
       chartCanvas["tab2c-" + i + "Small"].clear();
       chartCanvas["tab2c-" + i + "Small"].render();
       viewFig("tab2c-" + i); 
+      setDataDL("tab2c-" + i, tmpVals, tmpXLabels);
       d3.selectAll(".canvasChart").classed("selected", false); 
       d3.select("#tab2c-" + i).classed("selected", true);
       setTimeout(function() {
@@ -4397,7 +4813,7 @@ function tab2c(tmpData) {
     chartOpts["tab2c-" + i].small.options.scales.xAxes[1].gridLines.color = "rgba(0,0,0,0.3)";
     chartOpts["tab2c-" + i].small.options.scales.xAxes[1].position = 'bottom';
     chartOpts["tab2c-" + i].small.options.scales.xAxes[1].scaleLabel.display = false;
-    chartOpts["tab2c-" + i].small.options.layout.padding.top = 20;
+    chartOpts["tab2c-" + i].small.options.layout.padding.top = 10;
 
   
     //***Large graph
@@ -4408,7 +4824,8 @@ function tab2c(tmpData) {
     chartOpts["tab2c-" + i].large.options.animation.onComplete = function () {
       var chartInstance = this.chart;
       var ctx = chartInstance.ctx;
-      ctx.font = "13px Arial";
+      var chartDim = document.getElementById("canvasChartsLargeDiv").getElementsByTagName("canvas")[0].getBoundingClientRect();
+
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
@@ -4417,7 +4834,13 @@ function tab2c(tmpData) {
       this.data.datasets.forEach(function (dataset, i) {
         var meta = chartInstance.controller.getDatasetMeta(i);
         meta.data.forEach(function (bar, index) {
-          //var data = dataset.data[index];
+          if(bar._datasetIndex == 0) {
+            ctx.font = (7 + (7 * (Math.max((chartDim.width - 730),1)/730))) + "px Arial";
+          }
+          else {
+            ctx.font = (8 + (8 * (Math.max((chartDim.width - 730),1)/730))) + "px Arial";
+          }
+
           if(Array.isArray(tmpVals[bar._index][bar._datasetIndex])) {
             if(tmpVals[bar._index][bar._datasetIndex].length > 1) {
               var tmpX = bar._model.x + binWidth;
@@ -4560,90 +4983,173 @@ function tab2a(tmpData) {
 
     var tmpSpp = clData.map(function(d) { return d.species; });
 
-    regData = [{}];
-    regData[0].region = ndepData[0].region;
-    regData[0].region_name = reg;
-    regData[0].min = ndepData[0].min;
-    regData[0].max = ndepData[0].max;
-    regData[0].area_ha = Math.round(ndepData[0].shape_area_m2 * 0.0001);
-    regData[0].area_acres = Math.round(ndepData[0].shape_area_m2 * 0.000247105);
-    regData[0].title = "Exceedance for species in " + reg;
+    if(tmpSpp.length > 0) {
+      regData = [{}];
+      regData[0].region = ndepData[0].region;
+      regData[0].region_name = reg;
+      regData[0].min = ndepData[0].min;
+      regData[0].max = ndepData[0].max;
+      regData[0].area_ha = Math.round(ndepData[0].shape_area_m2 * 0.0001);
+      regData[0].area_acres = Math.round(ndepData[0].shape_area_m2 * 0.000247105);
+      regData[0].title = "Exceedance for species in " + reg;
 
-    var tmpVals = [];
-    var tmpValsNums = [0,1,2,3,4];
-    if(outUnit == "hectares") {
-      var tmpXLabels = ["Species", "Species Area (ha)", ["Species Area with N", "Deposition Data (ha)"], ["Area in Exceedance of", "Most Protective CL (ha)"], ["% Exceedance of", "Most Protective CL"]];
-    }
-    else {
-      var tmpXLabels = ["Species", "Species Area (ac)", ["Species Area with N", "Deposition Data (ac)"], ["Area in Exceedance of", "Most Protective CL (ac)"], ["% Exceedance of", "Most Protective CL"]];
-    }
-
-    tmpSpp.forEach(function(spp,k) {
-      tmpVals.push([]);
-      if(outSpecies == "latin") {  
-        tmpVals[k][0] = formatLabel(spp, 27);
-      }
-      else {
-        tmpVals[k][0] = formatLabel(speciesJSON[spp], 27);
-      }
+      var tmpVals = [];
+      var tmpValsNums = [0,1,2,3,4];
       if(outUnit == "hectares") {
-        tmpVals[k][1] = Math.round(clData[k].area_ha).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        tmpVals[k][2] = Math.round(areaData[k].area_ha).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        tmpVals[k][3] = Math.round(excData[k].count * 900 * 0.0001).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        var tmpXLabels = ["Species", "Species Area (ha)", ["Species Area with N", "Deposition Data (ha)"], ["Area in Exceedance of", "Most Protective CL (ha)"], ["% Exceedance of", "Most Protective CL"]];
       }
       else {
-        tmpVals[k][1] = Math.round(clData[k].area_acres).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        tmpVals[k][2] = Math.round(areaData[k].area_acres).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        tmpVals[k][3] = Math.round(excData[k].count * 900 * 0.000247105).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        var tmpXLabels = ["Species", "Species Area (ac)", ["Species Area with N", "Deposition Data (ac)"], ["Area in Exceedance of", "Most Protective CL (ac)"], ["% Exceedance of", "Most Protective CL"]];
       }
-      tmpVals[k][4] = Math.round(excData[k].percentage) + "%";
-    });
 
-    //***Invert data for horizontal bar graph
-    var tmpValsInvert = [];
-    var tmpValsMod = [];
-    for(var j = 0; j < tmpVals[0].length; j++) {
-      tmpValsInvert.push([]);
-      tmpValsMod.push([]);
-      for(var k = 0; k < tmpSpp.length; k++) {
-        tmpValsInvert[j].push(tmpVals[k][j]);
-        tmpValsMod[j].push(j);
+      tmpSpp.forEach(function(spp,k) {
+        tmpVals.push([]);
+        if(outSpecies == "latin") {  
+          tmpVals[k][0] = formatLabel(spp, 27);
+        }
+        else {
+          tmpVals[k][0] = formatLabel(speciesJSON[spp], 27);
+        }
+        if(outUnit == "hectares") {
+          tmpVals[k][1] = Math.round(clData[k].area_ha).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+          tmpVals[k][2] = Math.round(areaData[k].area_ha).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+          tmpVals[k][3] = Math.round(excData[k].count * 900 * 0.0001).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        else {
+          tmpVals[k][1] = Math.round(clData[k].area_acres).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+          tmpVals[k][2] = Math.round(areaData[k].area_acres).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+          tmpVals[k][3] = Math.round(excData[k].count * 900 * 0.000247105).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        tmpVals[k][4] = parseFloat(excData[k].percentage).toFixed(1) + "%";
+      });
+
+      //***Invert data for horizontal bar graph
+      var tmpValsInvert = [];
+      var tmpValsMod = [];
+      for(var j = 0; j < tmpVals[0].length; j++) {
+        tmpValsInvert.push([]);
+        tmpValsMod.push([]);
+        for(var k = 0; k < tmpSpp.length; k++) {
+          tmpValsInvert[j].push(tmpVals[k][j]);
+          tmpValsMod[j].push(j);
+        }
       }
-    }
     
-    d3.select("#resRegTabExAreaCanvas" + i)
-      .append("div")
-      .attr("class", "canvasChartSmall")
-      .html('<canvas id="tab2a-' + i + '" class="canvasChart" value="Tables">');
+      d3.select("#resRegTabCurrentCanvas" + i)
+        .append("div")
+        .attr("class", "canvasChartSmall")
+        .html('<canvas id="tab2a-' + i + '" class="canvasChart" value="Tables">');
 
-    d3.select("#tab2a-" + i).property("title", reg + " Exceedance by species");
+      d3.select("#tab2a-" + i).property("title", reg + " Exceedance by species");
 
-    chartOpts["tab2a-" + i] = {};
-    //***Small graph
-    chartOpts["tab2a-" + i].small = JSON.parse(JSON.stringify(chartOpts.default.bar));
-    chartOpts["tab2a-" + i].small.cl = regData;
-    chartOpts["tab2a-" + i].small.type = 'horizontalBar';
-    chartOpts["tab2a-" + i].small.data.yLabels = tmpSpp;
-    chartOpts["tab2a-" + i].small.data.xLabels = tmpValsNums;
+      chartOpts["tab2a-" + i] = {};
+      //***Small graph
+      chartOpts["tab2a-" + i].small = JSON.parse(JSON.stringify(chartOpts.default.bar));
+      chartOpts["tab2a-" + i].small.cl = regData;
+      chartOpts["tab2a-" + i].small.type = 'horizontalBar';
+      chartOpts["tab2a-" + i].small.data.yLabels = tmpSpp;
+      chartOpts["tab2a-" + i].small.data.xLabels = tmpValsNums;
 
-    tmpValsNums.forEach(function(stepVal,j) {
-      chartOpts["tab2a-" + i].small.data.datasets[j] = {
-        backgroundColor: 'rgba(0,0,0,0)',
-        borderColor: 'rgba(0,0,0,0)',
-        borderWidth: 1,
-        data: tmpValsMod[j],
-        label: ""
+      tmpValsNums.forEach(function(stepVal,j) {
+        chartOpts["tab2a-" + i].small.data.datasets[j] = {
+          backgroundColor: 'rgba(0,0,0,0)',
+          borderColor: 'rgba(0,0,0,0)',
+          borderWidth: 1,
+          data: tmpValsMod[j],
+          label: ""
+        }
+      });
+
+      chartOpts["tab2a-" + i].small.options.tooltips = {"enabled": false};
+      chartOpts["tab2a-" + i].small.options.animation = {
+        duration: 1,
+        hover: {"animationDuration": 0},
+        onComplete: function () {
+          var chartInstance = this.chart;
+          var ctx = chartInstance.ctx;
+          ctx.font = "3px Arial";
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+
+          var binWidth = (chartInstance.controller.getDatasetMeta(1).data[0]._model.x - chartInstance.controller.getDatasetMeta(0).data[0]._model.x) / 2
+
+          this.data.datasets.forEach(function (dataset, i) {
+            var meta = chartInstance.controller.getDatasetMeta(i);
+            meta.data.forEach(function (bar, index) {
+              if(bar._datasetIndex == 0 && outSpecies == "latin") {
+                ctx.font = "italic 3px Arial";
+              }
+              else {
+                ctx.font = "normal 3px Arial";
+              }
+              //var data = dataset.data[index];
+              if(Array.isArray(tmpVals[bar._index][bar._datasetIndex])) {
+                if(tmpVals[bar._index][bar._datasetIndex].length > 1) {
+                  var tmpX = bar._model.x + binWidth;
+                  var tmpY = bar._model.y - 2;
+                  tmpVals[bar._index][bar._datasetIndex].forEach(function(tmpLine, z) {
+                    ctx.fillText(tmpLine, tmpX, tmpY + (3 * z));
+                  });
+                }
+                else {
+                  ctx.fillText(tmpVals[bar._index][bar._datasetIndex], bar._model.x + binWidth, bar._model.y);
+                }
+              }
+              else {
+                ctx.fillText(tmpVals[bar._index][bar._datasetIndex], bar._model.x + binWidth, bar._model.y);
+              }
+            });
+          });
+        }
       }
-    });
+      chartOpts["tab2a-" + i].small.options.animation.duration = 0;
+      chartOpts["tab2a-" + i].small.options.events = ["click"];
+      chartOpts["tab2a-" + i].small.options.onClick = function(evt, tmpArray) {
+        chartCanvas["tab2a-" + i + "Small"].clear();
+        chartCanvas["tab2a-" + i + "Small"].render();
+        viewFig("tab2a-" + i); 
+        setDataDL("tab2a-" + i, tmpVals, tmpXLabels);
+        d3.selectAll(".canvasChart").classed("selected", false); 
+        d3.select("#tab2a-" + i).classed("selected", true);
+        setTimeout(function() {
+          addInfo(chartCanvas["tab2a-" + i + "Small"], chartOpts["tab2a-" + i].small.cl[0], document.getElementById("tab2a-" + i).getBoundingClientRect(), "small", 1, "tab2a-" + i);
+        }, 30);
+      };
 
-    chartOpts["tab2a-" + i].small.options.tooltips = {"enabled": false};
-    chartOpts["tab2a-" + i].small.options.animation = {
-      duration: 1,
-      hover: {"animationDuration": 0},
-      onComplete: function () {
+      chartOpts["tab2a-" + i].small.options.scales.yAxes[0].stacked = true;
+      chartOpts["tab2a-" + i].small.options.scales.yAxes[0].barPercentage = 1;
+      chartOpts["tab2a-" + i].small.options.scales.yAxes[0].ticks.display = false;
+      chartOpts["tab2a-" + i].small.options.scales.yAxes[0].gridLines.drawTicks = false;
+      chartOpts["tab2a-" + i].small.options.scales.yAxes[0].zeroLineColor = "rgba(0,0,0,0)";
+      chartOpts["tab2a-" + i].small.options.scales.yAxes[0].scaleLabel.display = false;
+      chartOpts["tab2a-" + i].small.options.scales.yAxes[1] = {position: 'right', display: true, ticks:{display:false}, scaleLabel:{display:false}, gridLines:{display:false, color: "rgba(0,0,0,0.3)"}, zeroLineColor: 'rgba(0,0,0,0)'};
+      chartOpts["tab2a-" + i].small.options.scales.yAxes[0].categoryPercentage = 1;
+      chartOpts["tab2a-" + i].small.options.scales.xAxes[0].position = 'top';
+      chartOpts["tab2a-" + i].small.options.scales.xAxes[0].gridLines.offsetGridLines = 'true';
+      chartOpts["tab2a-" + i].small.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return tmpXLabels[index]; };
+      chartOpts["tab2a-" + i].small.options.scales.xAxes[0].type = 'category';
+      chartOpts["tab2a-" + i].small.options.scales.xAxes[0].ticks.fontSize = setFontSizeSmall("Tables", "tab2a");
+      chartOpts["tab2a-" + i].small.options.scales.xAxes[0].ticks.fontWeigth = "bold";
+      chartOpts["tab2a-" + i].small.options.scales.xAxes[0].gridLines.tickMarkLength = 7;
+      chartOpts["tab2a-" + i].small.options.scales.xAxes[0].gridLines.display = true;
+      chartOpts["tab2a-" + i].small.options.scales.xAxes[1].gridLines.drawBorder = true;
+      chartOpts["tab2a-" + i].small.options.scales.xAxes[1].gridLines.color = "rgba(0,0,0,0.3)";
+      chartOpts["tab2a-" + i].small.options.scales.xAxes[1].position = 'bottom';
+      chartOpts["tab2a-" + i].small.options.scales.xAxes[1].scaleLabel.display = false;
+      chartOpts["tab2a-" + i].small.options.layout.padding.top = 20;
+
+  
+      //***Large graph
+      chartOpts["tab2a-" + i].large = JSON.parse(JSON.stringify(chartOpts["tab2a-" + i].small));
+      chartOpts["tab2a-" + i].large.options.scales.xAxes[0].gridLines.tickMarkLength = 30;
+      chartOpts["tab2a-" + i].large.options.events = false;
+      chartOpts["tab2a-" + i].large.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return tmpXLabels[index]; };
+      chartOpts["tab2a-" + i].large.options.animation.onComplete = function () {
         var chartInstance = this.chart;
         var ctx = chartInstance.ctx;
-        ctx.font = "3px Arial";
+        var chartDim = document.getElementById("canvasChartsLargeDiv").getElementsByTagName("canvas")[0].getBoundingClientRect();
+
+        //ctx.font = (8 + (8 * (Math.max((chartDim.width - 730),1)/730))) + "px Arial";
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
@@ -4653,18 +5159,18 @@ function tab2a(tmpData) {
           var meta = chartInstance.controller.getDatasetMeta(i);
           meta.data.forEach(function (bar, index) {
             if(bar._datasetIndex == 0 && outSpecies == "latin") {
-              ctx.font = "italic 3px Arial";
+              ctx.font = "italic " + (8 + (8 * (Math.max((chartDim.width - 730),1)/730))) + "px Arial";
             }
             else {
-              ctx.font = "normal 3px Arial";
+              ctx.font = "normal " + (8 + (8 * (Math.max((chartDim.width - 730),1)/730))) + "px Arial";
             }
             //var data = dataset.data[index];
             if(Array.isArray(tmpVals[bar._index][bar._datasetIndex])) {
               if(tmpVals[bar._index][bar._datasetIndex].length > 1) {
                 var tmpX = bar._model.x + binWidth;
-                var tmpY = bar._model.y - 2;
+                var tmpY = bar._model.y - 7;
                 tmpVals[bar._index][bar._datasetIndex].forEach(function(tmpLine, z) {
-                  ctx.fillText(tmpLine, tmpX, tmpY + (3 * z));
+                  ctx.fillText(tmpLine, tmpX, tmpY + (14 * z));
                 });
               }
               else {
@@ -4677,134 +5183,56 @@ function tab2a(tmpData) {
           });
         });
       }
-    }
-    chartOpts["tab2a-" + i].small.options.animation.duration = 0;
-    chartOpts["tab2a-" + i].small.options.events = ["click"];
-    chartOpts["tab2a-" + i].small.options.onClick = function(evt, tmpArray) {
-      chartCanvas["tab2a-" + i + "Small"].clear();
-      chartCanvas["tab2a-" + i + "Small"].render();
-      viewFig("tab2a-" + i); 
-      d3.selectAll(".canvasChart").classed("selected", false); 
-      d3.select("#tab2a-" + i).classed("selected", true);
-      setTimeout(function() {
-        addInfo(chartCanvas["tab2a-" + i + "Small"], chartOpts["tab2a-" + i].small.cl[0], document.getElementById("tab2a-" + i).getBoundingClientRect(), "small", 1, "tab2a-" + i);
-      }, 30);
-    };
-
-    chartOpts["tab2a-" + i].small.options.scales.yAxes[0].stacked = true;
-    chartOpts["tab2a-" + i].small.options.scales.yAxes[0].barPercentage = 1;
-    chartOpts["tab2a-" + i].small.options.scales.yAxes[0].ticks.display = false;
-    chartOpts["tab2a-" + i].small.options.scales.yAxes[0].gridLines.drawTicks = false;
-    chartOpts["tab2a-" + i].small.options.scales.yAxes[0].zeroLineColor = "rgba(0,0,0,0)";
-    chartOpts["tab2a-" + i].small.options.scales.yAxes[0].scaleLabel.display = false;
-    chartOpts["tab2a-" + i].small.options.scales.yAxes[1] = {position: 'right', display: true, ticks:{display:false}, scaleLabel:{display:false}, gridLines:{display:false, color: "rgba(0,0,0,0.3)"}, zeroLineColor: 'rgba(0,0,0,0)'};
-    chartOpts["tab2a-" + i].small.options.scales.yAxes[0].categoryPercentage = 1;
-    chartOpts["tab2a-" + i].small.options.scales.xAxes[0].position = 'top';
-    chartOpts["tab2a-" + i].small.options.scales.xAxes[0].gridLines.offsetGridLines = 'true';
-    chartOpts["tab2a-" + i].small.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return tmpXLabels[index]; };
-    chartOpts["tab2a-" + i].small.options.scales.xAxes[0].type = 'category';
-    chartOpts["tab2a-" + i].small.options.scales.xAxes[0].ticks.fontSize = setFontSizeSmall("Tables", "tab2a");
-    chartOpts["tab2a-" + i].small.options.scales.xAxes[0].ticks.fontWeigth = "bold";
-    chartOpts["tab2a-" + i].small.options.scales.xAxes[0].gridLines.tickMarkLength = 7;
-    chartOpts["tab2a-" + i].small.options.scales.xAxes[0].gridLines.display = true;
-    chartOpts["tab2a-" + i].small.options.scales.xAxes[1].gridLines.drawBorder = true;
-    chartOpts["tab2a-" + i].small.options.scales.xAxes[1].gridLines.color = "rgba(0,0,0,0.3)";
-    chartOpts["tab2a-" + i].small.options.scales.xAxes[1].position = 'bottom';
-    chartOpts["tab2a-" + i].small.options.scales.xAxes[1].scaleLabel.display = false;
-    chartOpts["tab2a-" + i].small.options.layout.padding.top = 20;
 
   
-    //***Large graph
-    chartOpts["tab2a-" + i].large = JSON.parse(JSON.stringify(chartOpts["tab2a-" + i].small));
-    chartOpts["tab2a-" + i].large.options.scales.xAxes[0].gridLines.tickMarkLength = 30;
-    chartOpts["tab2a-" + i].large.options.events = false;
-    chartOpts["tab2a-" + i].large.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return tmpXLabels[index]; };
-    chartOpts["tab2a-" + i].large.options.animation.onComplete = function () {
-      var chartInstance = this.chart;
-      var ctx = chartInstance.ctx;
-      ctx.font = "13px Arial";
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
+      //***Print graph
+      chartOpts["tab2a-" + i].print = JSON.parse(JSON.stringify(chartOpts["tab2a-" + i].large));
+      chartOpts["tab2a-" + i].print.options.scales.xAxes[0].gridLines.tickMarkLength = 37;
+      chartOpts["tab2a-" + i].print.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return tmpXLabels[index]; };
+      chartOpts["tab2a-" + i].print.options.animation.onComplete = function () {
+        var chartInstance = this.chart;
+        var ctx = chartInstance.ctx;
+        ctx.font = "17px Arial";
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
 
-      var binWidth = (chartInstance.controller.getDatasetMeta(1).data[0]._model.x - chartInstance.controller.getDatasetMeta(0).data[0]._model.x) / 2
+        var binWidth = (chartInstance.controller.getDatasetMeta(1).data[0]._model.x - chartInstance.controller.getDatasetMeta(0).data[0]._model.x) / 2
 
-      this.data.datasets.forEach(function (dataset, i) {
-        var meta = chartInstance.controller.getDatasetMeta(i);
-        meta.data.forEach(function (bar, index) {
-          if(bar._datasetIndex == 0 && outSpecies == "latin") {
-            ctx.font = "italic 13px Arial";
-          }
-          else {
-            ctx.font = "normal 13px Arial";
-          }
-          //var data = dataset.data[index];
-          if(Array.isArray(tmpVals[bar._index][bar._datasetIndex])) {
-            if(tmpVals[bar._index][bar._datasetIndex].length > 1) {
-              var tmpX = bar._model.x + binWidth;
-              var tmpY = bar._model.y - 7;
-              tmpVals[bar._index][bar._datasetIndex].forEach(function(tmpLine, z) {
-                ctx.fillText(tmpLine, tmpX, tmpY + (14 * z));
-              });
+        this.data.datasets.forEach(function (dataset, i) {
+          var meta = chartInstance.controller.getDatasetMeta(i);
+          meta.data.forEach(function (bar, index) {
+            if(bar._datasetIndex == 0 && outSpecies == "latin") {
+              ctx.font = "italic 17px Arial";
+            }
+            else {
+              ctx.font = "normal 17px Arial";
+            }
+            //var data = dataset.data[index];                            
+            if(Array.isArray(tmpVals[bar._index][bar._datasetIndex])) {
+              if(tmpVals[bar._index][bar._datasetIndex].length > 1) {
+                var tmpX = bar._model.x + binWidth;
+                var tmpY = bar._model.y - 9;
+                tmpVals[bar._index][bar._datasetIndex].forEach(function(tmpLine, z) {
+                  ctx.fillText(tmpLine, tmpX, tmpY + (18 * z));
+                });
+              }
+              else {
+                ctx.fillText(tmpVals[bar._index][bar._datasetIndex], bar._model.x + binWidth, bar._model.y);
+              }
             }
             else {
               ctx.fillText(tmpVals[bar._index][bar._datasetIndex], bar._model.x + binWidth, bar._model.y);
             }
-          }
-          else {
-            ctx.fillText(tmpVals[bar._index][bar._datasetIndex], bar._model.x + binWidth, bar._model.y);
-          }
+          });
         });
-      });
-    }
+      }
 
-  
-    //***Print graph
-    chartOpts["tab2a-" + i].print = JSON.parse(JSON.stringify(chartOpts["tab2a-" + i].large));
-    chartOpts["tab2a-" + i].print.options.scales.xAxes[0].gridLines.tickMarkLength = 37;
-    chartOpts["tab2a-" + i].print.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return tmpXLabels[index]; };
-    chartOpts["tab2a-" + i].print.options.animation.onComplete = function () {
-      var chartInstance = this.chart;
-      var ctx = chartInstance.ctx;
-      ctx.font = "17px Arial";
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
+      var tab2a_ctx = document.getElementById("tab2a-" + i).getContext('2d');
+      chartCanvas["tab2a-" + i + "Small"] = new Chart(tab2a_ctx, chartOpts["tab2a-" + i].small);
 
-      var binWidth = (chartInstance.controller.getDatasetMeta(1).data[0]._model.x - chartInstance.controller.getDatasetMeta(0).data[0]._model.x) / 2
-
-      this.data.datasets.forEach(function (dataset, i) {
-        var meta = chartInstance.controller.getDatasetMeta(i);
-        meta.data.forEach(function (bar, index) {
-          if(bar._datasetIndex == 0 && outSpecies == "latin") {
-            ctx.font = "italic 17px Arial";
-          }
-          else {
-            ctx.font = "normal 17px Arial";
-          }
-          //var data = dataset.data[index];                            
-          if(Array.isArray(tmpVals[bar._index][bar._datasetIndex])) {
-            if(tmpVals[bar._index][bar._datasetIndex].length > 1) {
-              var tmpX = bar._model.x + binWidth;
-              var tmpY = bar._model.y - 9;
-              tmpVals[bar._index][bar._datasetIndex].forEach(function(tmpLine, z) {
-                ctx.fillText(tmpLine, tmpX, tmpY + (18 * z));
-              });
-            }
-            else {
-              ctx.fillText(tmpVals[bar._index][bar._datasetIndex], bar._model.x + binWidth, bar._model.y);
-            }
-          }
-          else {
-            ctx.fillText(tmpVals[bar._index][bar._datasetIndex], bar._model.x + binWidth, bar._model.y);
-          }
-        });
-      });
-    }
-
-    var tab2a_ctx = document.getElementById("tab2a-" + i).getContext('2d');
-    chartCanvas["tab2a-" + i + "Small"] = new Chart(tab2a_ctx, chartOpts["tab2a-" + i].small);
-
-    //***Disable animation in small table so header and legend can be added
-    //chartOpts["tab2a-" + i].small.options.animation = false;
+      //***Disable animation in small table so header and legend can be added
+      //chartOpts["tab2a-" + i].small.options.animation = false;
+    } 
   });
 }
 
@@ -4907,10 +5335,10 @@ function tab1c(tmpData) {
     var tmpVals = [];
     var tmpValsNums = [0,1,2,3,4,5];
     if(outUnit == "hectares") {
-      var tmpXLabels = ["Region Name", ["Region Area", "(ha)"], ["N Deposition", "(kg/ha/yr)"], ["Species Area", "(ha)"], ["Area N Sensitive", "(ha)"], "% Area N Sensitive"];
+      var tmpXLabels = ["Region Name", ["Region Area", "(ha)"], ["N Deposition", "(kg/ha/yr)"], ["Species Area", "(ha)"], ["Area N More", "Sensitive (ha)"], ["% Area N", "More Sensitive"]];
     }
     else {
-      var tmpXLabels = ["Region Name", ["Region Area", "(ac)"], ["N Deposition", "(kg/ha/yr)"], ["Species Area", "(ac)"], ["Area N Sensitive", "(ac)"], "% Area N Sensitive"];
+      var tmpXLabels = ["Region Name", ["Region Area", "(ac)"], ["N Deposition", "(kg/ha/yr)"], ["Species Area", "(ac)"], ["Area N More", "Sensitive (ac)"], ["% Area N", "More Sensitive"]];
     }
 
     tmpNdep.forEach(function(reg,k) {
@@ -4923,7 +5351,7 @@ function tab1c(tmpData) {
       });
 
       tmpVals.push([]);
-      tmpVals[k][0] = formatLabel(reg, 27);
+      tmpVals[k][0] = formatLabel(areaShortName[reg], tmpLength);
       tmpVals[k][2] = ndepData[tmpBi].min.toFixed(1) + " - " + ndepData[tmpBi].max.toFixed(1);
       if(outUnit == "hectares") {
         tmpVals[k][1] = Math.round(ndepData[tmpBi].shape_area_m2 * 0.0001).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -4935,7 +5363,7 @@ function tab1c(tmpData) {
         tmpVals[k][3] = Math.round(clData[k].area_acres).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         tmpVals[k][4] = Math.round(clData[k].lo_count * 900 * 0.000247105).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
       }
-      tmpVals[k][5] = Math.round(clData[k].lo_percent) + "%";
+      tmpVals[k][5] = parseFloat(clData[k].lo_percent).toFixed(1) + "%";
     });
 
     //***Invert data for horizontal bar graph
@@ -4950,7 +5378,7 @@ function tab1c(tmpData) {
       }
     }
     
-    d3.select("#resRegTabCLCanvas-1")
+    d3.select("#resRegTabCurrentCanvas-1")
       .append("div")
       .attr("class", "canvasChartSmall")
       .html('<canvas id="tab1c-' + i + '" class="canvasChart" value="Tables">');
@@ -5017,6 +5445,7 @@ function tab1c(tmpData) {
       chartCanvas["tab1c-" + i + "Small"].clear();
       chartCanvas["tab1c-" + i + "Small"].render();
       viewFig("tab1c-" + i); 
+      setDataDL("tab1c-" + i, tmpVals, tmpXLabels);
       d3.selectAll(".canvasChart").classed("selected", false); 
       d3.select("#tab1c-" + i).classed("selected", true);
       setTimeout(function() {
@@ -5043,7 +5472,7 @@ function tab1c(tmpData) {
     chartOpts["tab1c-" + i].small.options.scales.xAxes[1].gridLines.color = "rgba(0,0,0,0.3)";
     chartOpts["tab1c-" + i].small.options.scales.xAxes[1].position = 'bottom';
     chartOpts["tab1c-" + i].small.options.scales.xAxes[1].scaleLabel.display = false;
-    chartOpts["tab1c-" + i].small.options.layout.padding.top = 20;
+    chartOpts["tab1c-" + i].small.options.layout.padding.top = 7;
 
   
     //***Large graph
@@ -5054,7 +5483,9 @@ function tab1c(tmpData) {
     chartOpts["tab1c-" + i].large.options.animation.onComplete = function () {
       var chartInstance = this.chart;
       var ctx = chartInstance.ctx;
-      ctx.font = "13px Arial";
+      var chartDim = document.getElementById("canvasChartsLargeDiv").getElementsByTagName("canvas")[0].getBoundingClientRect();
+
+      ctx.font = (8 + (8 * (Math.max((chartDim.width - 730),1)/730))) + "px Arial";
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
@@ -5063,7 +5494,6 @@ function tab1c(tmpData) {
       this.data.datasets.forEach(function (dataset, i) {
         var meta = chartInstance.controller.getDatasetMeta(i);
         meta.data.forEach(function (bar, index) {
-          //var data = dataset.data[index];
           if(Array.isArray(tmpVals[bar._index][bar._datasetIndex])) {
             if(tmpVals[bar._index][bar._datasetIndex].length > 1) {
               var tmpX = bar._model.x + binWidth;
@@ -5209,98 +5639,181 @@ function tab1a(tmpData) {
 
     var tmpSpp = clData.map(function(d) { return d.species; });
 
-    regData = [{}];
-    regData[0].region = ndepData[0].region;
-    regData[0].region_name = reg;
-    regData[0].min = ndepData[0].min;
-    regData[0].max = ndepData[0].max;
-    regData[0].area_ha = Math.round(ndepData[0].shape_area_m2 * 0.0001);
-    regData[0].area_acres = Math.round(ndepData[0].shape_area_m2 * 0.000247105);
-    regData[0].title = "Critical Loads for species in " + reg;
+    if(tmpSpp.length > 0) {
+      regData = [{}];
+      regData[0].region = ndepData[0].region;
+      regData[0].region_name = reg;
+      regData[0].min = ndepData[0].min;
+      regData[0].max = ndepData[0].max;
+      regData[0].area_ha = Math.round(ndepData[0].shape_area_m2 * 0.0001);
+      regData[0].area_acres = Math.round(ndepData[0].shape_area_m2 * 0.000247105);
+      regData[0].title = "Critical Loads for species in " + reg;
 
-    var tmpVals = [];
-    var tmpValsNums = [0,1,2,3,4,5];
-    if(outUnit == "hectares") {
-      var tmpXLabels = ["Species", ["Species Area", "(ha)"], ["CL Most Protective of N", "Sensitive Sites (kg/ha/yr)"], ["CL Most Protective of", "N Robust Sites (kg/ha/yr)"], ["Area N Sensitive", "(ha)"], "% Area N Sensitive"];
-    }
-    else {
-      var tmpXLabels = ["Species", ["Species Area", "(ac)"], ["CL Most Protective of N", "Sensitive Sites (kg/ha/yr)"], ["CL Most Protective of", "N Robust Sites (kg/ha/yr)"], ["Area N Sensitive", "(ac)"], "% Area N Sensitive"];
-    }
+      var tmpVals = [];
+      var tmpValsNums = [0,1,2,3,4,5];
+      if(outUnit == "hectares") {
+        var tmpXLabels = ["Species", ["Species Area", "(ha)"], ["CL Most Protective of", "N More Sensitive", "Sites (kg/ha/yr)"], ["CL Most Protective of", "N Less Sensitive", "Sites (kg/ha/yr)"], ["Area N More", "Sensitive (ha)"], ["% Area N", "More Sensitive"]];
+      }
+      else {
+        var tmpXLabels = ["Species", ["Species Area", "(ac)"], ["CL Most Protective of", "N More Sensitive", "Sites (kg/ha/yr)"], ["CL Most Protective of", "N Less Sensitive", "Sites (kg/ha/yr)"], ["Area N More", "Sensitive (ac)"], ["% Area N", "More Sensitive"]];
+      }
 
-    tmpSpp.forEach(function(spp,k) {
-      var tmpBi = 0;
-      rangeData.some(function(d,j) {
-        if(d.species == spp) {
-          tmpBi = j;
+      tmpSpp.forEach(function(spp,k) {
+        var tmpBi = 0;
+        rangeData.some(function(d,j) {
+          if(d.species == spp) {
+            tmpBi = j;
+          }
+          return tmpBi > 0;
+        });
+
+        tmpVals.push([]);
+        if(outSpecies == "latin") {  
+          tmpVals[k][0] = formatLabel(spp, 27);
         }
-        return tmpBi > 0;
+        else {
+          tmpVals[k][0] = formatLabel(speciesJSON[spp], 27);
+        }
+        tmpVals[k][2] = rangeData[tmpBi].min.toFixed(1);
+        tmpVals[k][3] = rangeData[tmpBi].max.toFixed(1);
+        if(outUnit == "hectares") {
+          tmpVals[k][1] = Math.round(clData[k].area_ha).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+          tmpVals[k][4] = Math.round(clData[k].lo_count * 900 * 0.0001).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        else {
+          tmpVals[k][1] = Math.round(clData[k].area_acres).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+          tmpVals[k][4] = Math.round(clData[k].lo_count * 900 * 0.000247105).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        tmpVals[k][5] = parseFloat(clData[k].lo_percent).toFixed(1) + "%";
       });
 
-      tmpVals.push([]);
-      if(outSpecies == "latin") {  
-        tmpVals[k][0] = formatLabel(spp, 27);
+      //***Invert data for horizontal bar graph
+      var tmpValsInvert = [];
+      var tmpValsMod = [];
+      for(var j = 0; j < tmpVals[0].length; j++) {
+        tmpValsInvert.push([]);
+        tmpValsMod.push([]);
+        for(var k = 0; k < tmpSpp.length; k++) {
+          tmpValsInvert[j].push(tmpVals[k][j]);
+          tmpValsMod[j].push(j);
+        }
       }
-      else {
-        tmpVals[k][0] = formatLabel(speciesJSON[spp], 27);
-      }
-      tmpVals[k][2] = rangeData[tmpBi].min.toFixed(1);
-      tmpVals[k][3] = rangeData[tmpBi].max.toFixed(1);
-      if(outUnit == "hectares") {
-        tmpVals[k][1] = Math.round(clData[k].area_ha).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        tmpVals[k][4] = Math.round(clData[k].lo_count * 900 * 0.0001).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      }
-      else {
-        tmpVals[k][1] = Math.round(clData[k].area_acres).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        tmpVals[k][4] = Math.round(clData[k].lo_count * 900 * 0.000247105).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      }
-      tmpVals[k][5] = Math.round(clData[k].lo_percent) + "%";
-    });
-
-    //***Invert data for horizontal bar graph
-    var tmpValsInvert = [];
-    var tmpValsMod = [];
-    for(var j = 0; j < tmpVals[0].length; j++) {
-      tmpValsInvert.push([]);
-      tmpValsMod.push([]);
-      for(var k = 0; k < tmpSpp.length; k++) {
-        tmpValsInvert[j].push(tmpVals[k][j]);
-        tmpValsMod[j].push(j);
-      }
-    }
     
-    d3.select("#resRegTabCLCanvas" + i)
-      .append("div")
-      .attr("class", "canvasChartSmall")
-      .html('<canvas id="tab1a-' + i + '" class="canvasChart" value="Tables">');
+      d3.select("#resRegTabCurrentCanvas" + i)
+        .append("div")
+        .attr("class", "canvasChartSmall")
+        .html('<canvas id="tab1a-' + i + '" class="canvasChart" value="Tables">');
 
-    d3.select("#tab1a-" + i).property("title", reg + " Critical Loads by species");
+      d3.select("#tab1a-" + i).property("title", reg + " Critical Loads by species");
 
-    chartOpts["tab1a-" + i] = {};
-    //***Small graph
-    chartOpts["tab1a-" + i].small = JSON.parse(JSON.stringify(chartOpts.default.bar));
-    chartOpts["tab1a-" + i].small.cl = regData;
-    chartOpts["tab1a-" + i].small.type = 'horizontalBar';
-    chartOpts["tab1a-" + i].small.data.yLabels = tmpSpp;
-    chartOpts["tab1a-" + i].small.data.xLabels = tmpValsNums;
+      chartOpts["tab1a-" + i] = {};
+      //***Small graph
+      chartOpts["tab1a-" + i].small = JSON.parse(JSON.stringify(chartOpts.default.bar));
+      chartOpts["tab1a-" + i].small.cl = regData;
+      chartOpts["tab1a-" + i].small.type = 'horizontalBar';
+      chartOpts["tab1a-" + i].small.data.yLabels = tmpSpp;
+      chartOpts["tab1a-" + i].small.data.xLabels = tmpValsNums;
 
-    tmpValsNums.forEach(function(stepVal,j) {
-      chartOpts["tab1a-" + i].small.data.datasets[j] = {
-        backgroundColor: 'rgba(0,0,0,0)',
-        borderColor: 'rgba(0,0,0,0)',
-        borderWidth: 1,
-        data: tmpValsMod[j],
-        label: ""
+      tmpValsNums.forEach(function(stepVal,j) {
+        chartOpts["tab1a-" + i].small.data.datasets[j] = {
+          backgroundColor: 'rgba(0,0,0,0)',
+          borderColor: 'rgba(0,0,0,0)',
+          borderWidth: 1,
+          data: tmpValsMod[j],
+          label: ""
+        }
+      });
+
+      chartOpts["tab1a-" + i].small.options.tooltips = {"enabled": false};
+      chartOpts["tab1a-" + i].small.options.animation = {
+        duration: 1,
+        hover: {"animationDuration": 0},
+        onComplete: function () {
+          var chartInstance = this.chart;
+          var ctx = chartInstance.ctx;
+          ctx.font = "3px Arial";
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+
+          var binWidth = (chartInstance.controller.getDatasetMeta(1).data[0]._model.x - chartInstance.controller.getDatasetMeta(0).data[0]._model.x) / 2
+
+          this.data.datasets.forEach(function (dataset, i) {
+            var meta = chartInstance.controller.getDatasetMeta(i);
+            meta.data.forEach(function (bar, index) {
+              if(bar._datasetIndex == 0 && outSpecies == "latin") {
+                ctx.font = "italic 3px Arial";
+              }
+              else {
+                ctx.font = "normal 3px Arial";
+              }
+              //var data = dataset.data[index];
+              if(Array.isArray(tmpVals[bar._index][bar._datasetIndex])) {
+                if(tmpVals[bar._index][bar._datasetIndex].length > 1) {
+                  var tmpX = bar._model.x + binWidth;
+                  var tmpY = bar._model.y - 2;
+                  tmpVals[bar._index][bar._datasetIndex].forEach(function(tmpLine, z) {
+                    ctx.fillText(tmpLine, tmpX, tmpY + (3 * z));
+                  });
+                }
+                else {
+                  ctx.fillText(tmpVals[bar._index][bar._datasetIndex], bar._model.x + binWidth, bar._model.y);
+                }
+              }
+              else {
+                ctx.fillText(tmpVals[bar._index][bar._datasetIndex], bar._model.x + binWidth, bar._model.y);
+              }
+            });
+          });
+        }
       }
-    });
+      chartOpts["tab1a-" + i].small.options.animation.duration = 0;
+      chartOpts["tab1a-" + i].small.options.events = ["click"];
+      chartOpts["tab1a-" + i].small.options.onClick = function(evt, tmpArray) {
+        chartCanvas["tab1a-" + i + "Small"].clear();
+        chartCanvas["tab1a-" + i + "Small"].render();
+        viewFig("tab1a-" + i); 
+        setDataDL("tab1a-" + i, tmpVals, tmpXLabels);
+        d3.selectAll(".canvasChart").classed("selected", false); 
+        d3.select("#tab1a-" + i).classed("selected", true);
+        setTimeout(function() {
+          addInfo(chartCanvas["tab1a-" + i + "Small"], chartOpts["tab1a-" + i].small.cl[0], document.getElementById("tab1a-" + i).getBoundingClientRect(), "small", 1, "tab1a-" + i);
+        }, 30);
+      };
 
-    chartOpts["tab1a-" + i].small.options.tooltips = {"enabled": false};
-    chartOpts["tab1a-" + i].small.options.animation = {
-      duration: 1,
-      hover: {"animationDuration": 0},
-      onComplete: function () {
+      chartOpts["tab1a-" + i].small.options.scales.yAxes[0].stacked = true;
+      chartOpts["tab1a-" + i].small.options.scales.yAxes[0].barPercentage = 1;
+      chartOpts["tab1a-" + i].small.options.scales.yAxes[0].ticks.display = false;
+      chartOpts["tab1a-" + i].small.options.scales.yAxes[0].gridLines.drawTicks = false;
+      chartOpts["tab1a-" + i].small.options.scales.yAxes[0].zeroLineColor = "rgba(0,0,0,0)";
+      chartOpts["tab1a-" + i].small.options.scales.yAxes[0].scaleLabel.display = false;
+      chartOpts["tab1a-" + i].small.options.scales.yAxes[1] = {position: 'right', display: true, ticks:{display:false}, scaleLabel:{display:false}, gridLines:{display:false, color: "rgba(0,0,0,0.3)"}, zeroLineColor: 'rgba(0,0,0,0)'};
+      chartOpts["tab1a-" + i].small.options.scales.yAxes[0].categoryPercentage = 1;
+      chartOpts["tab1a-" + i].small.options.scales.xAxes[0].position = 'top';
+      chartOpts["tab1a-" + i].small.options.scales.xAxes[0].gridLines.offsetGridLines = 'true';
+      chartOpts["tab1a-" + i].small.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return tmpXLabels[index]; };
+      chartOpts["tab1a-" + i].small.options.scales.xAxes[0].type = 'category';
+      chartOpts["tab1a-" + i].small.options.scales.xAxes[0].ticks.fontSize = setFontSizeSmall("Tables", "tab1a");
+      chartOpts["tab1a-" + i].small.options.scales.xAxes[0].ticks.fontWeigth = "bold";
+      chartOpts["tab1a-" + i].small.options.scales.xAxes[0].gridLines.tickMarkLength = 10;
+      chartOpts["tab1a-" + i].small.options.scales.xAxes[0].gridLines.display = true;
+      chartOpts["tab1a-" + i].small.options.scales.xAxes[1].gridLines.drawBorder = true;
+      chartOpts["tab1a-" + i].small.options.scales.xAxes[1].gridLines.color = "rgba(0,0,0,0.3)";
+      chartOpts["tab1a-" + i].small.options.scales.xAxes[1].position = 'bottom';
+      chartOpts["tab1a-" + i].small.options.scales.xAxes[1].scaleLabel.display = false;
+      chartOpts["tab1a-" + i].small.options.layout.padding.top = 10;
+
+  
+      //***Large graph
+      chartOpts["tab1a-" + i].large = JSON.parse(JSON.stringify(chartOpts["tab1a-" + i].small));
+      chartOpts["tab1a-" + i].large.options.scales.xAxes[0].gridLines.tickMarkLength = 55;
+      chartOpts["tab1a-" + i].large.options.events = false;
+      chartOpts["tab1a-" + i].large.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return tmpXLabels[index]; };
+      chartOpts["tab1a-" + i].large.options.animation.onComplete = function () {
         var chartInstance = this.chart;
         var ctx = chartInstance.ctx;
-        ctx.font = "3px Arial";
+        var chartDim = document.getElementById("canvasChartsLargeDiv").getElementsByTagName("canvas")[0].getBoundingClientRect();
+
+        //ctx.font = (8 + (8 * (Math.max((chartDim.width - 730),1)/730))) + "px Arial";
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
@@ -5310,18 +5823,18 @@ function tab1a(tmpData) {
           var meta = chartInstance.controller.getDatasetMeta(i);
           meta.data.forEach(function (bar, index) {
             if(bar._datasetIndex == 0 && outSpecies == "latin") {
-              ctx.font = "italic 3px Arial";
+              ctx.font = "italic " + (8 + (8 * (Math.max((chartDim.width - 730),1)/730))) + "px Arial";
             }
             else {
-              ctx.font = "normal 3px Arial";
+              ctx.font = "normal " + (8 + (8 * (Math.max((chartDim.width - 730),1)/730))) + "px Arial";
             }
-            //var data = dataset.data[index];
+
             if(Array.isArray(tmpVals[bar._index][bar._datasetIndex])) {
               if(tmpVals[bar._index][bar._datasetIndex].length > 1) {
                 var tmpX = bar._model.x + binWidth;
-                var tmpY = bar._model.y - 2;
+                var tmpY = bar._model.y - 7;
                 tmpVals[bar._index][bar._datasetIndex].forEach(function(tmpLine, z) {
-                  ctx.fillText(tmpLine, tmpX, tmpY + (3 * z));
+                  ctx.fillText(tmpLine, tmpX, tmpY + (14 * z));
                 });
               }
               else {
@@ -5334,52 +5847,182 @@ function tab1a(tmpData) {
           });
         });
       }
-    }
-    chartOpts["tab1a-" + i].small.options.animation.duration = 0;
-    chartOpts["tab1a-" + i].small.options.events = ["click"];
-    chartOpts["tab1a-" + i].small.options.onClick = function(evt, tmpArray) {
-      chartCanvas["tab1a-" + i + "Small"].clear();
-      chartCanvas["tab1a-" + i + "Small"].render();
-      viewFig("tab1a-" + i); 
-      d3.selectAll(".canvasChart").classed("selected", false); 
-      d3.select("#tab1a-" + i).classed("selected", true);
-      setTimeout(function() {
-        addInfo(chartCanvas["tab1a-" + i + "Small"], chartOpts["tab1a-" + i].small.cl[0], document.getElementById("tab1a-" + i).getBoundingClientRect(), "small", 1, "tab1a-" + i);
-      }, 30);
-    };
-
-    chartOpts["tab1a-" + i].small.options.scales.yAxes[0].stacked = true;
-    chartOpts["tab1a-" + i].small.options.scales.yAxes[0].barPercentage = 1;
-    chartOpts["tab1a-" + i].small.options.scales.yAxes[0].ticks.display = false;
-    chartOpts["tab1a-" + i].small.options.scales.yAxes[0].gridLines.drawTicks = false;
-    chartOpts["tab1a-" + i].small.options.scales.yAxes[0].zeroLineColor = "rgba(0,0,0,0)";
-    chartOpts["tab1a-" + i].small.options.scales.yAxes[0].scaleLabel.display = false;
-    chartOpts["tab1a-" + i].small.options.scales.yAxes[1] = {position: 'right', display: true, ticks:{display:false}, scaleLabel:{display:false}, gridLines:{display:false, color: "rgba(0,0,0,0.3)"}, zeroLineColor: 'rgba(0,0,0,0)'};
-    chartOpts["tab1a-" + i].small.options.scales.yAxes[0].categoryPercentage = 1;
-    chartOpts["tab1a-" + i].small.options.scales.xAxes[0].position = 'top';
-    chartOpts["tab1a-" + i].small.options.scales.xAxes[0].gridLines.offsetGridLines = 'true';
-    chartOpts["tab1a-" + i].small.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return tmpXLabels[index]; };
-    chartOpts["tab1a-" + i].small.options.scales.xAxes[0].type = 'category';
-    chartOpts["tab1a-" + i].small.options.scales.xAxes[0].ticks.fontSize = setFontSizeSmall("Tables", "tab1a");
-    chartOpts["tab1a-" + i].small.options.scales.xAxes[0].ticks.fontWeigth = "bold";
-    chartOpts["tab1a-" + i].small.options.scales.xAxes[0].gridLines.tickMarkLength = 7;
-    chartOpts["tab1a-" + i].small.options.scales.xAxes[0].gridLines.display = true;
-    chartOpts["tab1a-" + i].small.options.scales.xAxes[1].gridLines.drawBorder = true;
-    chartOpts["tab1a-" + i].small.options.scales.xAxes[1].gridLines.color = "rgba(0,0,0,0.3)";
-    chartOpts["tab1a-" + i].small.options.scales.xAxes[1].position = 'bottom';
-    chartOpts["tab1a-" + i].small.options.scales.xAxes[1].scaleLabel.display = false;
-    chartOpts["tab1a-" + i].small.options.layout.padding.top = 20;
 
   
-    //***Large graph
-    chartOpts["tab1a-" + i].large = JSON.parse(JSON.stringify(chartOpts["tab1a-" + i].small));
-    chartOpts["tab1a-" + i].large.options.scales.xAxes[0].gridLines.tickMarkLength = 30;
-    chartOpts["tab1a-" + i].large.options.events = false;
-    chartOpts["tab1a-" + i].large.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return tmpXLabels[index]; };
-    chartOpts["tab1a-" + i].large.options.animation.onComplete = function () {
+      //***Print graph
+      chartOpts["tab1a-" + i].print = JSON.parse(JSON.stringify(chartOpts["tab1a-" + i].large));
+      chartOpts["tab1a-" + i].print.options.scales.xAxes[0].gridLines.tickMarkLength = 70;
+      chartOpts["tab1a-" + i].print.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return tmpXLabels[index]; };
+      chartOpts["tab1a-" + i].print.options.animation.onComplete = function () {
+        var chartInstance = this.chart;
+        var ctx = chartInstance.ctx;
+        ctx.font = "17px Arial";
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+  
+        var binWidth = (chartInstance.controller.getDatasetMeta(1).data[0]._model.x - chartInstance.controller.getDatasetMeta(0).data[0]._model.x) / 2
+
+        this.data.datasets.forEach(function (dataset, i) {
+          var meta = chartInstance.controller.getDatasetMeta(i);
+          meta.data.forEach(function (bar, index) {
+            if(bar._datasetIndex == 0 && outSpecies == "latin") {
+              ctx.font = "italic 17px Arial";
+            }
+            else {
+              ctx.font = "normal 17px Arial";
+            }
+            //var data = dataset.data[index];                            
+            if(Array.isArray(tmpVals[bar._index][bar._datasetIndex])) {
+              if(tmpVals[bar._index][bar._datasetIndex].length > 1) {
+                var tmpX = bar._model.x + binWidth;
+                var tmpY = bar._model.y - 9;
+                tmpVals[bar._index][bar._datasetIndex].forEach(function(tmpLine, z) {
+                  ctx.fillText(tmpLine, tmpX, tmpY + (18 * z));
+                });
+              }
+              else {
+                ctx.fillText(tmpVals[bar._index][bar._datasetIndex], bar._model.x + binWidth, bar._model.y);
+              }
+            }
+            else {
+              ctx.fillText(tmpVals[bar._index][bar._datasetIndex], bar._model.x + binWidth, bar._model.y);
+            }
+          });
+        });
+      }
+
+      var tab1a_ctx = document.getElementById("tab1a-" + i).getContext('2d');
+      chartCanvas["tab1a-" + i + "Small"] = new Chart(tab1a_ctx, chartOpts["tab1a-" + i].small);
+
+      //***Disable animation in small table so header and legend can be added
+      //chartOpts["tab1a-" + i].small.options.animation = false;
+    }
+  });
+}
+
+
+
+
+
+
+
+function tab4a(tmpData) {
+  //***Table 4a
+  //console.log(tmpData);
+
+  var tmpCF = crossfilter(tmpData[0]);
+  var cl = {filter:{}};
+  
+  cl.keys = d3.keys(tmpData[0][0]);
+  cl.vals = d3.values(tmpData[0][0]);
+
+  cl.keys.forEach(function(key, i) {
+    cl.filter[key] = tmpCF.dimension(function(d) { if(isNaN(cl.vals[i])) {return d[key];} else {return +d[key];} });
+  });
+
+  var tmpCF = crossfilter(tmpData[1]);
+  var exc = {filter:{}};
+  
+  exc.keys = d3.keys(tmpData[1][0]);
+  exc.vals = d3.values(tmpData[1][0]);
+
+  exc.keys.forEach(function(key, i) {
+    exc.filter[key] = tmpCF.dimension(function(d) { if(isNaN(exc.vals[i])) {return d[key];} else {return +d[key];} });
+  });
+
+  var tmpCF = crossfilter(tmpData[2]);
+  var ndep = {filter:{}};
+  
+  ndep.keys = d3.keys(tmpData[2][0]);
+  ndep.vals = d3.values(tmpData[2][0]);
+
+  ndep.keys.forEach(function(key, i) {
+    ndep.filter[key] = tmpCF.dimension(function(d) { if(isNaN(ndep.vals[i])) {return d[key];} else {return +d[key];} });
+  });
+
+
+  var clData = cl.filter.region_name.bottom(Infinity);
+  var excData = exc.filter.region_name.bottom(Infinity);
+  var ndepData = ndep.filter.region_name.bottom(Infinity);
+
+  var tmpNdep = clData.map(function(d) { return d.region_name; });
+
+  regData = [{}];
+  regData[0].region = ndepData[0].region;
+  regData[0].title = "Community critical loads and exceedance in " + ndepData[0].region;
+  regData[0].subtitle = "CL A - Most protective of most sensitive species";
+
+  var tmpVals = [];
+  var tmpValsNums = [0,1,2,3,4,5,6];
+  if(outUnit == "hectares") {
+    var tmpXLabels = ["Region Name", ["Region Area", "(ha)"], ["Combined Species", "Area (ha)"], ["N Deposition", "(kg/ha/yr)"], ["CL Range"], ["Most Protective CL"], ["% Exceedance of", "Most Protective CL"]];
+  }
+  else {
+    var tmpXLabels = ["Region Name", ["Region Area", "(ac)"], ["Combined Species", "Area (ac)"], ["N Deposition", "(kg/ha/yr)"], ["CL Range"], ["Most Protective CL"], ["% Exceedance of", "Most Protective CL"]];
+  }
+
+  tmpNdep.forEach(function(reg,k) {
+    tmpVals.push([]);
+    tmpVals[k][0] = formatLabel(areaShortName[reg], tmpLength);
+    if(outUnit == "hectares") {
+      tmpVals[k][1] = Math.round(ndepData[k].shape_area_m2 * 0.0001).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      tmpVals[k][2] = Math.round(clData[k].area_ha).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+    else {
+      tmpVals[k][1] = Math.round(ndepData[k].shape_area_m2 * 0.000247105).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      tmpVals[k][2] = Math.round(clData[k].area_acres).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+    tmpVals[k][3] = ndepData[k].min.toFixed(1) + " - " + ndepData[k].max.toFixed(1);
+    tmpVals[k][4] = clData[k].min.toFixed(1) + " - " + clData[k].max.toFixed(1);
+    tmpVals[k][5] = clData[k].min.toFixed(1);
+    tmpVals[k][6] = parseFloat(excData[k].percentage).toFixed(1) + "%";
+  });
+
+  //***Invert data for horizontal bar graph
+  var tmpValsInvert = [];
+  var tmpValsMod = [];
+  for(var j = 0; j < tmpVals[0].length; j++) {
+    tmpValsInvert.push([]);
+    tmpValsMod.push([]);
+    for(var k = 0; k < tmpNdep.length; k++) {
+      tmpValsInvert[j].push(tmpVals[k][j]);
+      tmpValsMod[j].push(j);
+     }
+  }
+  
+  d3.select("#resRegTabCurrentCanvas-1")
+    .append("div")
+    .attr("class", "canvasChartSmall")
+    .html('<canvas id="tab4a" class="canvasChart" value="Tables">');
+
+  d3.select("#tab4a").property("title", "Community critical loads and exceedance in " + ndepData[0].region);
+
+  chartOpts["tab4a"] = {};
+  //***Small graph
+  chartOpts["tab4a"].small = JSON.parse(JSON.stringify(chartOpts.default.bar));
+  chartOpts["tab4a"].small.cl = regData;
+  chartOpts["tab4a"].small.type = 'horizontalBar';
+  chartOpts["tab4a"].small.data.yLabels = tmpNdep;
+  chartOpts["tab4a"].small.data.xLabels = tmpValsNums;
+
+  tmpValsNums.forEach(function(stepVal,j) {
+    chartOpts["tab4a"].small.data.datasets[j] = {
+      backgroundColor: 'rgba(0,0,0,0)',
+      borderColor: 'rgba(0,0,0,0)',
+      borderWidth: 1,
+      data: tmpValsMod[j],
+      label: ""
+    }
+  });
+
+  chartOpts["tab4a"].small.options.tooltips = {"enabled": false};
+  chartOpts["tab4a"].small.options.animation = {
+    duration: 1,
+    hover: {"animationDuration": 0},
+    onComplete: function () {
       var chartInstance = this.chart;
       var ctx = chartInstance.ctx;
-      ctx.font = "13px Arial";
+      ctx.font = "3px Arial";
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
@@ -5388,19 +6031,13 @@ function tab1a(tmpData) {
       this.data.datasets.forEach(function (dataset, i) {
         var meta = chartInstance.controller.getDatasetMeta(i);
         meta.data.forEach(function (bar, index) {
-          if(bar._datasetIndex == 0 && outSpecies == "latin") {
-            ctx.font = "italic 13px Arial";
-          }
-          else {
-            ctx.font = "normal 13px Arial";
-          }
           //var data = dataset.data[index];
           if(Array.isArray(tmpVals[bar._index][bar._datasetIndex])) {
             if(tmpVals[bar._index][bar._datasetIndex].length > 1) {
               var tmpX = bar._model.x + binWidth;
-              var tmpY = bar._model.y - 7;
+              var tmpY = bar._model.y - 2;
               tmpVals[bar._index][bar._datasetIndex].forEach(function(tmpLine, z) {
-                ctx.fillText(tmpLine, tmpX, tmpY + (14 * z));
+                ctx.fillText(tmpLine, tmpX, tmpY + (3 * z));
               });
             }
             else {
@@ -5413,55 +6050,128 @@ function tab1a(tmpData) {
         });
       });
     }
+  }
+  chartOpts["tab4a"].small.options.animation.duration = 0;
+  chartOpts["tab4a"].small.options.events = ["click"];
+  chartOpts["tab4a"].small.options.onClick = function(evt, tmpArray) {
+    chartCanvas["tab4a" + "Small"].clear();
+    chartCanvas["tab4a" + "Small"].render();
+    viewFig("tab4a"); 
+    setDataDL("tab4a", tmpVals, tmpXLabels);
+    d3.selectAll(".canvasChart").classed("selected", false); 
+    d3.select("#tab4a").classed("selected", true);
+    setTimeout(function() {
+      addInfo(chartCanvas["tab4a" + "Small"], chartOpts["tab4a"].small.cl[0], document.getElementById("tab4a").getBoundingClientRect(), "small", 1, "tab4a");
+    }, 30);
+  };
+
+  chartOpts["tab4a"].small.options.scales.yAxes[0].stacked = true;
+  chartOpts["tab4a"].small.options.scales.yAxes[0].barPercentage = 1;
+  chartOpts["tab4a"].small.options.scales.yAxes[0].ticks.display = false;
+  chartOpts["tab4a"].small.options.scales.yAxes[0].gridLines.drawTicks = false;
+  chartOpts["tab4a"].small.options.scales.yAxes[0].zeroLineColor = "rgba(0,0,0,0)";
+  chartOpts["tab4a"].small.options.scales.yAxes[0].scaleLabel.display = false;
+  chartOpts["tab4a"].small.options.scales.yAxes[1] = {position: 'right', display: true, ticks:{display:false}, scaleLabel:{display:false}, gridLines:{display:false, color: "rgba(0,0,0,0.3)"}, zeroLineColor: 'rgba(0,0,0,0)'};
+  chartOpts["tab4a"].small.options.scales.yAxes[0].categoryPercentage = 1;
+  chartOpts["tab4a"].small.options.scales.xAxes[0].position = 'top';
+  chartOpts["tab4a"].small.options.scales.xAxes[0].gridLines.offsetGridLines = 'true';
+  chartOpts["tab4a"].small.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return tmpXLabels[index]; };
+  chartOpts["tab4a"].small.options.scales.xAxes[0].type = 'category';
+  chartOpts["tab4a"].small.options.scales.xAxes[0].ticks.fontSize = setFontSizeSmall("Tables", "tab4a");
+  chartOpts["tab4a"].small.options.scales.xAxes[0].gridLines.tickMarkLength = 6;
+  chartOpts["tab4a"].small.options.scales.xAxes[0].gridLines.display = true;
+  chartOpts["tab4a"].small.options.scales.xAxes[1].gridLines.drawBorder = true;
+  chartOpts["tab4a"].small.options.scales.xAxes[1].gridLines.color = "rgba(0,0,0,0.3)";
+  chartOpts["tab4a"].small.options.scales.xAxes[1].position = 'bottom';
+  chartOpts["tab4a"].small.options.scales.xAxes[1].scaleLabel.display = false;
+  chartOpts["tab4a"].small.options.layout.padding.layout.top = 1;
 
   
-    //***Print graph
-    chartOpts["tab1a-" + i].print = JSON.parse(JSON.stringify(chartOpts["tab1a-" + i].large));
-    chartOpts["tab1a-" + i].print.options.scales.xAxes[0].gridLines.tickMarkLength = 37;
-    chartOpts["tab1a-" + i].print.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return tmpXLabels[index]; };
-    chartOpts["tab1a-" + i].print.options.animation.onComplete = function () {
-      var chartInstance = this.chart;
-      var ctx = chartInstance.ctx;
-      ctx.font = "17px Arial";
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
+  //***Large graph
+  chartOpts["tab4a"].large = JSON.parse(JSON.stringify(chartOpts["tab4a"].small));
+  chartOpts["tab4a"].large.options.scales.xAxes[0].gridLines.tickMarkLength = 32;
+  chartOpts["tab4a"].large.options.events = false;
+  chartOpts["tab4a"].large.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return tmpXLabels[index]; };
+  chartOpts["tab4a"].large.options.animation.onComplete = function () {
+    var chartInstance = this.chart;
+    var ctx = chartInstance.ctx;
+    var chartDim = document.getElementById("canvasChartsLargeDiv").getElementsByTagName("canvas")[0].getBoundingClientRect();
 
-      var binWidth = (chartInstance.controller.getDatasetMeta(1).data[0]._model.x - chartInstance.controller.getDatasetMeta(0).data[0]._model.x) / 2
+    //ctx.font = (7 + (7 * (Math.max((chartDim.width - 730),1)/730))) + "px Arial";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
 
-      this.data.datasets.forEach(function (dataset, i) {
-        var meta = chartInstance.controller.getDatasetMeta(i);
-        meta.data.forEach(function (bar, index) {
-          if(bar._datasetIndex == 0 && outSpecies == "latin") {
-            ctx.font = "italic 17px Arial";
-          }
-          else {
-            ctx.font = "normal 17px Arial";
-          }
-          //var data = dataset.data[index];                            
-          if(Array.isArray(tmpVals[bar._index][bar._datasetIndex])) {
-            if(tmpVals[bar._index][bar._datasetIndex].length > 1) {
-              var tmpX = bar._model.x + binWidth;
-              var tmpY = bar._model.y - 9;
-              tmpVals[bar._index][bar._datasetIndex].forEach(function(tmpLine, z) {
-                ctx.fillText(tmpLine, tmpX, tmpY + (18 * z));
-              });
-            }
-            else {
-              ctx.fillText(tmpVals[bar._index][bar._datasetIndex], bar._model.x + binWidth, bar._model.y);
-            }
+    var binWidth = (chartInstance.controller.getDatasetMeta(1).data[0]._model.x - chartInstance.controller.getDatasetMeta(0).data[0]._model.x) / 2
+
+    this.data.datasets.forEach(function (dataset, i) {
+      var meta = chartInstance.controller.getDatasetMeta(i);
+      meta.data.forEach(function (bar, index) {
+        if(bar._datasetIndex == 0) {
+          ctx.font = (7 + (7 * (Math.max((chartDim.width - 730),1)/730))) + "px Arial";
+        }
+        else {
+          ctx.font = (8 + (8 * (Math.max((chartDim.width - 730),1)/730))) + "px Arial";
+        }
+
+        if(Array.isArray(tmpVals[bar._index][bar._datasetIndex])) {
+          if(tmpVals[bar._index][bar._datasetIndex].length > 1) {
+            var tmpX = bar._model.x + binWidth;
+            var tmpY = bar._model.y - 7;
+            tmpVals[bar._index][bar._datasetIndex].forEach(function(tmpLine, z) {
+              ctx.fillText(tmpLine, tmpX, tmpY + (14 * z));
+            });
           }
           else {
             ctx.fillText(tmpVals[bar._index][bar._datasetIndex], bar._model.x + binWidth, bar._model.y);
           }
-        });
+        }
+        else {
+          ctx.fillText(tmpVals[bar._index][bar._datasetIndex], bar._model.x + binWidth, bar._model.y);
+        }  
       });
-    }
+    });
+  }
 
-    var tab1a_ctx = document.getElementById("tab1a-" + i).getContext('2d');
-    chartCanvas["tab1a-" + i + "Small"] = new Chart(tab1a_ctx, chartOpts["tab1a-" + i].small);
+  
+  //***Print graph
+  chartOpts["tab4a"].print = JSON.parse(JSON.stringify(chartOpts["tab4a"].large));
+  chartOpts["tab4a"].print.options.scales.xAxes[0].gridLines.tickMarkLength = 42;
+  chartOpts["tab4a"].print.options.scales.xAxes[0].ticks.callback = function(value, index, values) { return tmpXLabels[index]; };
+  chartOpts["tab4a"].print.options.animation.onComplete = function () {
+    var chartInstance = this.chart;
+    var ctx = chartInstance.ctx;
+    ctx.font = "17px Arial";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
 
-    //***Disable animation in small table so header and legend can be added
-    //chartOpts["tab1a-" + i].small.options.animation = false;
-  });
+    var binWidth = (chartInstance.controller.getDatasetMeta(1).data[0]._model.x - chartInstance.controller.getDatasetMeta(0).data[0]._model.x) / 2
+
+    this.data.datasets.forEach(function (dataset, i) {
+      var meta = chartInstance.controller.getDatasetMeta(i);
+      meta.data.forEach(function (bar, index) {
+        //var data = dataset.data[index];                            
+        if(Array.isArray(tmpVals[bar._index][bar._datasetIndex])) {
+          if(tmpVals[bar._index][bar._datasetIndex].length > 1) {
+            var tmpX = bar._model.x + binWidth;
+            var tmpY = bar._model.y - 9;
+            tmpVals[bar._index][bar._datasetIndex].forEach(function(tmpLine, z) {
+              ctx.fillText(tmpLine, tmpX, tmpY + (18 * z));
+            });
+          }
+          else {
+            ctx.fillText(tmpVals[bar._index][bar._datasetIndex], bar._model.x + binWidth, bar._model.y);
+          }
+        }
+        else {
+          ctx.fillText(tmpVals[bar._index][bar._datasetIndex], bar._model.x + binWidth, bar._model.y);
+        }
+      });
+    });
+  }
+
+  var tab4a_ctx = document.getElementById("tab4a").getContext('2d');
+  chartCanvas["tab4a" + "Small"] = new Chart(tab4a_ctx, chartOpts["tab4a"].small);
+
+  //***Disable animation in small table so header and legend can be added
+  //chartOpts["tab4a"].small.options.animation = false;
 }
-
