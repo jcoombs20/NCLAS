@@ -370,8 +370,8 @@
       var abioticID = ["n", "aspect", "bedrock", "clay", "coarse", "elevation", "permeability", "ph", "slope", "precip_annual", "precip_may_sept", "temp_jan", "temp_jul", "temp_may_sept"];
       var abioticTitles = ["N Deposition (T-Dep)", "Aspect", "Depth to Bedrock", "% Clay in Soil", "% Coarse Sand", "Elevation", "Soil Permeability", "Soil pH", "Slope Gradient", "Precipitation (Annual)", "Precipitation (May-Sept)", "Temperature (Jan)", "Temperature (July)", "Temperature (May-Sept)"];
       var abioticLayers = [];
-      var cropImg = {"top67": abioticID, "top33":[]};
-      cropImg.top67.splice(-1,0,"cl_mins_min","cl_mins_max","cl_maxs_min","cl_maxs_max");
+      var cropImg = {"top67": abioticID.slice(0), "top33":[]};
+      cropImg.top67.splice(cropImg.top67.length,0,"cl_mins_min","cl_mins_max","cl_maxs_min","cl_maxs_max");
 
       abioticID.forEach(function(tmpID, i) {
         abioticLayers[i] = L.tileLayer.wms("http://felek.cns.umass.edu:8080/geoserver/CL/wms", {
@@ -1074,6 +1074,8 @@
 
       //******Adds images to the legend
       function addLegendImg(tmpName, tmpTitle, tmpLayer, tmpPath) {
+        tmpLayer.setOpacity(1);
+
         legendDivs.push(tmpName);
         d3.selectAll(".layerLegend").style("display", "none");
 
@@ -1094,13 +1096,33 @@
           .append("img")
           .attr("id", tmpName + "LegendImg")
           .attr("class", "legendImg")
-          .attr("src", "http://felek.cns.umass.edu:8080/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=30&HEIGHT=30&LAYER=CL:" + tmpName)
+          //.attr("src", "http://felek.cns.umass.edu:8080/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=30&HEIGHT=30&LAYER=CL:" + tmpName)
           .property("title", tmpTitle);
+
+        //***Set div width and offset after the image has been loaded
+        $("#" + tmpName + "LegendImg").one("load", function() {
+          var tmpRect = document.getElementById(tmpName + "LegendImg").getBoundingClientRect();
+
+          if(cropImg.top67.indexOf(tmpName) > -1) {
+            d3.select("#" + tmpName + "LegImgDiv").style({"max-height":tmpRect.height - 67 + "px", "max-width": tmpRect.width + "px"});
+            d3.select("#" + tmpName + "LegendImg").style("top", "-69px");
+          }
+          else if(!tmpName.includes("range")) {
+            d3.select("#" + tmpName + "LegImgDiv").style({"max-height":tmpRect.height - 33 + "px", "max-width": tmpRect.width + "px"});
+            d3.select("#" + tmpName + "LegendImg").style("top", "-33px");
+          }
+          else {
+            d3.select("#" + tmpName + "LegImgDiv").style({"max-width": tmpRect.width + "px"});
+          }                   
+          d3.select("#" + tmpName + "Legend").style("opacity", "1"); 
+    
+          resizePanels();
+        }).attr("src", "http://felek.cns.umass.edu:8080/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=30&HEIGHT=30&LAYER=CL:" + tmpName);
 
         d3.select("#" + tmpName + "Legend")
           .append("input")
           .attr({type: "range", name: "layer", min: 0, max: 100, value: 100})
-          .attr("id", "legendSlider")
+          .attr("id", tmpName + "LegendSlider")
           .property("title", tmpTitle + " Layer Opacity: 100%")
           .on("input", function() { layerOpacity(this, tmpLayer); });
 
@@ -1122,25 +1144,6 @@
         if(d3.select("#legendDiv").style("opacity") == 0) {
           toolWindowToggle("legend");
         }
-
-        setTimeout(function() { 
-          resizePanels();
-
-          var tmpRect = document.getElementById(tmpName + "LegendImg").getBoundingClientRect();
-
-          if(cropImg.top67.indexOf(tmpName) > -1) {
-            d3.select("#" + tmpName + "LegImgDiv").style({"max-height":tmpRect.height - 67 + "px", "max-width": tmpRect.width + "px"});
-            d3.select("#" + tmpName + "LegendImg").style("top", "-69px");
-          }
-          else if(!tmpName.includes("range")) {
-            d3.select("#" + tmpName + "LegImgDiv").style({"max-height":tmpRect.height - 33 + "px", "max-width": tmpRect.width + "px"});
-            d3.select("#" + tmpName + "LegendImg").style("top", "-33px");
-          }
-          else {
-            d3.select("#" + tmpName + "LegImgDiv").style({"max-width": tmpRect.width + "px"});
-          }                   
-          d3.select("#" + tmpName + "Legend").style("opacity", "1");     
-        }, 600);
       }
 
 
@@ -1159,6 +1162,7 @@
         d3.select("#" + tmpName + "Legend").remove();
         legendDivs.splice(legendDivs.indexOf(tmpName),1);
 
+        //***If removing active legend display the first legend
         if(tmpBi == 1 && legendDivs.length > 0) {
           d3.select("#" + legendDivs[0] + "Legend").style("display", "block");
           var keys = d3.select("#" + legendDivs[0] + "Legend").attr("value").split(",");
@@ -1170,19 +1174,38 @@
           }
         }
 
+        //***Set div and arrow visibility based on number of legends left
         if(legendDivs.length == 0) {
           d3.select("#legendImgDiv").style("display", "none");
           d3.select("#legendDefault").style("display", "block");
         }
-        else if(tmpBi == 1) {
-          if(legendDivs.length == 1) {
-            d3.selectAll("#legendPrev,#legendNext").style("visibility", "hidden");
-          }
-          else {
+        else if(legendDivs.length == 1) {
+          d3.selectAll("#legendPrev,#legendNext").style("visibility", "hidden");
+        }
+        else if(legendDivs.length == 2) {
+          if(d3.select("#" + legendDivs[0] + "Legend").style("display") == "block") {
             d3.select("#legendPrev").style("visibility", "hidden");
             d3.select("#legendNext").style("visibility", "visible");
           }
+          else {
+            d3.select("#legendPrev").style("visibility", "visible");
+            d3.select("#legendNext").style("visibility", "hidden");
+          }
         }
+        else {
+          var tmpLegends = d3.selectAll(".layerLegend")[0];
+          if(d3.select(tmpLegends[0]).style("display") == "block") {
+            d3.select("#legendPrev").style("visibility", "hidden");
+            d3.select("#legendNext").style("visibility", "visible");
+          }
+          else if(d3.select(tmpLegends[tmpLegends.length - 1]).style("display") == "block") {
+            d3.select("#legendPrev").style("visibility", "visible");
+            d3.select("#legendNext").style("visibility", "hidden");
+          }
+          else {            
+            d3.selectAll("#legendPrev,#legendNext").style("visibility", "visible");
+          }
+        }          
       }
 
 
