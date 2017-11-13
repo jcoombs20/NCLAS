@@ -263,43 +263,48 @@
 
       //***Bing geocoder control
       var tmpPoint = new L.marker;
-      var bingGeocoder = new L.Control.BingGeocoder('At3gymJqaoGjGje-JJ-R5tJOuilUk-gd7SQ0DBZlTXTsRoMfVWU08ZWF1X7QKRRn', { callback: function (results) {
-        if(results.statusCode == 200) {
-          if(d3.select("#bingGeocoderSubmit").classed("glyphicon-search")) {
-            $(document).ready(function(){
-              $('[data-toggle="tooltip"]').tooltip();   
-            });
-            document.getElementById("bingGeocoderInput").blur();
-            var bbox = results.resourceSets[0].resources[0].bbox,
-              first = new L.LatLng(bbox[0], bbox[1]),
-              second = new L.LatLng(bbox[2], bbox[3]),
-              tmpBounds = new L.LatLngBounds([first, second]);
-            this._map.fitBounds(tmpBounds);
-            this._map.removeLayer(tmpPoint);
-            tmpPoint = new L.marker(results.resourceSets[0].resources[0].point.coordinates);  //.bindPopup(results.resourceSets[0].resources[0].address.formattedAddress);
-            this._map.addLayer(tmpPoint);
-            d3.select(".leaflet-marker-icon")
-              .attr("id","mapIcon")
-              .attr("data-toggle", "tooltip")
-              .attr("data-container", "body")
-              .attr("data-placement", "auto top")
-              .attr("data-html", "true")
-              .attr("title", '<p><b><center>' + results.resourceSets[0].resources[0].name + '</center></b></p>');
-            d3.select(tmpPoint)
-              .on("click", function() { clearSearch(); });
-            d3.select("#bingGeocoderSubmit")
-              .classed("glyphicon-search", false)
-              .classed("glyphicon-remove", true)
-              .style({"background":"#ff0040", "background":"linear-gradient(#ff0040, #b3002d)", "color":"#990000"})
-              .property("title", "Click to clear search results");
+      var bingGeocoder = new L.Control.BingGeocoder('At3gymJqaoGjGje-JJ-R5tJOuilUk-gd7SQ0DBZlTXTsRoMfVWU08ZWF1X7QKRRn', { callback: function (results) 
+        {
+          if(results.statusCode == 200 && results.resourceSets[0].estimatedTotal > 0) {
+            if(d3.select("#bingGeocoderSubmit").classed("glyphicon-search")) {
+              $(document).ready(function(){
+                $('[data-toggle="tooltip"]').tooltip();   
+              });
+              document.getElementById("bingGeocoderInput").blur();
+              var bbox = results.resourceSets[0].resources[0].bbox,
+                first = new L.LatLng(bbox[0], bbox[1]),
+                second = new L.LatLng(bbox[2], bbox[3]),
+                tmpBounds = new L.LatLngBounds([first, second]);
+              this._map.fitBounds(tmpBounds);
+              this._map.removeLayer(tmpPoint);
+              tmpPoint = new L.marker(results.resourceSets[0].resources[0].point.coordinates);  //.bindPopup(results.resourceSets[0].resources[0].address.formattedAddress);
+              this._map.addLayer(tmpPoint);
+              d3.select("#bingGeocoderInput").property("value", results.resourceSets[0].resources[0].name);
+              d3.select(".leaflet-marker-icon")
+                .attr("id","mapIcon")
+                .attr("value", results.resourceSets[0].resources[0].name)
+                .attr("data-toggle", "tooltip")
+                .attr("data-container", "body")
+                .attr("data-placement", "auto top")
+                .attr("data-html", "true")
+                .attr("title", '<p><b><center>' + results.resourceSets[0].resources[0].name + '</center></b></p>');
+              d3.select(tmpPoint)
+                .on("click", function() { clearSearch(); });
+              d3.select("#bingGeocoderSubmit")
+                .classed("glyphicon-search", false)
+                .classed("glyphicon-remove", true)
+                .property("title", "Click to clear search results");
+            }
+            else {
+              clearSearch();
+            }
           }
           else {
-            clearSearch();
+            d3.select("#bingGeocoderInput").property("value","No matching results");            
           }
         }
-        }
       });
-      //bingGeocoder.addTo(map);
+
      
 
       //******Clear the results of the geo search
@@ -1279,9 +1284,32 @@
         //.attr("class", "layerList");
 
       document.getElementById('bingGeoLocate').appendChild(bingGeocoder.onAdd(map));
+      d3.select("#bingGeocoderInput")
+        .on("mouseup", function() { if(this.value == "No matching results") { this.value = ""; } else { $(this).select(); } })
+        .on("blur", function() { modifySearch(this, "blur"); })
+        .on("keyup", function() { modifySearch(this, "key"); }); // if(d3.event.keyCode == 13) { if(d3.select("#bingGeocoderSubmit").classed("glyphicon-remove") == true) { $("#bingGeocoderSubmit").click(); } } });
 
 
 
+      function modifySearch(tmpEl, tmpEvent) {
+        if(tmpEvent == "blur") {
+          if((tmpEl.value == "" || tmpEl.value == "No matching results") && document.getElementById("mapIcon")) { 
+            tmpEl.value = d3.select("#mapIcon").attr("value"); 
+            d3.select("#bingGeocoderSubmit").classed("glyphicon-remove", true).classed("glyphicon-search", false);
+          }
+          else if(tmpEl.value == "No matching results" && !document.getElementById("mapIcon")) {
+            tmpEl.value = "";
+          }
+        } 
+        else if(document.getElementById("mapIcon")) {
+          if(tmpEl.value != d3.select("#mapIcon").attr("value")) {
+            d3.select("#bingGeocoderSubmit").classed("glyphicon-remove", false).classed("glyphicon-search", true);
+          }
+          else {
+            d3.select("#bingGeocoderSubmit").classed("glyphicon-remove", true).classed("glyphicon-search", false);
+          }
+        }
+      }
 
 
 
@@ -1412,7 +1440,7 @@
         .attr("class", "legTitle")
         .attr("id", "downloadTitle")
         .append("span")
-        .html('<span class="glyphicon glyphicon-info-sign help-tooltip" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Downloads</center></b></u></p><p>Download zip files containing GeoTIFFs for Abiotic and Species layers, shapefiles for Area layers, and CSV files for regional data.</p>"></span>');
+        .html('<span class="glyphicon glyphicon-info-sign help-tooltip" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Downloads</center></b></u></p><p>Download zip files containing GeoTIFFs for Abiotic and Species layers, shapefiles for Area layers, and CSV files for CL, EXC, and Abiotic regional data.</p>"></span>');
  
       d3.select("#downloadTitle")
         .append("span")
@@ -1435,7 +1463,7 @@
         .property("title", "Click to download selected layer")
         .html('<a id="dlLink" href="#"><span> Download Layer </span></a>');
 
-      var dlCat = ["Select category...", "Abiotic Layers", "Area Layers", "Combined Species Layers", "Individual Species Layers", "CL & EXC Regional Data"];
+      var dlCat = ["Select category...", "Abiotic Layers", "Area Layers", "Combined Species Layers", "Individual Species Layers", "CL, EXC, & Abiotic Data"];
       d3.select("#downloadCat")
         .property("title", "Select the category containing the layer you wish to download")
         .on("mousedown", function() {  d3.select(this).select("option").style("display", "none"); })
@@ -1523,9 +1551,9 @@
             var tmpData = layerExtTitles;
             var tmpVals = layerExt;
             break;
-          case "CL & EXC Regional Data":
-            var tmpData = ["CL & EXC Data Files"];
-            var tmpVals = ["N-CLAS_data_08-22-17"];
+          case "CL, EXC, & Abiotic Data":
+            var tmpData = ["Data Files"];
+            var tmpVals = ["N-CLAS_data_11-10-17"];
         }
 
         d3.select("#downloadLayer").selectAll("option").remove()

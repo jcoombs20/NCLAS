@@ -506,6 +506,12 @@ body {
   top: 2px;
 }
 
+#bingGeocoderSubmit.glyphicon-remove {
+  background":"#ff0040;
+  background: linear-gradient(rgb(255, 0, 64), rgb(179, 0, 45));
+  color: rgb(153, 0, 0);
+}
+
 #bingGeocoderSubmit:hover {
   border-color: white;
 }
