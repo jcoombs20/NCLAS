@@ -138,14 +138,9 @@ body {
   font-weight: bold;
 }
 
-#preferences a:focus {
+#feedback a:focus {
   color: #9d9d9d;
 }
-
-#preferences a:hover {
-  color: #fff;
-}
-
 
 #printDownload>span {
     color: white;
@@ -248,11 +243,38 @@ body {
   color: black;
 }
 
-#mapTools, #bingGeoLocate {
+#mapTools, #bingGeoLocate, #prefWelDiv {
   //width: 567px;
   height: 25px;
   display: inline-block;
   float: left;
+}
+
+.prefWel {
+  display: inline-block;
+  font-size: 22px;
+  margin-right: 15px;
+}
+
+.prefWel a {
+  color: white;
+  text-decoration: none;
+  opacity: 0.7;
+}
+
+.prefWel a:focus {
+  color: #9d9d9d;
+  opacity: 1;
+}
+
+.prefWel a:hover {
+  color: #fff;
+  opacity: 1;
+}
+
+#preferences {
+  position: relative;
+  top: 10px;
 }
 
 .layerList {
@@ -276,15 +298,16 @@ body {
   font-size: 13px;
   z-index: 2000;
   display: none;
+  box-shadow: 5px 5px 5px rgba(0,0,0,0.3);
 }
 
 #baselayerList {
-  width: 186px;
+  width: 181px;
   margin-left: 0px;
 }
 
 #baselayerListDropdown {
-  width: 186px;
+  width: 181px;
 }
 
 #abioticList {
@@ -293,6 +316,19 @@ body {
 
 #abioticListDropdown {
   width: 196px;
+}
+
+#histList {
+  width: calc(100% - 50px);
+  margin: auto;
+}
+
+#histListDropdown {
+  top: 35px;
+  left: calc(100% - -1px);
+  width: 210px;
+  text-align: left;
+  border-radius: 4px;
 }
 
 #areaList {
@@ -735,6 +771,242 @@ body {
   overflow-y: auto;
 }
 
+.methodDiv {
+  background: white;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  padding: 5px;
+}
+
+.approachLeftDiv {
+  font-size: 16px;
+  width: 50%;
+  display: inline-block;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+.approachRightDiv {
+  width: 50%;
+  display: inline-block;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+  text-align: center;
+}
+
+.approachImg {
+  width: 100%;
+  max-width: calc(100% - 10px);
+  display: inline-block;
+  border: 1px solid #666666;
+  border-radius: 4px;
+  vertical-align: top;
+  margin: 5px;
+}
+
+.approachUL li {
+  cursor: pointer;
+  font-weight: bold;
+  color: #337ab7;
+}
+
+.approachAnswer {
+  margin: 5px 0 5px 20px;
+}
+
+.approachAnswer p {
+  font-style: italic;
+}
+
+.approachAnswer li {
+  font-size: 16px;
+  color: black;
+  font-weight: normal;
+  font-style: italic;
+}
+
+.approachAnswerImg {
+  width: calc(100% - 20px);
+  max-width: max-content;
+  margin: 0px;
+  border: none;
+}
+
+#approachAnswer03 ul {
+  padding-left: 16px;
+}
+
+.approachModal {
+  width: 800px;
+}
+
+#approachModalFig .modal-dialog {
+  width: max-content;
+}
+
+#approachModalFigImg {
+  width: 100%;
+}
+
+.hyperlink {
+  color: limegreen;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.aLink {
+  font-weight: bold;
+  color: darkgreen;
+}
+
+.aLink:hover, .aLink:visited, .aLink:focus {
+  //color: #337ab7;
+  color: darkgreen;
+}
+
+.aLink:visited, .aLink:focus {
+  text-decoration: none;
+}
+
+.hyperlink:hover {
+  text-decoration: underline;
+}
+
+.modal-footer {
+  padding: 5px 15px;
+  text-align: center;
+}
+
+.modal-body p, .modal-body ul, .modal-body ol {
+  font-size: 16px;
+}
+
+#infoFigDiv {
+  position: absolute;
+  top: 50px;
+  left: 100px;
+  width: auto;
+  //min-width: 169px;
+  margin: 0px;
+  z-index: 3002 !important;
+  border-radius: 4px;
+  box-shadow: 5px 5px 5px rgba(0,0,0,0.3);
+  display: none;
+  opacity: 0;
+}
+
+button.close {
+  border: 1px solid #333333;
+  background: #337ab7;
+  padding: 5px;
+  border-radius: 4px;
+  opacity: 1;
+  color: white;
+  text-shadow: 2px 2px 2px #333333;
+  font-weight: normal;
+  font-size: 16px;
+  box-shadow: 2px 2px 3px rgba(0,0,0,0.5);
+  float: none;
+}
+
+button.close:hover {
+  opacity: 1;
+  color: white;
+}
+
+#faqQuestDiv {
+  background: white;
+  border: 1px solid #bbbbbb;
+  padding: 5px;
+  border-radius: 4px;
+  margin-bottom: 50px;
+}
+
+#faqQuestDiv hr {
+  border-top-color: #cccccc;
+}
+
+#faqQuestDiv p {
+  margin-left: 30px;
+}
+
+#faqQuestDiv a:hover, #faqQuestDiv a:focus {
+  color: #33cc33;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+#faqAnsDiv {
+  background: white;
+  border: 1px solid #bbbbbb;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+#faqAnsDiv h3 {
+  background: #337ab7;
+  color: white;
+  font-weight: bold;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+#faqAnsDiv div {
+  margin-left: 30px;
+}
+
+.faqQuestP, #faqQuestDiv p {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.faqQuestP {
+  margin-bottom: 0;
+}
+
+.faqAnsP {
+  margin-left: 50px;
+  font-style: italic;
+  margin-bottom: 20px;
+}
+
+#glossTable {
+  border-collapse: collapse;
+}
+
+#glossTable a:hover, #glossTable a:focus {
+  color: #337ab7;
+  text-decoration: none;
+}
+
+#glossTable tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
+#glossTable tr:nth-child(odd) {
+  background-color: white;
+}
+
+#glossTable td {
+  border: 1px solid #cccccc;
+  vertical-align: top;
+  padding: 5px;
+}
+
+.glossWord {
+  font-weight: bold;
+  margin-bottom: 0;
+}
+
+.glossDefDiv {
+  margin-left: 20px;
+}
+
+.glossDef, .glossDefDiv p {
+  margin-bottom: 0;
+}
+
 #container-results {
   display: none;
   padding: 5px 10px 5px 10px;
@@ -758,7 +1030,7 @@ body {
   margin: auto;
 }
 
-#canvasPrint {
+#canvasPrint, #histPrint {
   width: 1800px;
   height: auto;
 }
@@ -927,7 +1199,7 @@ ul img {
 }
 
 #outputTailor {
-  width: 1000px;
+  width: 920px;
   background: #16365c;
   background: linear-gradient(#1e487b, #0f243e);
   border-style: solid;
@@ -1752,7 +2024,7 @@ input[type="checkbox"]  {
   //background: rgba(0,0,255,0.5)
 }
 
-#legendDefault {
+#legendDefault, #histDefault {
   font-style: italic;
   padding: 5px;
   background: white;
@@ -1760,7 +2032,7 @@ input[type="checkbox"]  {
   font-size: 13px;
 }
 
-#legendImgDiv {
+#legendImgDiv, #histImgDiv {
   display: none;
   text-align: center;
   padding: 0px 5px 5px 5px;
@@ -2014,10 +2286,64 @@ li.key:hover {
   opacity: 0;
 }
 
+#histDiv {
+  position: absolute;
+  top: 170px;
+  left: 5px;
+  //width: 350px;
+  width: 370px;
+  margin: 0px;
+  z-index: 1002;
+  border-radius: 4px;
+  box-shadow: 5px 5px 5px rgba(0,0,0,0.3);
+  display: none;
+  opacity: 0;
+}
+
+#histFigDiv {
+  min-height: 150px;
+  max-height: 659px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  background: whitesmoke;
+  border: 1px solid #333;
+  border-radius: 4px;
+  margin-top: 5px;
+  padding: 6px;
+  padding-bottom: 0px;
+  font-style: italic;
+  text-align: left;
+}
+
+.histFig {
+  background: white;
+  border: 1px solid gray;
+  padding: 5px;
+  padding-right: 0;
+  //width: calc(100% + 5px);
+  width: calc(100% - 20px);
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.histFigDL {
+  width: 20px;
+  height: 212px;
+  float: right;
+  padding-top: 65px;
+}
+
+.histFigDL span {
+  margin-left: 3px;
+  font-size: 21px;
+  opacity: 0.5;
+  color: black;
+}
+
 #downloadDiv {
   position: absolute;
   top: 145px;
-  right: 50px;
+  right: 100px;
   width: 200px;
   margin: 0px;
   z-index: 1001;
@@ -2067,7 +2393,7 @@ li.key:hover {
 #preferencesDiv {
   position: absolute;
   top: 145px;
-  left: 400px;
+  right: 370px;
   width: 305px;
   margin: 0px;
   z-index: 1001;

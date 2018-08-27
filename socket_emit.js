@@ -10,6 +10,131 @@ function socket_emit() {
     addSpeciesNames(sppExc,sppNoExcFilter);
   });
 
+  socket.on('get_abiotic', function(abioticData, tmpVals) {
+    //console.log(abioticData);
+    //console.log(tmpVals);
+    //***Remove all histograms
+    d3.selectAll(".histFig").remove();
+    d3.select("#histFigDiv").text("");
+
+    tmpVals.hists.forEach(function(tmpHist,i) {
+      tmpVals.areas.forEach(function(tmpArea,j) {
+        //***Add div for graph
+        d3.select("#histFigDiv")
+          .append("div")
+          .attr("id", "hist" + i + j)
+          .attr("class", "histFig");
+
+        d3.select("#histFigDiv")
+          .append("div")
+          .attr("id", "hist" + i + j + "DL")
+          .attr("class", "histFigDL")
+          .html('<a id="histFigDLFig' + i + j + '" href="#" download="' + tmpArea + '-' + tmpHist + '.jpg"><span class="glyphicon glyphicon-stats histFigDLFig" title="Download as graph"></span></a><br><br><a id="histFigDLTab' + i + j + '" href="#" download="' + tmpArea + '-' + tmpHist + '.csv"><span class="glyphicon glyphicon-list-alt" title="Download as table"></span></a>');
+
+        //***Filter data for area and abiotic factor
+        var tmpData = [[tmpHist, "Count"]];
+        var tickData = [];
+        var step = 8;
+        var start = 3;
+        var k = 0
+        var printData = [];
+        abioticData[0].forEach(function(d) {
+          if(d.region_name == tmpArea && d.abiotic == tmpHist) {
+            tmpData.push([parseFloat(d.mid_bin), parseInt(d.count)]);
+            printData.push(d);
+            if(k == start) {
+              //tickData.push(parseFloat(d.mid_bin.toFixed(2)));
+              start += step;
+            }
+            k += 1;
+          }
+        });
+
+/*
+        if(tickData[tickData.length - 1] - tickData[0] > 10) {
+          tickData.forEach(function(d,k) {
+            tickData[k] = parseInt(d);
+          });
+        }
+*/
+
+        //***Add graph
+        var data = google.visualization.arrayToDataTable(tmpData);
+        var options = {
+          title: tmpArea,
+          titleTextStyle: {color: "black", fontSize: 16},
+          //vAxis: {title: "Count", titleTextStyle: {bold: true, italic: false}},
+          vAxis: {format: "short"},
+          hAxis: {format: "decimal", title: tmpHist + " " + abioticUnits[tmpHist], titleTextStyle: {bold: true, italic: false, fontSize: 12}}, //ticks: tickData, gridlines: {count: 4}},
+          bar: {groupWidth: "100%"},
+          legend: {position: "none"},
+          chartArea: {left: 30, width: 270},
+          width: 300
+        };
+        
+        //***Add small graph
+        var chart = new google.visualization.ColumnChart(document.getElementById("hist" + i + j));
+        chart.draw(data, options);
+        //***New barchart style (doesn't have much style control)
+        //var chart = new google.charts.Bar(document.getElementById("hist" + i + j));
+        //chart.draw(data, google.charts.Bar.convertOptions(options));
+
+        //***Add print graph
+        d3.select("#histPrint").remove();
+        d3.select("body")
+          .append("div")
+          .attr("id", "histPrint");
+
+        options.width = 1800;
+        options.height = 1200;
+        options.chartArea.width = 1620;
+        options.chartArea.height = 900;
+        options.chartArea.left = 180;
+        options.titleTextStyle.fontSize = 48;
+        options.titleTextStyle.italic = true;
+        options.hAxis.titleTextStyle.fontSize = 36;
+        options.hAxis.titleTextStyle.italic = true;
+        options.hAxis.textStyle = {fontSize: 30, italic: true};
+        options.vAxis.title = "Count";
+        options.vAxis.titleTextStyle = {fontSize: 36, italic: true, bold: true};
+        options.vAxis.textStyle = {fontSize: 30, italic: true};
+
+        var chartPrint = new google.visualization.ColumnChart(document.getElementById("histPrint"));
+        chartPrint.draw(data, options);
+
+        //***Add jpg link
+        var link = chartPrint.getImageURI();
+        d3.select("#histFigDLFig" + i + j).attr("href", link);
+        d3.select("#histPrint").style("display", "none");
+
+        //***Add CSV link
+        var printContent = "Area,Area Name,Abiotic,Lower Bin,Upper Bin,Mid Bid,Count\n";
+        printData.forEach(function(d) {
+          printContent += d.region + "," + d.region_name + "," + d.abiotic + "," + d.lower_bin + "," + d.upper_bin + "," + d.mid_bin + "," + d.count + "\n";
+        });
+
+/*
+        //***Get data from chart (less information)
+        //build column headings
+        var csvColumns = '';
+        for (var n = 0; n < data.getNumberOfColumns(); n++) {
+          csvColumns += data.getColumnLabel(n);
+          if (n < (data.getNumberOfColumns() - 1)) {
+            csvColumns += ',';
+          }
+        }
+        csvColumns += '\n';
+
+        //get data rows
+        var csvContent = csvColumns + google.visualization.dataTableToCsv(data);
+*/
+
+        d3.select("#histFigDLTab" + i + j).attr("href", "data:attachment/csv," +   encodeURIComponent(printContent));
+      });
+    });
+    resizePanels();
+  });
+
 
   socket.on('get_output', function(tmpData) {
     console.log(tmpData);
