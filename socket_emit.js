@@ -64,11 +64,12 @@ function socket_emit() {
           title: tmpArea,
           titleTextStyle: {color: "black", fontSize: 16},
           //vAxis: {title: "Count", titleTextStyle: {bold: true, italic: false}},
-          vAxis: {format: "short"},
-          hAxis: {format: "decimal", title: tmpHist + " " + abioticUnits[tmpHist], titleTextStyle: {bold: true, italic: false, fontSize: 12}}, //ticks: tickData, gridlines: {count: 4}},
+          vAxis: {format: "short", textStyle: {fontSize: 12}},
+          hAxis: {format: "decimal", title: tmpHist + " " + abioticUnits[tmpHist], titleTextStyle: {bold: true, italic: false, fontSize: 13}, textStyle: {fontSize: 12}}, //ticks: tickData, gridlines: {count: 4}},
           bar: {groupWidth: "100%"},
+          tooltip: {textStyle: {fontSize: 13}},
           legend: {position: "none"},
-          chartArea: {left: 30, width: 270},
+          chartArea: {left: 35, width: 265},
           width: 300
         };
         
@@ -88,16 +89,17 @@ function socket_emit() {
         options.width = 1800;
         options.height = 1200;
         options.chartArea.width = 1620;
-        options.chartArea.height = 900;
-        options.chartArea.left = 180;
-        options.titleTextStyle.fontSize = 48;
+        options.chartArea.height = 900; //800;
+        options.chartArea.left = 180; //260;
+        options.titleTextStyle.fontSize = 54; //96;
         options.titleTextStyle.italic = true;
-        options.hAxis.titleTextStyle.fontSize = 36;
+        options.hAxis.titleTextStyle.fontSize = 45; //72;
         options.hAxis.titleTextStyle.italic = true;
-        options.hAxis.textStyle = {fontSize: 30, italic: true};
+        options.hAxis.textStyle = {fontSize: 36, italic: true}; //75
         options.vAxis.title = "Count";
-        options.vAxis.titleTextStyle = {fontSize: 36, italic: true, bold: true};
-        options.vAxis.textStyle = {fontSize: 30, italic: true};
+        //options.hAxis.title = "";
+        options.vAxis.titleTextStyle = {fontSize: 45, italic: true, bold: true}; //72
+        options.vAxis.textStyle = {fontSize: 36, italic: true}; //75
 
         var chartPrint = new google.visualization.ColumnChart(document.getElementById("histPrint"));
         chartPrint.draw(data, options);
@@ -281,11 +283,11 @@ function socket_emit() {
       case "Forest Service Wilderness Areas":
         tmpNames.forEach(function(d) { areaShortName[d] = d.replace(" Wilderness",""); });
         break;
-      case "Ecoregions Level 3":
+      case "Level III Ecoregions":
         tmpNames.forEach(function(d) { areaShortName[d] = d.replace("",""); });
         tmpLength = 27;
         break;
-      case "Ecoregions Level 2":
+      case "Level II Ecoregions":
         tmpNames.forEach(function(d) { areaShortName[d] = d.replace("",""); });
         break;
       case "Ecoregions Combined":
@@ -778,10 +780,10 @@ function setFontSizePrint(tmpArea, tmpID) {
     case "Ecoregions Combined":
       var tmpSize = 30;
       break;
-    case "Ecoregions Level 2":
+    case "Level II Ecoregions":
       var tmpSize = 30;
       break;
-    case "Ecoregions Level 3":
+    case "Level III Ecoregions":
       var tmpSize = 16;
       break;
     case "Forest Service Wilderness Areas":
@@ -822,10 +824,10 @@ function setFontSizeLarge(tmpArea, tmpID) {
     case "Ecoregions Combined":
       var tmpSize = 12;
       break;
-    case "Ecoregions Level 2":
+    case "Level II Ecoregions":
       var tmpSize = 12;
       break;
-    case "Ecoregions Level 3":
+    case "Level III Ecoregions":
       var tmpSize = 6;
       break;
     case "Forest Service Wilderness Areas":
@@ -865,10 +867,10 @@ function setFontSizeSmall(tmpArea, tmpID) {
     case "Ecoregions Combined":
       var tmpSize = 7;
       break;
-    case "Ecoregions Level 2":
+    case "Level II Ecoregions":
       var tmpSize = 7;
       break;
-    case "Ecoregions Level 3":
+    case "Level III Ecoregions":
       var tmpSize = 2;
       break;
     case "Forest Service Wilderness Areas":
@@ -981,6 +983,7 @@ function getDivide(tmpVal) {
 
 
 function fig15a(tmpData) {
+console.log(tmpData);
   //******Figure 15A
   d3.select("#resRegFigExAreaCanvas-1")
     .append("div")    .attr("class", "canvasChartSmall")
@@ -1022,7 +1025,8 @@ function fig15a(tmpData) {
     d3.selectAll(".canvasChart").classed("selected", false);
     d3.select("#fig15a").classed("selected", true);
   };
-  chartOpts.fig15a.small.options.title.text = "Exceedance of Most Protective Critical Load";
+  //chartOpts.fig15a.small.options.title.text = "Exceedance of Most Protective Critical Load";
+  chartOpts.fig15a.small.options.title.text = "Exceedance of the Critical Load";
   chartOpts.fig15a.small.options.scales.yAxes[0].scaleLabel.labelString = "% Area in Exceedance of CL";
   chartOpts.fig15a.small.options.scales.xAxes[0].ticks.fontSize = setFontSizeSmall(d3.select("#areaList").attr("value"), "fig15a");
   chartOpts.fig15a.small.options.scales.xAxes[1].scaleLabel.labelString = d3.select("#areaList").attr("value") + ", Combined Species";
@@ -1100,7 +1104,8 @@ function fig15b(tmpData) {
     d3.selectAll(".canvasChart").classed("selected", false);
     d3.select("#fig15b").classed("selected", true);
   };
-  chartOpts.fig15b.small.options.title.text = "Exceedance of Most Protective Critical Load";
+  //chartOpts.fig15b.small.options.title.text = "Exceedance of Most Protective Critical Load";
+  chartOpts.fig15b.small.options.title.text = "Exceedance of the Critical Load";
   chartOpts.fig15b.small.options.scales.yAxes[0].scaleLabel.labelString = tmpAreaLabel + " in Exceedance of CL " + tmpDivideLabel;
   chartOpts.fig15b.small.options.scales.xAxes[0].ticks.fontSize = setFontSizeSmall(d3.select("#areaList").attr("value"), "fig15b");
   chartOpts.fig15b.small.options.scales.xAxes[1].scaleLabel.labelString = d3.select("#areaList").attr("value") + ", Combined Species";
@@ -1215,7 +1220,8 @@ function fig15bi(tmpData) {
     d3.selectAll(".canvasChart").classed("selected", false);
     d3.select("#fig15bi").classed("selected", true);
   };
-  chartOpts.fig15bi.small.options.title.text = "Exceedance of Most Protective Critical Load";
+  //chartOpts.fig15bi.small.options.title.text = "Exceedance of Most Protective Critical Load";
+  chartOpts.fig15bi.small.options.title.text = "Exceedance of the Critical Load";
   chartOpts.fig15bi.small.options.scales.yAxes[0].scaleLabel.labelString = tmpAreaLabel + " in Exceedance of CL " + tmpDivideLabel;
   chartOpts.fig15bi.small.options.scales.yAxes[0].stacked = true;
   chartOpts.fig15bi.small.options.scales.xAxes[0].ticks.fontSize = setFontSizeSmall(d3.select("#areaList").attr("value"), "fig15bi");
@@ -1281,7 +1287,8 @@ function fig2a(tmpData) {
       d3.selectAll(".canvasChart").classed("selected", false);
       d3.select("#fig2a-" + i).classed("selected", true);
     };
-    chartOpts["fig2a-" + i].small.options.title.text = "Exceedance of Most Protective Critical Load";
+    //chartOpts["fig2a-" + i].small.options.title.text = "Exceedance of Most Protective Critical Load";
+    chartOpts["fig2a-" + i].small.options.title.text = "Exceedance of the Critical Load";
     chartOpts["fig2a-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "% Area in Exceedance of CL";
     if(outSpecies == "latin") {
       chartOpts["fig2a-" + i].small.options.scales.xAxes[0].ticks.fontStyle = 'italic';
@@ -1375,7 +1382,8 @@ function fig2b(tmpData) {
       d3.selectAll(".canvasChart").classed("selected", false);
       d3.select("#fig2b-" + i).classed("selected", true);
     };
-    chartOpts["fig2b-" + i].small.options.title.text = "Exceedance of Most Protective Critical Load";
+    //chartOpts["fig2b-" + i].small.options.title.text = "Exceedance of Most Protective Critical Load";
+    chartOpts["fig2b-" + i].small.options.title.text = "Exceedance of the Critical Load";
     chartOpts["fig2b-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = tmpAreaLabel + " in Exceedance of CL " + tmpDivideLabel;
     if(outSpecies == "latin") {
       chartOpts["fig2b-" + i].small.options.scales.xAxes[0].ticks.fontStyle = 'italic';
@@ -1511,7 +1519,8 @@ function fig2bi(tmpData) {
       d3.selectAll(".canvasChart").classed("selected", false);
       d3.select("#fig2bi-" + i).classed("selected", true);
     };
-    chartOpts["fig2bi-" + i].small.options.title.text = "Exceedance of Most Protective Critical Load";
+    //chartOpts["fig2bi-" + i].small.options.title.text = "Exceedance of Most Protective Critical Load";
+    chartOpts["fig2bi-" + i].small.options.title.text = "Exceedance of the Critical Load";
     chartOpts["fig2bi-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = tmpAreaLabel + " in Exceedance of CL " + tmpDivideLabel;
     chartOpts["fig2bi-" + i].small.options.scales.yAxes[0].stacked = true;
     if(outSpecies == "latin") {
@@ -1595,7 +1604,8 @@ function fig11a(tmpData) {
       d3.selectAll(".canvasChart").classed("selected", false);
       d3.select("#fig11a-" + i).classed("selected", true);
     };
-    chartOpts["fig11a-" + i].small.options.title.text = "Level of Exceedance of Most Protective Critical Load";
+    //chartOpts["fig11a-" + i].small.options.title.text = "Level of Exceedance of Most Protective Critical Load";
+    chartOpts["fig11a-" + i].small.options.title.text = "Level of Exceedance of the Critical Load";
     chartOpts["fig11a-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "% Area in Exceedance of CL";
     //chartOpts["fig11a-" + i].small.options.scales.yAxes[0].ticks.max = 100;
     chartOpts["fig11a-" + i].small.options.scales.xAxes[0].ticks.fontSize = setFontSizeSmall("Numbers", "fig11a");
@@ -1684,7 +1694,8 @@ function fig12a(tmpData) {
       d3.selectAll(".canvasChart").classed("selected", false);
       d3.select("#fig12a-" + i).classed("selected", true);
     };
-    chartOpts["fig12a-" + i].small.options.title.text = "Level of Exceedance of Most Protective Critical Load";
+    //chartOpts["fig12a-" + i].small.options.title.text = "Level of Exceedance of Most Protective Critical Load";
+    chartOpts["fig12a-" + i].small.options.title.text = "Level of Exceedance of the Critical Load";
     chartOpts["fig12a-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "% Area in Exceedance of CL";
     //chartOpts["fig12a-" + i].small.options.scales.yAxes[0].ticks.max = 100;
     chartOpts["fig12a-" + i].small.options.scales.xAxes[0].ticks.fontSize = setFontSizeSmall("Numbers", "fig12a");
@@ -1772,7 +1783,8 @@ function fig12b(tmpData) {
     chartOpts["fig12b-" + i].small.data.labels = tmpExc[0];
 
     var tmpColors = ['rgba(255,102,0', 'rgba(255,0,0', 'rgba(204,0,0', 'rgba(204,153,0']
-    var legendParts = [["A","Most","most"],["B","Most","least"],["C","Least","least"],["D","Least","most"]];
+    //var legendParts = [["A","Most","most"],["B","Most","least"],["C","Least","least"],["D","Least","most"]];
+    var legendParts = [["CL","Most","most"],["TL-MID","Most","least"],["TL-HIGH","Least","least"],["TL-LOW","Least","most"]];
     tmpColors.forEach(function(tmpColor,j) {
       chartOpts["fig12b-" + i].small.data.datasets[j] = {
         backgroundColor: tmpColor + ",0.5)",
@@ -1781,7 +1793,7 @@ function fig12b(tmpData) {
         pointRadius: 0,
         pointHitRadius: 20,
         lineTension: 0,
-        label: "EX " + legendParts[j][0] + ": " + legendParts[j][1] + " protective of " + legendParts[j][2] + " sensitive species"
+        label: "EXC of " + legendParts[j][0] + ": " + legendParts[j][1] + " protective of " + legendParts[j][2] + " sensitive species"
       }
     });
 
@@ -1895,7 +1907,8 @@ function fig3a(tmpData) {
         d3.selectAll(".canvasChart").classed("selected", false);
         d3.select("#fig3a-" + i + k).classed("selected", true);
       };
-      chartOpts["fig3a-" + i + k].small.options.title.text = "Exceedance of Most Protective Critical Load";
+      //chartOpts["fig3a-" + i + k].small.options.title.text = "Exceedance of Most Protective Critical Load";
+      chartOpts["fig3a-" + i + k].small.options.title.text = "Exceedance of the Critical Load";
       chartOpts["fig3a-" + i + k].small.options.scales.yAxes[0].scaleLabel.labelString = "% of Area with Level of Exceedance";
       //chartOpts["fig3a-" + i + k].small.options.scales.yAxes[0].ticks.max = 100;
       chartOpts["fig3a-" + i + k].small.options.scales.xAxes[0].ticks.fontSize = setFontSizeSmall("Numbers", "fig3a");
@@ -1995,7 +2008,8 @@ function fig4a(tmpData) {
         d3.selectAll(".canvasChart").classed("selected", false);
         d3.select("#fig4a-" + i + k).classed("selected", true);
       };
-      chartOpts["fig4a-" + i + k].small.options.title.text = "Exceedance of Most Protective Critical Load";
+      //chartOpts["fig4a-" + i + k].small.options.title.text = "Exceedance of Most Protective Critical Load";
+      chartOpts["fig4a-" + i + k].small.options.title.text = "Exceedance of the Critical Load";
       chartOpts["fig4a-" + i + k].small.options.scales.yAxes[0].scaleLabel.labelString = "% of Area with Level of Exceedance";
       //chartOpts["fig4a-" + i + k].small.options.scales.yAxes[0].ticks.max = 100;
       chartOpts["fig4a-" + i + k].small.options.scales.xAxes[0].ticks.fontSize = setFontSizeSmall("Numbers", "fig4a");
@@ -2126,7 +2140,8 @@ function fig4c(tmpData) {
       d3.selectAll(".canvasChart").classed("selected", false);
       d3.select("#fig4c-" + i).classed("selected", true);
     };
-    chartOpts["fig4c-" + i].small.options.title.text = "Exceedance of Most Protective Critical Load";
+    //chartOpts["fig4c-" + i].small.options.title.text = "Exceedance of Most Protective Critical Load";
+    chartOpts["fig4c-" + i].small.options.title.text = "Exceedance of the Critical Load";
     chartOpts["fig4c-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "% of Area with Level of Exceedance";
     //chartOpts["fig4c-" + i].small.options.scales.yAxes[0].ticks.max = 100;
     chartOpts["fig4c-" + i].small.options.scales.xAxes[0].ticks.fontSize = setFontSizeSmall("Numbers", "fig4c");
@@ -2710,7 +2725,7 @@ function fig13e(tmpData) {
       d3.selectAll(".canvasChart").classed("selected", false);
       d3.select("#fig13e-" + i).classed("selected", true);
     };
-    chartOpts["fig13e-" + i].small.options.title.text = "Area in Exceedance of Most Protective CL at Each N Deposition Level";
+    chartOpts["fig13e-" + i].small.options.title.text = "Area in Exceedance of CL at Each N Deposition Level";
     chartOpts["fig13e-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "Cumulative % Area in Exceedance of CL";
     chartOpts["fig13e-" + i].small.options.scales.yAxes[0].ticks.max = 102;
     chartOpts["fig13e-" + i].small.options.scales.yAxes[0].ticks.stepSize = 20;
@@ -2848,7 +2863,8 @@ function fig13h(tmpData) {
     chartOpts["fig13h-" + i].small.data.labels = tmpCLCum[0];
 
     var tmpColors = ['rgba(255,102,0', 'rgba(204,153,0']
-    var legendParts = [["A","Most","most"],["D","Least","most"]];
+    //var legendParts = [["A","Most","most"],["D","Least","most"]];
+    var legendParts = [["CL","Most","most"],["TL-LOW","Least","most"]];
     tmpColors.forEach(function(tmpColor,j) {
       chartOpts["fig13h-" + i].small.data.datasets[j] = {
         backgroundColor: tmpColor + ",0.5)",
@@ -2858,7 +2874,7 @@ function fig13h(tmpData) {
         pointHitRadius: 20,
         lineTension: 0,
         spanGaps: true,
-        label: "EX " + legendParts[j][0] + ": " + legendParts[j][1] + " protective of " + legendParts[j][2] + " sensitive species"
+        label: "EXC of " + legendParts[j][0] + ": " + legendParts[j][1] + " protective of " + legendParts[j][2] + " sensitive species"
       }
     });
     chartOpts["fig13h-" + i].small.data.datasets[0].fill = false;
@@ -3020,7 +3036,8 @@ function fig13g(tmpData) {
     chartOpts["fig13g-" + i].small.data.labels = tmpCLCum[0];
 
     var tmpColors = ['rgba(255,102,0', 'rgba(255,0,0', 'rgba(204,0,0', 'rgba(204,153,0']
-    var legendParts = [["A","Most","most"],["B","Most","least"],["C","Least","least"],["D","Least","most"]];
+    //var legendParts = [["A","Most","most"],["B","Most","least"],["C","Least","least"],["D","Least","most"]];
+    var legendParts = [["CL","Most","most"],["TL-MID","Most","least"],["TL-HIGH","Least","least"],["TL-LOW","Least","most"]];
     tmpColors.forEach(function(tmpColor,j) {
       chartOpts["fig13g-" + i].small.data.datasets[j] = {
         backgroundColor: tmpColor + ",1)",
@@ -3031,7 +3048,7 @@ function fig13g(tmpData) {
         pointHitRadius: 20,
         lineTension: 0,
         spanGaps: true,
-        label: "EX " + legendParts[j][0] + ": " + legendParts[j][1] + " protective of " + legendParts[j][2] + " sensitive species"
+        label: "EXC of " + legendParts[j][0] + ": " + legendParts[j][1] + " protective of " + legendParts[j][2] + " sensitive species"
       }
     });
 
@@ -3176,7 +3193,7 @@ function fig6c(tmpData) {
       d3.selectAll(".canvasChart").classed("selected", false);
       d3.select("#fig6c-" + i).classed("selected", true);
     };
-    chartOpts["fig6c-" + i].small.options.title.text = "% Area in Exceedance of Most Protective CL at Each N Deposition Level";
+    chartOpts["fig6c-" + i].small.options.title.text = "% Area in Exceedance of CL at Each N Deposition Level";
     chartOpts["fig6c-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "Cumulative % Area in Exceedance of CL";
     chartOpts["fig6c-" + i].small.options.scales.yAxes[0].ticks.max = 102;
     chartOpts["fig6c-" + i].small.options.scales.yAxes[0].ticks.stepSize = 20;
@@ -3344,7 +3361,7 @@ function fig13f(tmpData) {
     d3.selectAll(".canvasChart").classed("selected", false);
     d3.select("#fig13f").classed("selected", true);
   };
-  chartOpts["fig13f"].small.options.title.text = "% Area in Exceedance of Most Protective CL at Each N Deposition Level";
+  chartOpts["fig13f"].small.options.title.text = "% Area in Exceedance of CL at Each N Deposition Level";
   chartOpts["fig13f"].small.options.scales.yAxes[0].scaleLabel.labelString = "Cumulative % Area in Exceedance of CL";
   chartOpts["fig13f"].small.options.scales.yAxes[0].ticks.max = 102;
   chartOpts["fig13f"].small.options.scales.yAxes[0].ticks.stepSize = 20;
@@ -3475,7 +3492,7 @@ function fig13a(tmpData) {
       d3.selectAll(".canvasChart").classed("selected", false);
       d3.select("#fig13a-" + i).classed("selected", true);
     };
-    chartOpts["fig13a-" + i].small.options.title.text = "Area Protected at Most Protective CL at Each N Deposition Level";
+    chartOpts["fig13a-" + i].small.options.title.text = "Area Protected at CL at Each N Deposition Level";
     chartOpts["fig13a-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "Cumulative % Area Protected";
     chartOpts["fig13a-" + i].small.options.scales.yAxes[0].ticks.max = 102;
     chartOpts["fig13a-" + i].small.options.scales.yAxes[0].ticks.stepSize = 20;
@@ -3779,7 +3796,8 @@ function fig13c(tmpData) {
     chartOpts["fig13c-" + i].small.data.labels = tmpCLCum[0];
 
     var tmpColors = ['rgba(255,102,0', 'rgba(255,0,0', 'rgba(204,0,0', 'rgba(204,153,0']
-    var legendParts = [["A","Most","most"],["B","Most","least"],["C","Least","least"],["D","Least","most"]];
+    //var legendParts = [["A","Most","most"],["B","Most","least"],["C","Least","least"],["D","Least","most"]];
+    var legendParts = [["CL","Most","most"],["TL-MID","Most","least"],["TL-HIGH","Least","least"],["TL-LOW","Least","most"]];
     tmpColors.forEach(function(tmpColor,j) {
       chartOpts["fig13c-" + i].small.data.datasets[j] = {
         backgroundColor: tmpColor + ",1)",
@@ -3790,7 +3808,7 @@ function fig13c(tmpData) {
         pointHitRadius: 20,
         lineTension: 0,
         spanGaps: true,
-        label: "EX " + legendParts[j][0] + ": " + legendParts[j][1] + " protective of " + legendParts[j][2] + " sensitive species"
+        label: "EXC of " + legendParts[j][0] + ": " + legendParts[j][1] + " protective of " + legendParts[j][2] + " sensitive species"
       }
     });
 
@@ -3936,7 +3954,7 @@ function fig6a(tmpData) {
       d3.selectAll(".canvasChart").classed("selected", false);
       d3.select("#fig6a-" + i).classed("selected", true);
     };
-    chartOpts["fig6a-" + i].small.options.title.text = "Area Protected at Most Protective CL at Each N Deposition Level";
+    chartOpts["fig6a-" + i].small.options.title.text = "Area Protected at CL at Each N Deposition Level";
     chartOpts["fig6a-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "Cumulative % Area Protected";
     chartOpts["fig6a-" + i].small.options.scales.yAxes[0].ticks.max = 102;
     chartOpts["fig6a-" + i].small.options.scales.yAxes[0].ticks.stepSize = 20;
@@ -4105,7 +4123,7 @@ function fig13b(tmpData) {
     d3.selectAll(".canvasChart").classed("selected", false);
     d3.select("#fig13b").classed("selected", true);
   };
-  chartOpts["fig13b"].small.options.title.text = "Area Protected at Most Protective CL at Each N Deposition Level";
+  chartOpts["fig13b"].small.options.title.text = "Area Protected at CL at Each N Deposition Level";
   chartOpts["fig13b"].small.options.scales.yAxes[0].scaleLabel.labelString = "Cumulative % Area Protected";
   chartOpts["fig13b"].small.options.scales.yAxes[0].ticks.max = 102;
   chartOpts["fig13b"].small.options.scales.yAxes[0].ticks.stepSize = 20;
@@ -4193,7 +4211,7 @@ function tab3b(tmpData) {
     if(tmpSpecies.length > 0) {
       regData[0].minCL = minCL;
       regData[0].maxCL = maxCL;
-      regData[0].title = "% Area in Exceedance of Most Protective CL at Each N Deposition Level";
+      regData[0].title = "% Area in Exceedance of CL at Each N Deposition Level";
       regData[0].table = 0;
 
       if(maxCL % 1 != 0) {
@@ -4316,7 +4334,7 @@ function tab3b(tmpData) {
           addInfo(chartCanvas["tab3b-" + i + "Small"], chartOpts["tab3b-" + i].small.cl[0], document.getElementById("tab3b-" + i).getBoundingClientRect(), "small", 1, "tab3b-" + i);
         }, 30);
       };
-      //chartOpts["tab3b-" + i].small.options.title.text = "% Area in Exceedance of Most Protective CL at Each N Deposition Level";
+      //chartOpts["tab3b-" + i].small.options.title.text = "% Area in Exceedance of CL at Each N Deposition Level";
       chartOpts["tab3b-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "Species";
       chartOpts["tab3b-" + i].small.options.scales.yAxes[0].ticks.fontSize = 4;
       if(outSpecies == "latin") {
@@ -4469,7 +4487,7 @@ function tab3c(tmpData) {
     if(tmpSpecies.length > 0) {
       regData[0].minCL = minCL;
       regData[0].maxCL = maxCL;
-      regData[0].title = "% Area Protected by Most Protective CL at Each N Deposition Level";
+      regData[0].title = "% Area Protected by CL at Each N Deposition Level";
       regData[0].table = 1;
 
       if(maxCL % 1 != 0) {
@@ -4594,7 +4612,7 @@ function tab3c(tmpData) {
           addInfo(chartCanvas["tab3c-" + i + "Small"], chartOpts["tab3c-" + i].small.cl[0], document.getElementById("tab3c-" + i).getBoundingClientRect(), "small", 1, "tab3c-" + i);
         }, 30);
       };
-      //chartOpts["tab3c-" + i].small.options.title.text = "% Area in Exceedance of Most Protective CL at Each N Deposition Level";
+      //chartOpts["tab3c-" + i].small.options.title.text = "% Area in Exceedance of CL at Each N Deposition Level";
       chartOpts["tab3c-" + i].small.options.scales.yAxes[0].scaleLabel.labelString = "Species";
       chartOpts["tab3c-" + i].small.options.scales.yAxes[0].ticks.fontSize = 4;
       if(outSpecies == "latin") {

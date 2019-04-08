@@ -354,7 +354,7 @@
             zIndex: 0,
             attribution: '<a href="http://www.doi.gov">U.S. Department of the Interior</a> | <a href="http://www.usgs.gov">U.S. Geological Survey</a> | <a href="http://www.usgs.gov/laws/policies_notices.html">Policies</a>'
             });
-      var states = new L.tileLayer.wms("http://felek.cns.umass.edu:8080/geoserver/CL/wms", {
+      var states = new L.tileLayer.wms("http://felek.cns.umass.edu:8080/geoserver/birds/wms", {
           layers: 'us_states',
           format: 'image/png',
           transparent: true,
@@ -424,7 +424,8 @@
 
       //******Add Community Layers
       var commID = ["cl_mins_min", "cl_maxs_min", "cl_mins_max", "cl_maxs_max", "exc_cl_mins_min", "exc_cl_maxs_min", "exc_cl_mins_max", "exc_cl_maxs_max"]
-      var commTitles = ["Most Protective CL", "Low Intermediate CL", "High Intermediate CL", "Least Protective CL", "EXC of Most Protective CL", "EXC of Low Intermediate CL", "EXC of High Intermediate CL", "EXC of Least Protective CL"];
+      //var commTitles = ["Most Protective CL", "Low Intermediate CL", "High Intermediate CL", "Least Protective CL", "EXC of Most Protective CL", "EXC of Low Intermediate CL", "EXC of High Intermediate CL", "EXC of Least Protective CL"];
+      var commTitles = ["CL", "TL-LOW", "TL-MID", "TL-HIGH", "EXC of CL", "EXC of TL-LOW", "EXC of TL-MID", "EXC of TL-HIGH"];
       var commTooltip = ["Most protective Critical Load for most sensitive species (CL A)", "Critical Load at which at least one species is severely at risk (CL D)", "Most Protective CL for least sensitive species (CL C)", "Critical Load at which all species are severely at risk (CL B)", "Exceedance of most protective Critical Load for most sensitive species (EXC of CL A)", "Exceedance of Critical Load at which at least one species is severely at risk (EXC of CL D)", "Exceedance of most protective Critical Load for least sensitive species (EXC of CL C)", "Exceedance of Critical Load at which all species are severely at risk (EXC of CL B)"];
       //var commID = ["cl_mins_min", "cl_mins_max", "cl_maxs_min", "cl_maxs_max", "exc_cl_mins_min", "exc_cl_mins_max", "exc_cl_maxs_min", "exc_cl_maxs_max"]
       //var commTitles = ["Min CL (lower range)", "Max CL (lower range)", "Min CL (upper range)", "Max CL (upper range)", "Exceedance A (min min)", "Exceedance B (max min)", "Exceedance D (min max)", "Exceedance C (max max)"];
@@ -445,7 +446,8 @@
       //******Add SVG Layers
       //******Area Select Layers
       var areaID = ["state", "eco", "eco2", "eco3", "fs_wild", "fs", "class1"];
-      var areaTitles = ["States", "Ecoregions Combined", "Ecoregions Level 2", "Ecoregions Level 3", "Forest Service Wilderness Areas", "Forest Service Admin Areas", "Class I Areas"];
+      //var areaTitles = ["States", "Ecoregions Combined", "Ecoregions Level 2", "Ecoregions Level 3", "Forest Service Wilderness Areas", "Forest Service Admin Areas", "Class I Areas"];
+      var areaTitles = ["States", "Ecoregions Combined", "Level II Ecoregions", "Level III Ecoregions", "Forest Service Wilderness Areas", "Forest Service Admin Areas", "Class I Areas"];
       var areaLayers = [];
 
       var topoSVG = d3.select(map.getPanes().overlayPane).append("svg");
@@ -1089,7 +1091,7 @@
                 + '<p class="glossWord">Ecoregion</p>'
               + '</td>'
               + '<td>'
-                + '<p class="glossDef">Ecoregions are areas where ecosystems are generally similar. The <a href="https://www.epa.gov/eco-research/ecoregions" target="_blank">CEC ecoregion classification system</a> has four levels, of which only the first three are currently included in N-CLAS. "Level I" divides North America into 15 broad ecoregions. "Level II" subdivides those regions again into 52 smaller ecoregions. "Level III" subdivides those regions again into 182 ecoregions.</p>'
+                + '<p class="glossDef">Ecoregions are areas where ecosystems are generally similar. The <a href="https://www.epa.gov/eco-research/ecoregions" target="_blank">CEC ecoregion classification system</a> has four levels, of which only the first three are currently included in N-CLAS. "Level I" divides North America into 15 broad ecoregions. "Level 2" subdivides those regions again into 52 smaller ecoregions. "Level 3" subdivides those regions again into 182 ecoregions.</p>'
               + '</td>'
             + '</tr>'
             + '<tr>'
@@ -2690,7 +2692,8 @@
       function get_abiotic_counts() {
         if(d3.select("#areaList").attr("value") != null) {
           var tmpVals = {};
-          tmpVals.area = d3.select("#areaList").attr("value");
+          //tmpVals.area = d3.select("#areaList").attr("value");
+          tmpVals.area = findArea();
           var tmpAreas = [];
           d3.selectAll(".remCheck")[0].forEach(function(d) { if(d.checked) { tmpAreas.push(d.value); } });
           if(tmpAreas.length > 0) {
@@ -3977,21 +3980,35 @@
 
         switch(document.querySelector('input[name=outRadio]:checked').value) {
           case "basic":
-            var tmpVals = {"type":"comp", "area": d3.select("#areaList").attr("value"), "areas": tmpAreas, "species": tmpSpp};
+            var tmpVals = {"type":"comp", "area": findArea(), "areas": tmpAreas, "species": tmpSpp};
             socket.emit('get_output', tmpVals);
             break;
           case "tail":
-            var tmpVals = {"type":"comp", "area": d3.select("#areaList").attr("value"), "areas": tmpAreas, "species": tmpSpp};
+            var tmpVals = {"type":"comp", "area": findArea(), "areas": tmpAreas, "species": tmpSpp};
             socket.emit('get_output', tmpVals);
             break;
           case "comp":
-            var tmpVals = {"type":"comp", "area": d3.select("#areaList").attr("value"), "areas": tmpAreas, "species": tmpSpp};
+            //var tmpVals = {"type":"comp", "area": d3.select("#areaList").attr("value"), "areas": tmpAreas, "species": tmpSpp};
+            var tmpVals = {"type":"comp", "area": findArea(), "areas": tmpAreas, "species": tmpSpp};
             socket.emit('get_output', tmpVals);
             break;
         }
       }
 
 
+
+      function findArea() {
+        var tmpArea = d3.select("#areaList").attr("value");
+        if(tmpArea == "Level III Ecoregions") {
+          return "Ecoregions Level 3";
+        }
+        else if(tmpArea == "Level II Ecoregions") {
+          return "Ecoregions Level 2";
+        }
+        else {
+          return tmpArea;
+        }
+      }
 
 
 
@@ -4316,8 +4333,10 @@
       var areaColors = {};
       areaColors["States"] = ['#ff0000','#ff6200','#ff9000','#ffb700','#ffdc00','#ffff00','#a7cc00','#4c9900','#427147','#584da2','#0000ff','#3e00cb','#4a009a','#6c1f97','#ac50c2','#ee82ee'];
       areaColors["Ecoregions Combined"] = ['#ffa500'];
-      areaColors["Ecoregions Level 2"] = ['#cc5200','#0000ff','#00e600'];
-      areaColors["Ecoregions Level 3"] = ['#4D2600','#FFB3FF','#004D00','#990099','#000000','#B35900','#000099','#FFFF00','#FF0000','#0066FF','#00FF00','#FF9900'];
+      //areaColors["Ecoregions Level 2"] = ['#cc5200','#0000ff','#00e600'];
+      areaColors["Level II Ecoregions"] = ['#cc5200','#0000ff','#00e600'];
+      //areaColors["Ecoregions Level 3"] = ['#4D2600','#FFB3FF','#004D00','#990099','#000000','#B35900','#000099','#FFFF00','#FF0000','#0066FF','#00FF00','#FF9900'];
+      areaColors["Level III Ecoregions"] = ['#4D2600','#FFB3FF','#004D00','#990099','#000000','#B35900','#000099','#FFFF00','#FF0000','#0066FF','#00FF00','#FF9900'];
       areaColors["Forest Service Wilderness Areas"] = ['#ff0000','#ff4300','#ff6200','#ff7a00','#ff9000','#ffa500','#ffb700','#ffca00','#ffdc00','#ffed00','#ffff00','#d3e500','#a7cc00','#7bb200','#4c9900','#008000','#427147','#556075','#584da2','#4b35d0','#0000ff','#2e00e5','#3e00cb','#4600b2','#4a009a','#4b0082','#6c1f97','#8c38ac','#ac50c2','#cd69d8','#ee82ee'];
       areaColors["Forest Service Admin Areas"] = ['#ff0000','#ff8b00','#ffd300','#c8df00','#008000','#503cc4','#4200bf','#74259c','#ee82ee'];
       areaColors["Class I Areas"] = ['#ff0000','#ff7a00','#ffb700','#ffed00','#a7cc00','#008000','#584da2','#2e00e5','#4a009a','#8c38ac','#ee82ee'];
@@ -4479,7 +4498,8 @@
         topos.eco3.color = {"Acadian_Plains_and_Hills": "#4D2600", "Driftless_Area": "#FFB3FF", "Eastern_Great_Lakes_Lowlands": "#004D00", "Erie_Drift_Plain": "#990099", "North_Central_Appalachians": "#000000", "North_Central_Hardwood_Forests": "#B35900", "Northeastern_Coastal_Zone": "#000099", "Northern_Appalachian_and_Atlantic_Maritime_Highlands": "#FFFF00", "Northern_Allegheny_Plateau": "#FF0000", "Northern_Lakes_and_Forests": "#0066FF", "Northern_Minnesota_Wetlands": "#00FF00", "Southern_Michigan/Northern_Indiana_Drift_Plains": "#FF9900"};
 
         //******Create area to layer key
-        area2layer = {"Class I Areas":"class1", "Forest Service Wilderness Areas":"fs_wild", "Forest Service Admin Areas":"fs", "Ecoregions Level 3":"eco3", "Ecoregions Level 2":"eco2", "Ecoregions Combined":"eco", "States":"state"};
+        //area2layer = {"Class I Areas":"class1", "Forest Service Wilderness Areas":"fs_wild", "Forest Service Admin Areas":"fs", "Ecoregions Level 3":"eco3", "Ecoregions Level 2":"eco2", "Ecoregions Combined":"eco", "States":"state"};
+        area2layer = {"Class I Areas":"class1", "Forest Service Wilderness Areas":"fs_wild", "Forest Service Admin Areas":"fs", "Level III Ecoregions":"eco3", "Level II Ecoregions":"eco2", "Ecoregions Combined":"eco", "States":"state"};
 
         //******Get feature ids
         layers = ["class1", "fs_wild", "fs", "eco3", "eco2", "eco", "state"];
