@@ -1,7 +1,7 @@
 html {
   width: 100%;
   height: 100%;
-  min-width: 1280px;
+  //min-width: 1280px;
   min-height: 750px;
   //overflow: hidden;
 }
@@ -14,7 +14,7 @@ body {
 
 .msgBackgroundDiv {
   width: 100%;
-  min-width: 1262px;
+  //min-width: 1262px;
   min-height: 750px;
   height: 100%;
   z-index: 99999;
@@ -33,9 +33,9 @@ body {
   border-radius: 4px;
   font-size: 13px;
   color: black;
-  width: 1200px;
-  height: 715px;
-  min-width: 1200px;
+  width: 90%;
+  max-width: 1200px;
+  //min-width: 1000px;
   padding: 15px;
   padding-left: 30px;
 }
@@ -55,9 +55,9 @@ body {
 }
 
 #splashButton {
-  width: 300px;
+  width: 200px;
   position: relative;
-  margin-left: 384px;
+  margin-left: 20%;
   margin-top: 15px;
   height: 50px;
   font-size: 25px;
@@ -406,18 +406,20 @@ body {
 
 #resHeader li.active>a, #resHeader li.active>a:hover, #resSubHeader li.active>a, #resSubHeader li.active>a:hover {
   background-color: #337ab7 !important;
+  color: white;
 }
 
 #resHeader li>a {
   color: #33adff;
 }
 
-#resHeader li.active>a {
+#resHeader li.active>a, #resHeader li.active>a:hover {
   color: white;
 }
 
 #resHeader li>a:hover, #resSubHeader li>a:hover {
   background-color: #66ff66 !important;
+  color: navy;
 }
 
 #resFigsDiv, #resTabsDiv, #resMapDiv {
@@ -634,6 +636,11 @@ body {
   margin: 0px;
 }
 
+.italic {
+  font-style: italic;
+  font-weight: bold;
+}
+
 .choice {
   font-size: 24px;
   color: white;
@@ -657,6 +664,7 @@ body {
 
 .nav>li>a {
   padding: 5px 15px;
+  color: #33adff;
 }
 
 #ulRes li {
@@ -1094,9 +1102,15 @@ ul img {
 }
 
 .state.inactive, .state.inactive:hover, .eco.inactive, .eco.inactive:hover, .eco2.inactive, .eco2.inactive:hover, .eco3.inactive, .eco3.inactive:hover, .fs_wild.inactive, .fs_wild.inactive:hover, .fs.inactive, .fs.inactive:hover, .class1.inactive, .class1.inactive:hover  {
-  fill-opacity: 0 !important;
+  fill-opacity: 0.05 !important;
   cursor: default !important;
+  //pointer-events: none;
 }  
+
+.state.inactive.selected, .state.inactive.selected:hover, .eco.inactive.selected, .eco.inactive.selected:hover, .eco2.inactive.selected, .eco2.inactive.selected:hover, .eco3.inactive.selected, .eco3.inactive.selected:hover, .fs_wild.inactive.selected, .fs_wild.inactive.selected:hover, .fs.inactive.selected, .fs.inactive.selected:hover, .class1.inactive.selected, .class1.inactive.selected:hover  {
+  fill-opacity: 0.5 !important;
+}
+
 
 #loadingDiv {
   width: 100%;
@@ -1399,7 +1413,7 @@ ul img {
 
 #outPreviewDiv {
   margin: 5px;
-  height: 578px;
+  height: 538px;
 }
 
 .outPreviewDivs {
@@ -1408,37 +1422,45 @@ ul img {
   height: 100%;
 }
 
+.hover {
+  color:blue;
+  text-decoration:underline;
+  font-weight:bold;
+  cursor:pointer;
+}
+
 .pink {
-  background: rgb(252,242,242);
+  //background: rgb(252,242,242);
 }
 
 .blue {
-  background: rgb(235,239,246);
+  //background: rgb(235,239,246);
 }
 
 .yellow {
-  background: rgb(255,254,241);
+  //background: rgb(255,254,241);
 }
 
 .mauve {
-  background: rgb(255,240,225);
+  //background: rgb(255,240,225);
 }
 
 .green {
-  background: rgb(236,241,233);
+  //background: rgb(236,241,233);
 }
 
 .prevThumbImgDiv {
   font-size: 13px;
   float: left;
-  height: 140px;
+  height: 130px;
   border-radius: 4px;
   margin: 2px;
 }
 
 .prevThumbImgDiv p {
   margin: 5px 0 2px 0;
-  color: darkslategray;
+  //color: darkslategray;
+  color: white;
 }
 
 .prevThumbImg {
@@ -1528,7 +1550,7 @@ ul img {
   position: absolute;
   display: none;
   width: calc(66% + 1px);
-  height: calc(80% - 2px);
+  height: calc(80% - 9px);
   top: 48px;
   left: 7px;
   border: 1px solid gray;

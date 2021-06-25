@@ -1,6 +1,10 @@
 function socket_emit() {
-  socket = io.connect('http://ecosheds.org:3413');
+  socket = io.connect();
+  //socket = io.connect('https://nclas.ecosheds.org/socket.io/', {secure: true});
 
+  socket.on('connect', function() {
+    console.log("connected to socket");
+  });
 
   socket.on('get_spp', function(sppData) {
     var sppExc = sppData[0].map(function(d) { return d.species; });
@@ -440,12 +444,12 @@ function socket_emit() {
     $("#resFigs").click();
   });
 
-
+/*
   socket.on('disconnect', function(err) {
     console.log(err);
     console.log('Socket has been disconnected');
   });
-
+*/
 
   socket.on('error', function(err) {
     console.log(err.error);
@@ -785,6 +789,7 @@ function setFontSizePrint(tmpArea, tmpID) {
       break;
     case "Level III Ecoregions":
       var tmpSize = 16;
+      //var tmpSize = 20;
       break;
     case "Forest Service Wilderness Areas":
       var tmpSize = 6.5;

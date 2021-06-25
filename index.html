@@ -31,7 +31,8 @@
     <script src="jquery-ui.min.js"></script>
     <!--script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script-->
     <script src="bootstrap.min.js"></script>
-    <script src="http://maps.google.com/maps/api/js?v=3"></script>
+    <!--script src="https://maps.google.com/maps/api/js?v=3"></script-->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBk-pRMxjeu0G6yIfxqnZMPQE5LgLLB6P8"></script>
     <!--script src="bundle.js"></script-->
     <script src="Bing_tile.js"></script>
     <script src="Control.BingGeocoder.js"></script>
@@ -44,7 +45,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.min.js"></script>
 
 
-    <script src="http://ecosheds.org:3413/socket.io/socket.io.js"></script>
+    <script src="https://nclas.ecosheds.org/socket.io/socket.io.js"></script>
     <script src="socket_emit.js"></script>
     <!--script src="http://d3js.org/d3.v3.min.js"></script-->
     <script src="d3.v3.min.js"></script>
@@ -56,6 +57,16 @@
     <script src="queue.min.js"></script>
     <script src="crossfilter.min.js"></script>
 
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150914675-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-150914675-1');
+    </script>
+
   </head>
 
   <body>
@@ -63,7 +74,7 @@
       <div class="container-fluid">
         <ul class="nav navbar-nav">
           <li id="home" title="Click to return to the main page" class="active"><a href="#">Home</a></li>
-          <li id="basics" title="Click to see how to begin using N-CLAS"><a href="#">Quick Start</a></li>
+          <li id="basics" title="Click to see how to begin using N-CLAS"><a href="#">Overview</a></li>
           <li id="approach" title="Click to view details about how N-CLAS functions"><a href="#">About N-CLAS</a></li>
           <li id="guide" title="Click to view information on how to use N-CLAS"><a href="#">Users Guide</a></li>
           <li id="tutorial" title="Click to view tutorials about N-CLAS and its uses"><a href="#">Tutorial</a></li>
@@ -252,12 +263,8 @@
 
 
       //******Add Map with custom zoom depending on screen size
-      if(window.innerWidth > 1900) {
-        var map = new L.Map('map', {center: new L.LatLng(43.5, -80), zoomControl: false, zoom: 6, minZoom: 2, maxZoom: 20, inertiaDeceleration: 1000});
-      }
-      else {
-        var map = new L.Map('map', {center: new L.LatLng(40, -78), zoomControl: false, zoom: 5, minZoom: 2, maxZoom: 20, inertiaDeceleration: 1000});
-      }
+      var map = new L.Map('map', {zoomControl: false, minZoom: 2, maxZoom: 20, inertiaDeceleration: 1000, worldCopyJump: true});
+      map.fitBounds([[37,-97],[49,-63]]);
       d3.select(".leaflet-control-attribution a").property("target", "_blank")
 
       //******Add map controls
@@ -329,19 +336,19 @@
       }
 
       //******Add base layers
-      var googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+      var googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
         maxZoom: 20,
         subdomains:['mt0','mt1','mt2','mt3']
       });
-      var googleSatellite = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
+      var googleSatellite = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
         maxZoom: 20,
         subdomains:['mt0','mt1','mt2','mt3']
       }); 
-      var googleStreet = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
+      var googleStreet = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
         maxZoom: 20,
         subdomains:['mt0','mt1','mt2','mt3']
       });
-      var googleTerrain = googleTerrain = L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{
+      var googleTerrain = googleTerrain = L.tileLayer('https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{
         maxZoom: 20,
         subdomains:['mt0','mt1','mt2','mt3']
       });
@@ -349,12 +356,12 @@
       var bingHybrid = new L.BingLayer("At3gymJqaoGjGje-JJ-R5tJOuilUk-gd7SQ0DBZlTXTsRoMfVWU08ZWF1X7QKRRn", {type: 'AerialWithLabels'});
       var bingSatellite = new L.BingLayer("At3gymJqaoGjGje-JJ-R5tJOuilUk-gd7SQ0DBZlTXTsRoMfVWU08ZWF1X7QKRRn", {type: 'Aerial'});
       var bingStreet = new L.BingLayer("At3gymJqaoGjGje-JJ-R5tJOuilUk-gd7SQ0DBZlTXTsRoMfVWU08ZWF1X7QKRRn", {type: 'Road'});
-      var usgsTopo = new L.tileLayer('http://basemap.nationalmap.gov/ArcGIS/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}', {
+      var usgsTopo = new L.tileLayer('https://basemap.nationalmap.gov/ArcGIS/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 15,
             zIndex: 0,
-            attribution: '<a href="http://www.doi.gov">U.S. Department of the Interior</a> | <a href="http://www.usgs.gov">U.S. Geological Survey</a> | <a href="http://www.usgs.gov/laws/policies_notices.html">Policies</a>'
+            attribution: '<a href="https://www.doi.gov">U.S. Department of the Interior</a> | <a href="https://www.usgs.gov">U.S. Geological Survey</a> | <a href="https://www.usgs.gov/laws/policies_notices.html">Policies</a>'
             });
-      var states = new L.tileLayer.wms("http://felek.cns.umass.edu:8080/geoserver/birds/wms", {
+      var states = new L.tileLayer.wms("https://ecosheds.org/geoserver/birds/wms", {
           layers: 'us_states',
           format: 'image/png',
           transparent: true,
@@ -367,7 +374,7 @@
 
 
       //******Study region layer
-      var studyRegion = new L.tileLayer.wms("http://felek.cns.umass.edu:8080/geoserver/CL/wms", {
+      var studyRegion = new L.tileLayer.wms("https://ecosheds.org/geoserver/CL/wms", {
           layers: 'ecoregions_dissolved',
           format: 'image/png',
           transparent: true,
@@ -388,7 +395,7 @@
       cropImg.top67.splice(cropImg.top67.length,0,"cl_mins_min","cl_mins_max","cl_maxs_min","cl_maxs_max");
 
       abioticID.forEach(function(tmpID, i) {
-        abioticLayers[i] = L.tileLayer.wms("http://felek.cns.umass.edu:8080/geoserver/CL/wms", {
+        abioticLayers[i] = L.tileLayer.wms("https://ecosheds.org/geoserver/CL/wms", {
           layers: "CL:" + tmpID,
           format: 'image/png',
           transparent: true,
@@ -411,7 +418,7 @@
       speciesID.forEach(function(tmpID, i) {
         speciesLayers[i] = [];
         layerExt.forEach(function(tmpExt, j) {
-          speciesLayers[i][j] = L.tileLayer.wms("http://felek.cns.umass.edu:8080/geoserver/CL/wms", {
+          speciesLayers[i][j] = L.tileLayer.wms("https://ecosheds.org/geoserver/CL/wms", {
             layers: "CL:" + tmpID + tmpExt,
             format: 'image/png',
             transparent: true,
@@ -432,7 +439,7 @@
       var commLayers = [];
 
       commID.forEach(function(tmpID, i) {
-        commLayers[i] = L.tileLayer.wms("http://felek.cns.umass.edu:8080/geoserver/CL/wms", {
+        commLayers[i] = L.tileLayer.wms("https://ecosheds.org/geoserver/CL/wms", {
           layers: "CL:" + tmpID,
           format: 'image/png',
           transparent: true,
@@ -500,11 +507,11 @@
             })
             .on("click", function(data) { 
               if (d3.select(this).style("stroke-opacity") == "1") {
-                d3.select(this).style({"fill-opacity": "", "stroke-opacity": ""});
+                d3.select(this).style({"fill-opacity": "", "stroke-opacity": ""}).classed("selected", false);
                 d3.selectAll(".remCheck").property("checked", function() {if(this.value == data.id) {return false;} });
               } 
               else {
-                d3.select(this).style({"fill-opacity": "0.5", "stroke-opacity": "1"});
+                d3.select(this).style({"fill-opacity": "0.5", "stroke-opacity": "1"}).classed("selected", true);
                 d3.selectAll(".remCheck").property("checked", function() {if(this.value == data.id) {return true;} });
               }
               get_spp();
@@ -540,7 +547,8 @@
             + '<li>Which species are the most sensitive?</li>'
           + '</ul><br>'
           + '<p style="font-size:16px">The interactive web interface provides maximum flexibility for the user to assess heterogeneous landscapes for specific areas and species of interest.  Outputs include downloadable maps, tables and figures summarizing critical loads and exceedance based on a range of customizable options, including output products that reflect the minimum CL value, range of CL values, or percent of the target area protected.</p><br>'
-          + '<p style="font-size:16px">You can also download base layer maps of <span style="color:orange;font-weight:bold;cursor:pointer;" data-toggle="tooltip" data-container="body" data-placement="auto bottom" data-html="true" title="<p><u><b><center>N Deposition</center></b></u></p><p>N Deposition (Total Dep)</p>">N deposition</span>, <span style="color:blue;font-weight:bold;cursor:pointer;" data-toggle="tooltip" data-container="body" data-placement="auto bottom" data-html="true" title="<p><u><b><center>Climate</center></b></u></p><p>Precipitation (Annual)<br>Precipitation (May-Sept)<br>Temperature (Jan)<br>Temperature (July)<br>Temperature (May-Sept)</p>">climate</span>, <span style="color:red;font-weight:bold;cursor:pointer;" data-toggle="tooltip" data-container="body" data-placement="auto bottom" data-html="true" title="<p><u><b><center>Soil</center></b></u></p><p>Bedrock Depth<br>Clay<br>Coarse<br>Permeability<br>pH</p>">soil</span>, and <span style="color:green;font-weight:bold;cursor:pointer;" data-toggle="tooltip" data-container="body" data-placement="auto bottom" data-html="true" title="<p><u><b><center>Topographic</center></b></u></p><p>Aspect<br>Elevation<br>Slope</p>">topographic</span> parameters.</p><br>'
+          + '<p style="font-size:16px">You can also download base layer maps of <span class="hover" data-toggle="tooltip" data-container="body" data-placement="auto bottom" data-html="true" title="<p><u><b><center>N Deposition</center></b></u></p><p>N Deposition (Total Dep)</p>">N deposition</span>, <span class="hover" data-toggle="tooltip" data-container="body" data-placement="auto bottom" data-html="true" title="<p><u><b><center>Climate</center></b></u></p><p>Precipitation (Annual)<br>Precipitation (May-Sept)<br>Temperature (Jan)<br>Temperature (July)<br>Temperature (May-Sept)</p>">climate</span>, <span class="hover" data-toggle="tooltip" data-container="body" data-placement="auto bottom" data-html="true" title="<p><u><b><center>Soil</center></b></u></p><p>Bedrock Depth<br>Clay<br>Coarse<br>Permeability<br>pH</p>">soil</span>, and <span class="hover" data-toggle="tooltip" data-container="body" data-placement="auto bottom" data-html="true" title="<p><u><b><center>Topographic</center></b></u></p><p>Aspect<br>Elevation<br>Slope</p>">topographic</span> parameters.</p>'
+          + '<img src="images/overview_download.png" title="Download menu" style="height:325px;"></img><br><br>'
           + '<p style=font-size:24px;"><b><u>How it Works</u></b></p>'
           + '<p style="font-size:16px">Nitrogen Critical Load Assessment by Site (N-CLAS) is a GIS-based tool designed for resource managers and policy makers to assess the effects of nitrogen deposition and climate change on forest ecosystems in the Northeastern United States.  N-CLAS uses geospatial data layers for key topographic, climactic, soil abiotic factors, and nitrogen deposition levels to predict whether growth at a site will be optimal or suboptimal for each of 23 significant tree species.  N-CLAS can then be used to assess critical loads and exceedance for individual species or summarized for all species combined  for user selected areas.</p><br>'
           + '<p style="font-size:16px"><i>Customize your output by setting your preferences for area unit (acres or hectares), and tree species name (Latin or common).</i><br></p>'
@@ -580,23 +588,28 @@
           + '<p style="font-size:24px;"><b><u>N-CLAS Overview</u></b></p>'
           + '<div class="methodDiv">'
             + '<div class="approachLeftDiv">'
-              + '<p class="approachP">N-CLAS is a GIS-based tool designed for resource managers to assess the effects of nitrogen deposition and determine <b>critical loads</b> and <b>exceedance</b> for forest ecosystems in the Northeastern United States.<span class="glyphicon glyphicon-info-sign approachModalGlyph" style="margin:0;margin-left:5px;cursor:pointer;" title="Click to view detailed information"</span></p>'
+              + '<p class="approachP">N-CLAS is a GIS-based tool designed for resource managers to assess the effects of nitrogen deposition and determine <span class="hover" data-toggle="tooltip" data-container="body" data-placement="auto bottom" data-html="true" title="<p><u><b><center>Critical Loads</center></b></u></p><p>A critical load is defined as the level of deposition below which no harmful effects occur over the long term (UBA 2004). In N-CLAS, this is the amount of N deposition that will negatively impact the tree species present.</p>">critical loads</span> and <span class="hover" data-toggle="tooltip" data-container="body" data-placement="auto bottom" data-html="true" title="<p><u><b><center>Exceedance</center></b></u></p><p>The amount by which the actual load of deposition is greater than the critical load.<br><br>Exceedance of N = total N deposition - N critical load</p>">exceedance</span> for forest ecosystems in the Northeastern United States.<span class="glyphicon glyphicon-info-sign approachModalGlyph" style="display:none;margin:0;margin-left:5px;cursor:pointer;" title="Click to view detailed information"</span></p>'
               + '<ul class="approachUL">'
-                + '<li data-toggle="collapse" data-target="#approachAnswer00" title="Click to show/hide answer">What tree species does N-CLAS include?</li>'
+                + '<li data-toggle="collapse" data-target="#approachAnswer00" title="Click to show/hide answer">What factors does N-CLAS consider when determining CL?</li>'
                 + '<div class="approachAnswer collapse" id="approachAnswer00">'
+                  + '<p id="hyperlinkP">N-CLAS can be used to determine critical loads and exceedance for individual tree species or all tree species present for <span class="hyperlink nonInfo" onclick="d3.select(&#34;#approachModalFigImg&#34;).attr(&#34;src&#34;, &#34;images/about/table_F1.jpg&#34;);">user selected areas</span>, including national forests and parks, wilderness areas, and <a class="aLink" href="https://www.epa.gov/eco-research/ecoregions-north-america" target="_blank">ecoregions</a> (areas with similar ecosystem structure and function as defined by the Commission for Environmental Cooperation (CEC)).<br><br>N-CLAS uses geospatial data of abiotic modifying factors (topographic, climatic, and soil parameters) to predict whether growth in each 30 m x 30 m pixel is likely to be <span class="hyperlink nonInfo" onclick="d3.select(&#34;#approachModalFigImg&#34;).attr(&#34;src&#34;, &#34;images/about/fig_2.2.jpg&#34;);">optimal or sub-optimal</span> for a given species. Sub-optimal growth conditions are expected to increase sensitivity to N deposition, whereas optimal growth conditions are expected to result in increased N demand and higher tolerance of N deposition.<br><br>N-CLAS combines the effect of the abiotic modifying factors on growth to determine if the critical load for a species will be in the bottom half or upper half of the species&#39; documented critical load range.<ul><li>In N-CLAS, suboptimal growth conditions are expected to increase sensitivity to N deposition and thus shift the critical load to the bottom half of the species&#39; critical loads range.</li><br><li>Optimal growth conditions are expected to result in increased N demand and thus shift the critical load to the upper half of the critical loads range.</li></ul></p>'
+                + '</div>'
+
+                + '<li data-toggle="collapse" data-target="#approachAnswer01" title="Click to show/hide answer">What tree species does N-CLAS include?</li>'
+                + '<div class="approachAnswer collapse" id="approachAnswer01">'
                   + '<p>N-CLAS includes 23 species of management concern, of commercial interest and dominant species in the northern forest.</p>'
                   + '<img class="approachAnswerImg" src="images/about/table_2.1.jpg">'
                 + '</div>'
 
-                + '<li data-toggle="collapse" data-target="#approachAnswer01" title="Click to show/hide answer">What areas does N-CLAS include?</li>'
-                + '<div class="approachAnswer collapse" id="approachAnswer01">'
+                + '<li data-toggle="collapse" data-target="#approachAnswer02" title="Click to show/hide answer">What areas does N-CLAS include?</li>'
+                + '<div class="approachAnswer collapse" id="approachAnswer02">'
                   + '<p>N-CLAS can be used to determine critical loads and exceedance for <span class="hyperlink nonInfo" onclick="d3.select(&#34;#approachModalFigImg&#34;).attr(&#34;src&#34;, &#34;images/about/table_2.1.jpg&#34;);">individual tree species</span> or all tree species present at user-selected areas, including national forests and parks, wilderness areas, and <a class="aLink" href="https://www.epa.gov/eco-research/ecoregions-north-america" target="_blank">ecoregions</a> (areas with similar ecosystem structure and function as defined by the Commission for Environmental Cooperation (CEC)).</p>'
                   + '<img class="approachAnswerImg" src="images/about/table_F1.jpg">'
                 + '</div>'
 
-                + '<li data-toggle="collapse" data-target="#approachAnswer02" title="Click to show/hide answer">What factors modify the CL in N-CLAS?</li>'
-                + '<div class="approachAnswer collapse" id="approachAnswer02">'
-                  + '<p>N-CLAS uses geospatial data for <span class="hyperlink nonInfo" onclick="d3.select(&#34;#approachModalFigImg&#34;).attr(&#34;src&#34;, &#34;images/about/table_2.4.jpg&#34;);">topographic, climatic, and soil parameters</span> to assess whether growth is likely to be optimal or sub-optimal for each species at a given location.</p>'
+                + '<li data-toggle="collapse" data-target="#approachAnswer03" title="Click to show/hide answer">What factors modify the CL in N-CLAS?</li>'
+                + '<div class="approachAnswer collapse" id="approachAnswer03">'
+                  + '<p>N-CLAS uses geospatial data for <span class="hyperlink nonInfo" onclick="d3.select(&#34;#approachModalFigImg&#34;).attr(&#34;src&#34;, &#34;images/about/table_2.4.jpg&#34;);">topographic, climatic, and soil parameters</span> to assess whether growth is likely to be optimal or sub-optimal for each species at a given location. N-CLAS then modifies the critical load for each species based on these factors.</p>'
                   + '<ul>'
                     + '<li>Topographic factors</li>'
                       + '<ul>'
@@ -619,8 +632,8 @@
                   + '</ul>'
                 + '</div>'
 
-                + '<li data-toggle="collapse" data-target="#approachAnswer03" title="Click to show/hide answer">How do optimal growth conditions affect the CL in N-CLAS?</li>'
-                + '<div class="approachAnswer collapse" id="approachAnswer03">'
+                + '<li data-toggle="collapse" data-target="#approachAnswer04" title="Click to show/hide answer">How do optimal growth conditions affect the CL in N-CLAS?</li>'
+                + '<div class="approachAnswer collapse" id="approachAnswer04">'
                   + '<ul>'
                     + '<li>Optimal growth conditions are expected to result in increased N demand and thus shift the critical load to the <span class="hyperlink nonInfo" onclick="d3.select(&#34;#approachModalFigImg&#34;).attr(&#34;src&#34;, &#34;images/about/fig_slide_6.jpg&#34;);">upper half of the species&#39; documented critical loads range</span>.</li>'
                     + '<img class="approachAnswerImg" src="images/about/fig_2.2.jpg" style="margin-bottom:5px;">'
@@ -642,8 +655,10 @@
           + '<p style="font-size:24px;"><b><u>N-CLAS Approach</u></b></p>'
           + '<div class="methodDiv">'
             + '<div class="approachLeftDiv">'
-              + '<p class="approachP">N-CLAS critical loads can be reported for individual species or aggregated for all tree species present.<span class="glyphicon glyphicon-info-sign approachModalGlyph" style="margin:0;margin-left:5px;cursor:pointer;" title="Click to view detailed information"</span></p>'
-              + '<p class="approachP">Steps N-CLAS uses to calculate the critical load <span class="glyphicon glyphicon-info-sign approachModalGlyph" style="margin:0;margin-left:5px;cursor:pointer;" title="Click to view detailed information"</span></p>'
+              + '<p class="approachP">N-CLAS uses a 5-step process to calculate critical loads.<span class="glyphicon glyphicon-info-sign approachModalGlyph" style="margin:0;margin-left:5px;cursor:pointer;" title="Click to view detailed information"</span></p>'
+              + '<a class="aLink" href="images/about/Methods_for_NCLAS_20180223.pdf" target="_blank">PDF containing detailed methodology</a>'
+              + '<p class="approachP" style="margin-top:10px;">N-CLAS critical loads can be reported for individual species or aggregated for all tree species present.</p>'
+              + '<p class="approachP">Steps N-CLAS uses to calculate the critical load:</p>' // <span class="glyphicon glyphicon-info-sign approachModalGlyph" style="margin:0;margin-left:5px;cursor:pointer;" title="Click to view detailed information"</span></p>'
               + '<ol>'
 
                 + '<li><p class="approachP">Identify the species present <span class="glyphicon glyphicon-info-sign approachModalGlyph" style="margin:0;margin-left:5px;cursor:pointer;" title="Click to view detailed information"</span></p></li>'
@@ -654,7 +669,7 @@
                     + '</div>'
                     + '<li data-toggle="collapse" data-target="#approachAnswer11" title="Click to show/hide answer">What species are included in each SAF Forest Cover Type?</li>'
                     + '<div class="approachAnswer collapse" id="approachAnswer11">'
-                      + '<p>Species composition of each forest cover type is derived from Eyre (1980), the USDA <a class="aLink" href="https://www.feis-crs.org/feis/" target="_blank">Fire Effects Information System</a>, and Little&#39;s <a class="aLink" href="https://esp.cr.usgs.gov/data/little/" target="_blank">Little&#39;s species range maps</a>. We created a list of species included in each SAF forect cover type used by LANDFIRE.</p>'
+                      + '<p>Species composition of each forest cover type is derived from Eyre (1980), the USDA <a class="aLink" href="https://www.feis-crs.org/feis/" target="_blank">Fire Effects Information System</a>, and Little&#39;s <a class="aLink" href="https://esp.cr.usgs.gov/data/little/" target="_blank">Little&#39;s species range maps</a>. We created a list of species included in each SAF forest cover type used by LANDFIRE.</p>'
                     + '</div>'
                 + '</ul>'
                 + '<br>'
@@ -665,7 +680,7 @@
                     + '<div class="approachAnswer collapse" id="approachAnswer12">'
                       + '<p>For each tree species, <a class="aLink" href="https://www.fs.fed.us/nrs/pubs/gtr/gtr_nrs172.pdf" target="_blank">Robin-Abbott and Pardo (2017)</a> identified the <a class="aLink" href="https://www.fs.fed.us/nrs/pubs/download/gtr_nrs172_appendix2.pdf" target="_blank">optimal range for growth for specified topographic, climatic, and soil abiotic modifying factors</a>.</p>'
                     + '</div>'
-                    + '<li data-toggle="collapse" data-target="#approachAnswer13" title="Click to show/hide answer">What species are included in each SAF Forest Cover Type?</li>'
+                    + '<li data-toggle="collapse" data-target="#approachAnswer13" title="Click to show/hide answer">How is the optimal range for growth determined?</li>'
                     + '<div class="approachAnswer collapse" id="approachAnswer13">'
                       + '<p><a class="aLink" href="https://www.fs.fed.us/nrs/pubs/download/gtr_nrs172_appendix2.pdf" target="_blank">The optimal range for growth for specified topographic, climatic, and soil abiotic modifying factors</a> is based on <a class="aLink" href="https://www.fs.fed.us/nrs/pubs/download/gtr_nrs172_appendix1.pdf" target="_blank">importance values and distribution data</a> from the Climate Change Tree Atlas (U.S. Forest Service, n.d.) and information from other sources, including the Forest Service silvics handbook "Silvics of North America" (Burns and Honkala, 1990); the PLANTS database (NRCS 2014); and additional literature sources.</p>'
                       + '<img class="approachAnswerImg" src="images/about/fig_2.3.jpg">'
@@ -711,7 +726,7 @@
                     + '</div>'
                     + '<li data-toggle="collapse" data-target="#approachAnswer111" title="Click to show/hide answer">What does it mean if the adjusted CL is in the bottom half of the CL range for that species?</li>'
                     + '<div class="approachAnswer collapse" id="approachAnswer111">'
-                      + '<p>If the adjusted critical load is in the bottom half of the CL range, it means that in this area, the species is more sensitive to N deposition, suboptimal growth conditions are expected to increase sensitivity to N deposition and thus shift the critical load to the bottom half of the species&#39; critical loads range.</p>'
+                      + '<p>If the adjusted critical load is in the bottom half of the CL range, it means that in this area, the species is more sensitive to N deposition. Suboptimal growth conditions are expected to increase sensitivity to N deposition and thus shift the critical load to the bottom half of the species&#39; critical loads range.</p>'
                     + '</div>'
                     + '<li data-toggle="collapse" data-target="#approachAnswer112" title="Click to show/hide answer">What does it mean if the adjusted CL is in the upper half of the CL range for that species?</li>'
                     + '<div class="approachAnswer collapse" id="approachAnswer112">'
@@ -740,7 +755,7 @@
       //******Add modal information div
       var modalContentP = [];
       modalContentP.push('<p>N-CLAS can be used to determine critical loads and exceedance for individual tree species or all tree species present for <span class="hyperlink info" onclick="d3.select(&#34;#infoFigImg&#34;).attr(&#34;src&#34;, &#34;images/about/table_F1.jpg&#34;);">user selected areas</span>, including national forests and parks, wilderness areas, and <a class="aLink" href="https://www.epa.gov/eco-research/ecoregions-north-america" target="_blank">ecoregions</a> (areas with similar ecosystem structure and function as defined by the Commission for Environmental Cooperation (CEC)).<br><br>N-CLAS uses geospatial data of abiotic modifying factors (topographic, climatic, and soil parameters) to predict whether growth in each 30 m x 30 m pixel is likely to be <span class="hyperlink info" onclick="d3.select(&#34;#infoFigImg&#34;).attr(&#34;src&#34;, &#34;images/about/fig_2.2.jpg&#34;);">optimal or sub-optimal</span> for a given species. Sub-optimal growth conditions are expected to increase sensitivity to N deposition, whereas optimal growth conditions are expected to result in increased N demand and higher tolerance of N deposition.<br><br>N-CLAS combines the effect of the abiotic modifying factors on growth to determine if the critical load for a species will be in the bottom half or upper half of the species&#39; documented critical load range.<ul><li>In N-CLAS, suboptimal growth conditions are expected to increase sensitivity to N deposition and thus shift the critical load to the bottom half of the species&#39; critical loads range.</li><br><li>Optimal growth conditions are expected to result in increased N demand and thus shift the critical load to the upper half of the critical loads range.</li></ul></p>');
-      modalContentP.push('<p>N-CLAS calculates critical loads for individual species at each 30 m x 30 m pixel across the landscape. These critical loads can then be reported for individual species or aggregated across all tree species, which enables the identification of the lowest critical loads across <i>all</i> species present in that location. <span class="hyperlink info" onclick="d3.select(&#34;#infoFigImg&#34;).attr(&#34;src&#34;, &#34;images/about/table_2.4.jpg&#34;);">Abiotic modifying factors and spatial data layers</span> used in the N-CLAS GIS tool include topographic (elevation, aspect, slope gradient), climatic (measures of annual and seasonal temperature and precipitation), and soil (pH, clay and sand content, permeability, depth to bedrock) parameters.<br><br><a class="aLink" href="images/about/Methods_for_NCLAS_20180223.pdf" target="_blank">PDF containing detailed methodology</a></p>');
+      //modalContentP.push('<p>N-CLAS calculates critical loads for individual species at each 30 m x 30 m pixel across the landscape. These critical loads can then be reported for individual species or aggregated across all tree species, which enables the identification of the lowest critical loads across <i>all</i> species present in that location. <span class="hyperlink info" onclick="d3.select(&#34;#infoFigImg&#34;).attr(&#34;src&#34;, &#34;images/about/table_2.4.jpg&#34;);">Abiotic modifying factors and spatial data layers</span> used in the N-CLAS GIS tool include topographic (elevation, aspect, slope gradient), climatic (measures of annual and seasonal temperature and precipitation), and soil (pH, clay and sand content, permeability, depth to bedrock) parameters.</p>');
       modalContentP.push('<p>The process by which N-CLAS calculates critical loads for each pixel includes: <ol><li>Identifying the species present.</li><li>Evaluating whether the effect of each abiotic modifying factor is more likely to lead to optimal or sub-optimal growth conditions for that species.</li><li>Weighing the strength of evidence for the relationship between abiotic factors and species&#39; growth.</li><li>Incorporating the relative ecological significance of each abiotic factor.</li><li>Adjusting the species critical load value based on the combined effect of all abiotic modifying factors.</li></ol></p>');
       modalContentP.push('<p>The first step is to determine which species are present in each pixel. N-CLAS uses <a class="aLink" href="https://www.landfire.gov" target="_blank">LANDFIRE</a> and SAF (Society of American Foresters) forest cover types to identify the presence or absence of species in a given pixel, assuming species composition of each cover type based on Eyre (1980), the USDA <a class="aLink" href="https://www.feis-crs.org/feis/" target="_blank">Fire Effects Information System</a>, and Little&#39;s <a class="aLink" href="https://esp.cr.usgs.gov/data/little/" target="_blank">Little&#39;s species range maps</a></p>');
       modalContentP.push('<p>The second step is to evaluate whether the abiotic conditions at a given location are optimal for growth of each species.'
@@ -817,6 +832,9 @@
         $(d).click(function(){ $("#approachModalFig").modal(); });
       });
 
+      //******Make images work for hyperlinks outside of .approachModalGlyph class
+      //d3.select("#hyperlinkP").selectAll(".hyperlink.noninfo")[0].forEach(function(d,i) { $(d).click(function(){ if(d3.select("#infoFigDiv").style("opacity",0)) {toolWindowToggle("infoFig");} });});
+
 
 
 
@@ -831,13 +849,14 @@
           + '<p style="font-size:16px;margin-left:30px">N-CLAS includes data aggregation by state, ecoregions (levels 2 and 3), National Forest, National Park, and wilderness area classes. You can select one, or multiple areas for comparison within each class.</p><br>'
           + '<p style="font-size:16px;margin-left:30px"><u>Step 2</u>: Select your <span style="color:white;background:rgb(118,147,60);font-weight:bold;padding:2px;border:1px solid black;">Species</span> of interest</p>'
           + '<p style="font-size:16px;margin-left:30px">A total of 23 tree species are included in the N-CLAS assessment. You may select a single species of interest, any combination of key species, or all species to better understand the forest as a whole.</p><br>'
-          + '<p style="font-size:16px;margin-left:30px"><u>Step 3</u>: Select your preferred <span style="color:white;background:rgb(54,96,146);font-weight:bold;padding:2px;border:1px solid black;">Output</span></p>'
+          + '<p style="font-size:16px;margin-left:30px"><u>Step 3</u>: Select your preferred <span style="color:white;background:rgb(54,96,146);font-weight:bold;padding:2px;border:1px solid black;">Output</span> format</p>'
           + '<p style="font-size:16px;margin-left:30px">Three levels of detail are provided for output maps, figures and tables:</p>'
           + '<ul style="font-size:16px;margin-left:30px">'
-            + '<li><b>Basic</b>: Summary figures and tables are limited to assessments for the <b>most protective critical load of most sensitive species</b>.<br><i>This can be used as an efficient assessment of the maximum forest risk from nitrogen deposition.</i><br></li>'
-            + '<li><b>Tailored</b>: A set of screening questions about the key research questions helps to guide the selection of informative output tables, figures and maps. Output products can be previewed to ensure that all required results are included, with the ability to remove unnecessary outputs or select additional outputs.<br><i>This may be the best option for many stakeholders to ensure the appropriate level of information without unnecessary outputs.</i><br></li>'
-            + '<li><b>Comprehensive</b>: This selection will include outputs to address all ranges of values of critical loads, and output data products. Output products can be previewed to ensure that all required results are included, with the ability to remove unnecessary outputs.<br><i>This may be most useful for those who wish to have the complete set of information available to identify questions or issues that may not have been obvious prior to analysis (for "data mining").</i><br></li>'
-          + '</ul><br>'
+            + '<li><b>Basic</b>: Summary figures and tables are limited to assessments for the <b>most protective critical load of the most sensitive species</b>.<br><i>This can be used as an efficient assessment of the maximum forest risk from nitrogen deposition.</i><br></li>'
+            + '<li><b>Tailored</b>: Users select outputs tailored to meet their specific needs by answering a set of screening questions.<br><i>This may be the best option for many stakeholders to ensure the appropriate level of information without unnecessary outputs.</i><br></li>'
+            + '<li><b>Comprehensive</b>: This selection will include outputs to address all ranges of values of critical loads, and output data products.<br><i>This may be most useful for those who wish to have the complete set of information available to identify questions or issues that may not have been obvious prior to analysis (for "data mining").</i><br></li>'
+          + '</ul>'
+          + '<p style="font-size:16px;margin-left:30px">Output products can be previewed to ensure that all required results are included, with the ability to remove unnecessary outputs or select additional outputs.</p><br>'
           + '<p style="font-size:16px;margin-left:30px"><u>Step 4</u>: View your generated <span style="color:white;background:rgb(255,192,0);font-weight:bold;padding:2px;border:1px solid black;">Results</span></p>'
           + '<p style="font-size:16px;margin-left:30px">The results window allows users to explore a variety of graphs, tables, and figures generated according to their customized settings.</p>'
           + '<p style="font-size:16px;margin-left:30px">These products are nested in the results window on the right side of the map interface. Select and expand various result tabs, hover for additional information on each output product, or click for a zoomed view.</p>'
@@ -846,7 +865,7 @@
           + '<ul style="font-size:16px;">'
             + '<li>When in doubt, <b>hover</b>. Hovering will generally open a brief description of the item of interest.<br></li>'
             + '<li>Many items in the web app contain an <b>info icon</b> (<span class="glyphicon glyphicon-info-sign" style="margin:0;cursor:pointer;" data-toggle="tooltip" data-container="body" data-placement="auto top" data-html="true" title="<p><u><b><center>Information</center></b></u></p><p>Hovering over these icons activates a pop-up containing information about the item.</p>"></span>). Hovering over these icons provides a summary of the function of each item.<br></li>'
-            + '<li>The preferences tab will allow you to change the unit of area measurement to acres or hectares, and the tree species names to Latin or common for produced output.<br></li>'
+            + '<li>The preferences icon (<span class="glyphicon glyphicon-option-horizontal" style="margin:0;cursor:pointer;background:darkgray;" data-toggle="tooltip" data-container="body" data-placement="auto top" data-html="true" title="<p><u><b><center>Preferences</center></b></u></p><p>Enables the user to change unit of measure and species naming convention. It can be found on the top menu of the Home screen.</p>"></span>) will allow you to change the unit of area measurement to acres or hectares, and the tree species names to Latin or common for produced output.<br></li>'
             + '<li>Clicking on output products (tables or figures) in the results pane will enlarge those in the main viewer.<br></li>'
             + '<li>The main viewer can be expanded by collapsing the left and right side panels by clicking on the side arrows.<br></li>'
             + '<li>To clear settings select the refresh button (<span class="glyphicon glyphicon-refresh" style="margin:0;"></span>) in the upper right corner<br></li>'
@@ -1034,7 +1053,7 @@
               + '<td>'
                 + '<p class="glossDef">Characteristics of the environment in which trees grow. In N-CLAS, these include:</p>'
                 + '<div class="glossDefDiv">'
-                  + '<p>Topographic - elevation, slope, aspect<br>Climactic - temperature and precipitation<br>Soil parameters - drainage, pH</p>'
+                  + '<p>Topographic - elevation, slope, aspect<br>Climactic - temperature, precipitation<br>Soil parameters - drainage, pH</p>'
                 + '</div>'
               + '</td>'
             + '</tr>'
@@ -1059,7 +1078,7 @@
                 + '<p class="glossWord">Class II Area</p>'
               + '</td>'
               + '<td>'
-                + '<p class="glossDef"></p>'
+                + '<p class="glossDef">Class II Areas encompass nearly all other areas in the U.S. These areas are only allowed moderate change in the air quality and have stringent standards to meet.</p>'
               + '</td>'
             + '</tr>'
             + '<tr>'
@@ -1115,7 +1134,7 @@
                 + '<p class="glossWord">Harmful Ecological Effects</p>'
               + '</td>'
               + '<td>'
-                + '<p class="glossDef">Detrimental responses at the tissue level (nutrient deficiencies, nutrient imbalances), at the plant level (declines in growth, survival, and health), at the community level (decreased species richness, shifts in community composition), at the ecosystem level (increases in watershed nitrate export).</p>'
+                + '<p class="glossDef">Harmful ecological effects include: detrimental responses at the tissue level (nutrient deficiencies, nutrient imbalances), at the plant level (declines in growth, survival, and health), at the community level (decreased species richness, shifts in community composition), and at the ecosystem level (increases in watershed nitrate export).</p>'
               + '</td>'
             + '</tr>'
             + '<tr>'
@@ -1123,7 +1142,7 @@
                 + '<p class="glossWord">Importance Values</p>'
               + '</td>'
               + '<td>'
-                + '<p class="glossDef">A measure of how dominant a species is in a given forest area (the relative importance of a species within a plot).</p>'
+                + '<p class="glossDef">A measure of how dominant a species is in a given forest area (the relative importance of a species within a plot). The more dominant a species is, the higher its importance value.</p>'
               + '</td>'
             + '</tr>'
             + '<tr>'
@@ -1131,7 +1150,7 @@
                 + '<p class="glossWord">Negative Consequences of Increased N Deposition</p>'
               + '</td>'
               + '<td>'
-                + '<p class="glossDef">See "Harmful Ecological Effects".</p>'
+                + '<p class="glossDef">Negative consequences of increased N deposition include: detrimental responses at the tissue level (nutrient deficiencies, nutrient imbalances), at the plant level (declines in growth, survival, and health), at the community level (decreased species richness, shifts in community composition), and at the ecosystem level (increases in watershed nitrate export).</p>'
               + '</td>'
             + '</tr>'
             + '<tr>'
@@ -1171,7 +1190,7 @@
                 + '<p class="glossWord">TDep</p>'
               + '</td>'
               + '<td>'
-                + '<p class="glossDef">Maps summing dry and wet deposition of nitrogen (total deposition) are created as part of the <a href="http://nadp.sws.uiuc.edu/committees/tdep/tdepmaps/" target="_blank">National Atmospheric Deposition Program</a></p>'
+                + '<p class="glossDef">Maps summing dry and wet deposition of nitrogen (total deposition) are created as part of the <a href="https://nadp.slh.wisc.edu/committees/tdep/tdepmaps/" target="_blank">National Atmospheric Deposition Program</a></p>'
               + '</td>'
             + '</tr>'
             + '<tr>'
@@ -1187,7 +1206,7 @@
                 + '<p class="glossWord">Weight of Influence</p>'
               + '</td>'
               + '<td>'
-                + '<p class="glossDef">The rating of how important a given abiotic factor is in determining the ultimate growth response of a given tree species and its susceptibility to N deposition (since not all factors are equally important). Note that the weight of influence reflects the <b>ecological significance</b> of the factor which is different than the weight of evidence, which addresses the <b>strength of the relationship shown by the data</b>.</p>'
+                + '<p class="glossDef">The rating of how important a given abiotic factor is in determining the ultimate growth response of a given tree species and its susceptibility to N deposition (since not all factors are equally important). Note that the weight of influence reflects the <b>ecological significance</b> of the factor and is different than the weight of evidence, which addresses the <b>strength of the relationship shown by the data</b>.</p>'
               + '</td>'
             + '</tr>'
             + '<tr>'
@@ -1242,12 +1261,12 @@
         .append("img")
         .attr("src", "images/N-CLAS.png")
         .property("title", "Image showing critical loads of nitrogen deposition for tree communitites across the northeast United States")
-        .style({"height":"200px","display":"inline-block","float":"left","border":"1px solid #333333","border-radius":"4px","margin-top":"15px"});
+        .style({"width":"34%","display":"inline-block","float":"right","border":"1px solid #333333","border-radius":"4px","margin-top":"15px"});
 
       d3.select("#splashScreenDiv")
         .append("p")
-        .html('This tool is designed to calculate critical loads and exceedances for N deposition to forests in the northeastern US. It provides high resolution outputs (maps, graphs, and tables) for multiple areas and accounts for the influence of site, climate, and topographic conditions on 23 key tree species in the region. N-CLAS facilitates assessment of risk to forest ecosystems for resource managers and policy makers.')
-        .style({"font-size":"24px","margin":"10px 0px 20px 5px","text-align":"left","display":"inline-block","width":"70%"}); 
+        .html('N-CLAS facilitates assessment of risk to forest ecosystems for resource managers and policy makers. This tool is designed to calculate critical loads and exceedances for Nitrogen deposition to forests in the northeastern US. It provides high resolution outputs (maps, graphs, and tables) for multiple areas and accounts for the influence of site, climate, and topographic conditions on 23 key tree species in the region.')
+        .style({"font-size":"23px","margin":"10px 5px 20px 0px","text-align":"left","display":"inline-block","width":"64%"}); 
 
       d3.select("#splashScreenDiv")
         .append("p")
@@ -1266,13 +1285,13 @@
 
       d3.select("#splashScreenDiv")
         .append("p")
-        .html('<u>Step 3</u>: Select your preferred <span style="color:white;background:rgb(54,96,146);font-weight:bold;padding:2px;border:1px solid black;">Output</span>')
+        .html('<u>Step 3</u>: Select your preferred <span style="color:white;background:rgb(54,96,146);font-weight:bold;padding:2px;border:1px solid black;">Output</span> format')
         .style({"font-size":"18px","margin":"5px 10px","text-align":"left"});
 
       d3.select("#splashScreenDiv")
         .append("div")
         .style({"margin-left":"115px","text-align":"left","font-size":"18px"})
-        .html('<p style="margin:5px 10px">-  Basic: Summary figures and tables for most protective critical load of most sensitive species</p><p style="margin:5px 10px">-  Tailored: Answers to screening questions determines appropriate output</p><p style="margin:5px 10px">-  Comprehensive: All figures and tables</p>');
+        .html('<p style="margin:5px 10px">-  Basic: Summary figures and tables for most protective critical load of most sensitive species</p><p style="margin:5px 10px">-  Tailored: Set of outputs based on your response to screening questions about your needs</p><p style="margin:5px 10px">-  Comprehensive: All figures and tables</p>');
 
       d3.select("#splashScreenDiv")
         .append("p")
@@ -1282,7 +1301,7 @@
       d3.select("#splashScreenDiv")
         .append("div")
         .style({"margin-left":"115px","text-align":"left","font-size":"18px"})
-        .html('<p style="margin:5px 10px">-  Explore graph, table, and map output</p><p style="margin:5px 10px">-  Download individual outputs</p><p style="margin:5px 10px">-  Create a report containing all generated output <span style="color:green">(<i>Coming soon</i>)</span></p>');
+        .html('<p style="margin:5px 10px">-  Explore graph, table, and map outputs</p><p style="margin:5px 10px">-  Download individual outputs</p>');
 
       d3.select("#splashScreenDiv")
         .append("button")
@@ -1307,7 +1326,7 @@
         .style({"margin":"10px","float":"right","position":"relative","top":"30px"})
         .append("label")
         .property("title", "Check box to prevent this screen from displaying on future website visits")
-        .html('<input type="checkbox" id="disableSplash" style="transform:scale(1.3);margin-right:10px;position:relative;top:3px;">Check to prevent this screen from displaying again</input>');
+        .html('<input type="checkbox" id="disableSplash" style="transform:scale(1.3);margin-right:10px;position:relative;top:3px;">Check to prevent default display</input>');
 
 
 
@@ -1675,7 +1694,7 @@
           .append("img")
           .attr("id", tmpName + "LegendImg")
           .attr("class", "legendImg")
-          //.attr("src", "http://felek.cns.umass.edu:8080/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=30&HEIGHT=30&LAYER=CL:" + tmpName)
+          //.attr("src", "https://ecosheds.org/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=30&HEIGHT=30&LAYER=CL:" + tmpName)
           .property("title", tmpTitle);
 
         //***Set div width and offset after the image has been loaded
@@ -1696,7 +1715,7 @@
           d3.select("#" + tmpName + "Legend").style("opacity", "1"); 
     
           resizePanels();
-        }).attr("src", "http://felek.cns.umass.edu:8080/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=30&HEIGHT=30&LAYER=CL:" + tmpName);
+        }).attr("src", "https://ecosheds.org/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=30&HEIGHT=30&LAYER=CL:" + tmpName);
 
         d3.select("#" + tmpName + "Legend")
           .append("input")
@@ -2049,7 +2068,7 @@
         .attr("class", "legTitle")
         .attr("id", "preferencesTitle")
         .append("span")
-        .html('<span class="glyphicon glyphicon-info-sign help-tooltip" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Preferences</center></b></u></p><p>Set preferences for whether or not to display the boundary of the target ecoregions on the map, and for area measurement unit and species naming convention for output figures and tables.</p>"></span>');
+        .html('<span class="glyphicon glyphicon-info-sign help-tooltip" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Preferences</center></b></u></p><p>Set preferences for area measurement unit and species naming convention for output figures and tables, and whether to display the boundary of the target ecoregions on the map.</p>"></span>');
  
       d3.select("#preferencesTitle")
         .append("span")
@@ -2061,15 +2080,18 @@
         .append("div")
         .attr("id", "preferencesOptions")
         .append("div")
-        .html('<div id="prefOptDivDisplay" class="prefOptDiv" style="margin-bottom:20px">'
-          + '<p>Show boundary of target ecoregions on map:</p>' //<span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></p>'
-          + '<label><input type="radio" id="outDisplayShow" value="show" class="prefCheck" name="outDisplay"><span>Show</span></label><label><input type="radio" id="outDisplayHide" value="hide" class="prefCheck" name="outDisplay" checked><span>Hide</span></label>'
-          + '</div><div id="prefOptDivUnit" class="prefOptDiv" style="margin-bottom:20px">'
+        .html(''
+          + '<div id="prefOptDivUnit" class="prefOptDiv" style="margin-bottom:20px">'
           + '<p>Preferred units for area measurements:</p>' //<span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></p>'
           + '<label><input type="radio" id="outUnitAcres" value="acres" class="prefCheck" name="outUnit" checked><span>Acres</span></label><label><input type="radio" id="outUnitHectares" value="hectares" class="prefCheck" name="outUnit"><span>Hectares</span></label>'
-          + '</div><div id="prefOptDivName" class="prefOptDiv">'
+          + '</div>'
+          + '<div id="prefOptDivName" class="prefOptDiv" style="margin-bottom:20px">'
           + '<p>Preferred naming convention for species titles:</p>' //<span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></p>'
           + '<label><input type="radio" id="outSpeciesLatin" value="latin" class="prefCheck" name="outSpecies" checked><span>Latin Names</span></label><label><input type="radio" id="outSpeciesCommon" value="common" class="prefCheck" name="outSpecies"><span>Common Names</span></label>'
+          + '</div>'
+          + '<div id="prefOptDivDisplay" class="prefOptDiv" style="margin-bottom:20px">'
+          + '<p>Show boundaries of target ecoregions on map:</p>' //<span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Info</center></b></u></p><p>Write info here.</p>"></span></p>'
+          + '<label><input type="radio" id="outDisplayShow" value="show" class="prefCheck" name="outDisplay"><span>Show</span></label><label><input type="radio" id="outDisplayHide" value="hide" class="prefCheck" name="outDisplay" checked><span>Hide</span></label>'
           + '</div>'
           + '<div id="showPrefDiv" style="margin-top:30px;text-align:center;"><label style="font-weight:normal;margin-left:0;" title="Checking this option will prevent this window from automatically displaying on page load"><input type="checkbox" id="showPrefCheck" style="position:relative;top:2px;"></input><span>Check to hide this window on page load</span></label></div>'
         );
@@ -2727,10 +2749,10 @@
         topos[areaID[i]].g.selectAll("." + areaID[i])[0].forEach(function(feat) {
           if(feat.id == tmpObj.value) {
             if(tmpObj.checked == true) {
-              d3.select(feat).style({"fill-opacity": "0.5", "stroke-opacity": "1"});
+              d3.select(feat).style({"fill-opacity": "0.5", "stroke-opacity": "1"}).classed("selected", true);
             }
             else {
-              d3.select(feat).style({"fill-opacity": "", "stroke-opacity": ""});
+              d3.select(feat).style({"fill-opacity": "", "stroke-opacity": ""}).classed("selected", false);
             }
           }
         });
@@ -2768,7 +2790,7 @@
         .attr("class", "choice")
         .append("div")
         .attr("id", "sppHeader")
-        .html('<div class="choiceHeader" style="background:rgb(118,147,60);">Individual Species</div><ul id="ulSpp" class="nav nav-pills"><li id="comSpp" class="active"><a href="#">Common Names</a></li><li id="sciSpp"><a href="#">Scientific Names</a></li></ul><hr style="margin-top:5px;margin-bottom:5px;">');  //<label><input id="sppAll" type="checkbox"></input><span> Select All </span><br></input><hr style="margin-top:5px;margin-bottom:5px;"></label>');
+        .html('<div class="choiceHeader" style="background:rgb(118,147,60);">Species</div><ul id="ulSpp" class="nav nav-pills"><li id="comSpp" class="active"><a href="#">Common Names</a></li><li id="sciSpp"><a href="#">Scientific Names</a></li></ul><hr style="margin-top:5px;margin-bottom:5px;">');  //<label><input id="sppAll" type="checkbox"></input><span> Select All </span><br></input><hr style="margin-top:5px;margin-bottom:5px;"></label>');
 
       //******Add procedural steps action
       d3.select("#selSpp").on("click", function() { stepAction(this); });
@@ -2818,7 +2840,7 @@
             .style("margin-top", "10px")
             .property("title", "Select all species with exceedance")
             .on("click", function() { checkSppAll("Yes"); checkOutput(); })
-            .html('<input id="sppExcAll" type="checkbox"></input><span>Select All</span>');
+            .html('<input id="sppExcAll" type="checkbox"></input><span class="italic">Select All</span>');
         }
 
         //***Add No exceedance species second
@@ -2844,8 +2866,20 @@
             .style("margin-top", "10px")
             .property("title", "Select all species without exceedance")
             .on("click", function() { checkSppAll("No"); checkOutput(); })
-            .html('<input id="sppNoExcAll" type="checkbox"></input><span>Select All</span>');
+            .html('<input id="sppNoExcAll" type="checkbox"></input><span class="italic">Select All</span>');
 
+        }
+        else {  //No species without exceedance
+          d3.select("#sppOptions")
+            .append("label")
+            .attr("class", "sppCheck")
+            .text("Species without Exceedance of Minimum CL")
+            .style({"text-decoration":"underline","font-size":"15px","color":"lightgreen","margin-top":function() {if(ExcArr.lenght == 0) {return "";} else {return "10px";} } });
+
+          d3.select("#sppOptions")
+            .append("label")
+            .property("title", "None")
+            .html('<span class="italic" style="font-weight:normal;">none</span><br>');
         }
       }
 
@@ -2970,12 +3004,12 @@
         .append("div")
         .attr("id", "outChoice")
         .attr("class", "outChoice")
-        .html('<div id="outDiv" class="choiceHeader outputHeader">Select Output Type</div>'); //<ul id="ulOut" class="nav nav-pills"><li id="comOut" class="active"><a href="#">Combined Species</a></li><li id="indOut"><a href="#">Individual Species</a></li></ul><hr style="margin-top:5px;margin-bottom:5px;"><div id="comOutDiv" class="output"></div><div id="indOutDiv" class="output"></div>');
+        .html('<div id="outDiv" class="choiceHeader outputHeader">Select Output Format</div>'); //<ul id="ulOut" class="nav nav-pills"><li id="comOut" class="active"><a href="#">Combined Species</a></li><li id="indOut"><a href="#">Individual Species</a></li></ul><hr style="margin-top:5px;margin-bottom:5px;"><div id="comOutDiv" class="output"></div><div id="indOutDiv" class="output"></div>');
 
       d3.select("#outDiv")
         .append("span")
         .attr("class", "outputInfo")
-        .html('<span class="glyphicon glyphicon-info-sign help-tooltip" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Output Type</center></b></u></p><p>Choose an option to determine initial output selections to produce.<br><br>All options eventually proceed to a preview window where output selections can be modified before being produced.</p>"></span>');
+        .html('<span class="glyphicon glyphicon-info-sign help-tooltip" data-toggle="tooltip" data-container="body" data-placement="auto right" data-html="true" title="<p><u><b><center>Output Format</center></b></u></p><p>Choose an option to determine initial output selections to produce.<br><br>All options eventually proceed to a preview window where output selections can be modified before being produced.</p>"></span>');
 
       d3.select("#outDiv")
         .append("span")
@@ -3000,8 +3034,8 @@
         .append("div")
         .attr("id","outOptButton")
         .attr("class", "outButton")
-        .text("Proceed with Selected Output Type")
-        .property("title", "Proceed with output selection using the chosen output type")
+        .text("Proceed with Selected Output Format")
+        .property("title", "Proceed with output selection using the chosen output format")
         .on("click", function() { 
           d3.select("#outputOptions").style("display", "none");
           if(document.querySelector('input[name=outRadio]:checked').value == "tail") {
@@ -3700,16 +3734,10 @@
 
         outArrayKeys.forEach(function(key) {
           if(outArray[key] == false) {
-            if(d3.select("#" + key + "Check").classed("glyphicon-ok-sign")) {
-              $("#" + key + "Check").click();
-            }
-          }
-          else {
-            if(d3.select("#" + key + "Check").classed("glyphicon-ban-circle")) {
-              $("#" + key + "Check").click();
-            }
+            $("#" + key + "Check").click();
           }
         });
+
       }
 
 
@@ -3818,7 +3846,7 @@
             d3.select("#" + fig + "Div")
               .append("div")
               .attr("class", "thumbGlyphsDiv")
-              .html('<span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto bottom" data-html="true" title="' + figDescArrayExc[i][j] + '"></span><span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-container="body" data-placement="auto bottom" data-html="true" title="' + figUseArrayExc[i][j] + '"></span><span id="' + fig + 'Check" value="' + fig + '" class="glyphicon glyphicon-ok-sign figCheck"></span>');
+              .html('<span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto bottom" data-html="true" title="' + figDescArrayExc[i][j] + '"></span><span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-container="body" data-placement="auto bottom" data-html="true" title="' + figUseArrayExc[i][j] + '"></span><span id="' + fig + 'Check" value="' + fig + '" class="glyphicon glyphicon-ok-sign figCheck" data-toggle="tooltip" data-container="body" data-placement="auto bottom" data-html="true" title="Click to exclude figure from produced output"></span>');
           });
         });
 
@@ -3872,7 +3900,7 @@
             d3.select("#" + fig + "Div")
               .append("div")
               .attr("class", "thumbGlyphsDiv")
-              .html('<span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto bottom" data-html="true" title="' + figDescArrayNdep[i][j] + '"></span><span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-container="body" data-placement="auto bottom" data-html="true" title="' + figUseArrayNdep[i][j] + '"></span><span id="' + fig + 'Check" value="' + fig + '" class="glyphicon glyphicon-ok-sign figCheck"></span>');
+              .html('<span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-container="body" data-placement="auto bottom" data-html="true" title="' + figDescArrayNdep[i][j] + '"></span><span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-container="body" data-placement="auto bottom" data-html="true" title="' + figUseArrayNdep[i][j] + '"></span><span id="' + fig + 'Check" value="' + fig + '" class="glyphicon glyphicon-ok-sign figCheck" data-toggle="tooltip" data-container="body" data-placement="auto bottom" data-html="true" title="Click to exclude figure from produced output"></span>');
           });
         });
 
@@ -3893,22 +3921,17 @@
 
         //***Add disable function to check mark icon
         d3.selectAll(".figCheck")
-          .property("title", "Click to exclude figure from produced output")
+          //.property("title", "Click to exclude figure from produced output")
           .on("click", function() {
-            //if(d3.select(this).classed("glyphicon-ok-sign")) {
             if(d3.select("#" + d3.select(this).attr("value") + "Div").classed("unselected") == false) {
               d3.select(this)
-                //.classed("glyphicon-ok-sign", false)
-                //.classed("glyphicon-ban-circle", true)
-                .property("title", "Click to include figure in produced output");
+                .property("title", "Click to include figure in produced output")
+                .attr("data-original-title", "Click to include figure in produced output");
               d3.select("#" + d3.select(this).attr("value") + "Div").classed("unselected", true);
             }
             else {
               d3.select(this)
-                //.classed("unselected", false)
-                //.classed("glyphicon-ban-circle", false)
-                //.classed("glyphicon-ok-sign", true)
-                .property("title", "Click to exclude figure from produced output");
+                .attr("data-original-title", "Click to exclude figure from produced output");
               d3.select("#" + d3.select(this).attr("value") + "Div").classed("unselected", false);
             }
           });
@@ -4027,7 +4050,8 @@
       d3.select("#resChoice")
         .append("div")
         .attr("id", "resSubHeader")
-        .html('<div><ul id="ulResSub" class="nav nav-pills"><li id="resFigsCurrent" class="active" title="Critical load and exceedance output for current N deposition levels"><a href="#" style="background-color:rgb(180,198,231);">Current Condition</a></li><li id="resFigsResponse" title="Cumulative exceedance and protection output for varying levels of N deposition"><a href="#" style="background-color:rgb(255,230,153);">Response to N Dep</a></li></ul></div><hr style="margin:0;"><div id="resSubSubHeader"><div id="resSubSubCurrent" class="resSubSub"><ul id="ulResSubSubCurrent" class="nav nav-pills"></ul></div><div id="resSubSubResponse" class="resSubSub"><ul id="ulResSubSubResponse" class="nav nav-pills"></ul></div><hr style="margin:0;"></div>');
+        .html('<div><ul id="ulResSub" class="nav nav-pills"><li id="resFigsCurrent" class="active" title="Critical load and exceedance output for current N deposition levels"><a href="#">Current Condition</a></li><li id="resFigsResponse" title="Cumulative exceedance and protection output for varying levels of N deposition"><a href="#">Response to N Dep</a></li></ul></div><hr style="margin:0;"><div id="resSubSubHeader"><div id="resSubSubCurrent" class="resSubSub"><ul id="ulResSubSubCurrent" class="nav nav-pills"></ul></div><div id="resSubSubResponse" class="resSubSub"><ul id="ulResSubSubResponse" class="nav nav-pills"></ul></div><hr style="margin:0;"></div>');
+        //.html('<div><ul id="ulResSub" class="nav nav-pills"><li id="resFigsCurrent" class="active" title="Critical load and exceedance output for current N deposition levels"><a href="#" style="background-color:rgb(180,198,231);">Current Condition</a></li><li id="resFigsResponse" title="Cumulative exceedance and protection output for varying levels of N deposition"><a href="#" style="background-color:rgb(255,230,153);">Response to N Dep</a></li></ul></div><hr style="margin:0;"><div id="resSubSubHeader"><div id="resSubSubCurrent" class="resSubSub"><ul id="ulResSubSubCurrent" class="nav nav-pills"></ul></div><div id="resSubSubResponse" class="resSubSub"><ul id="ulResSubSubResponse" class="nav nav-pills"></ul></div><hr style="margin:0;"></div>');
 
       d3.select("#ulResSubSubCurrent")
         .html('<li id="ExAreaPill" class="li3 active" title="Measures of exceedance for areas and species"><a href="#" class="pink">EXC Area</a></li><li id="ExMagPill" class="li3" title="Extent and magnitude of exceedance for areas and species" style="width:33%;"><a href="#" class="blue">EXC Magnitude</a></li><li id="CLPill" class="li3" title="Critical load sensitivities to N deposition for species and areas based on site conditions"><a href="#" class="yellow">CL</a></li>')
@@ -4234,12 +4258,31 @@
         d3.select("#areaListDropdown").style("display", "inline-block");
 
         //***zoom to initial extent
-        if(window.innerWidth > 1900) {
-          map.setView([43.5, -80],6);
-        }
-        else {
-          map.setView([40, -78],5);
-        }
+        map.fitBounds([[37,-97],[49,-63]]);
+
+        //***reset baselayer
+        $("#baselayerListDropdown div:nth-child(9)").click();
+
+        //***remove any abiotic layers from map
+        d3.select("#abioticListDropdown").selectAll("div").each(function() {
+          if(d3.select(this).select("span").style("visibility") == "visible") {
+            $(this).click();
+          }
+        });
+
+        //***remove any CL and Exceedance layers from map
+        d3.selectAll(".sppSubopt").each(function() {
+          if(d3.select(this).select("span").style("visibility") == "visible") {
+            $(this).click();
+          }
+        });
+
+        //***toggle any open windows
+        ["legend","hist","preferences","download"].forEach(function(tmpWin) {
+          if(d3.select("#" + tmpWin + "Div").style("opacity") == 1) {
+            toolWindowToggle(tmpWin);
+          }
+        });
 
         //***Reset output selection window
         d3.select("#outputDiv").selectAll(".modal-dialog,modal-lg").style("display", "none");
