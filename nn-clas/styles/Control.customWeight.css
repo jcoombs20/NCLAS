@@ -1,0 +1,203 @@
+.leaflet-control-customWeight a {
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	display: block;
+}
+
+.leaflet-control-customWeight {
+	box-shadow: 0 1px 7px #999;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
+.leaflet-control-customWeight a {
+        background-color: white; 
+	background-image: url(../images/scale2_small.png);
+	width: 36px;
+	height: 36px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
+.leaflet-touch .leaflet-control-customWeight a {
+	width: 36px;
+	height: 36px;
+}
+
+.leaflet-control-customWeight .leaflet-control-customWeight-div,
+.leaflet-control-customWeight-expanded .leaflet-control-customWeight-toggle {
+	display: none;
+}
+
+.leaflet-control-customWeight-expanded .leaflet-control-customWeight-div {
+	display: block;
+}
+
+.leaflet-control-customWeight-button {
+	display: block;
+	text-align: center;
+	margin: auto;
+}
+
+.leaflet-control-customWeight-label {
+	display: inline-block;
+	margin: 8px 2px 2px 2px;
+}
+
+.leaflet-control-customWeight-h5 {
+	margin: 4px;
+	text-align: center;
+	font-weight: bold;
+}
+
+.leaflet-control-customWeight-input {
+       margin: 4px;
+       text-align: center;
+       position: absolute;
+       right: 0px;
+}
+
+#prioritization {
+  background: rgba(255, 255, 255, 0.9);
+  position: relative;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  max-width: 881px;
+}
+
+#eco {
+  float: left;
+  border-style: solid;
+  border-color: black;
+  border-width: 1px;
+  -moz-border-radius: 0px 0px 4px 4px;
+  -webkit-border-radius: 0px 0px 4px 4px;
+  border-radius: 0px 0px 4px 4px;
+  text-align: center;
+  width: 372px;
+}
+
+#transport {
+  float: left;
+  border-style: solid;
+  border-color: black;
+  border-width: 1px;
+  -moz-border-radius: 0px 0px 4px 4px;
+  -webkit-border-radius: 0px 0px 4px 4px;
+  border-radius: 0px 0px 4px 4px;
+  text-align: center;
+  width: 509px;
+}
+
+#tempThreshDiv {
+  float: left;
+  width: 42%;
+  margin-left: 8%;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+}
+
+#tempYearDiv {
+  float: left;
+  width: 42%;
+  margin-right: 8%;
+  border-right: 1px solid black;
+}
+
+#disrupt {
+  float: left;
+  width: 50%;
+  border-right: 0.5px solid black;
+}
+
+#rof {
+  float: left;
+  width: 50%;
+  border-left: 0.5px solid black;
+}
+
+#rofWeights {
+  padding-left: 15px;
+}
+
+#rofInputs {
+  float: left;
+}
+
+#priorUpdate {
+  text-align: center;
+  float: left;
+  width: 100%;
+}
+
+.connectDiv {
+  background: rgba(255, 255, 255, 1);
+  border-bottom-style: solid;
+  border-bottom-color: black;
+  border-bottom-width: 1px;
+}
+
+.priorInput {
+  margin: 5px;
+  text-align: center;
+  width: 45px;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.priorTitle {
+  font-weight: bold;
+  font-size: 20px;
+  margin: 5px 10px 10px 10px;
+}
+
+.priorHeader {
+  font-weight: bold;
+  font-size: 18px;
+  margin: 0px 0px 0px 10px;
+}
+
+.priorLabel {
+  font-weight: bold;
+  font-size: 15px;
+  margin: 8px 10px 8px 10px;
+}
+
+.priorHR {
+  margin: 8px 0px 4px 0px;
+  width: 100%;
+  border: none;
+  background: white;
+  height: 2px;
+}
+
+.priorButton {
+  margin: 5px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.priorDiv {
+  text-align: left;
+  padding-left: 10px;
+}
+
+.priorDiv:hover {
+  background: rgba(255,255,255,1);
+}
+
+input[type=radio], input[type=checkbox] {
+  margin: 0px 0px 0px 5px;
+}
+
+.glyphicon-info-sign {
+  margin-right: 5px;
+}
+
+.minimize-button {
+  margin-left: 5px;
+}
+
