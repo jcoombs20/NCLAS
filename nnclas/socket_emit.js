@@ -1,3 +1,7 @@
+function googleLoaded() {
+  console.log("Google maps loaded!");
+}
+
 function socket_emit() {
   socket = io.connect();
   //socket = io.connect('https://nclas.ecosheds.org/socket.io/', {secure: true});
@@ -12,6 +16,7 @@ function socket_emit() {
 
 
   socket.on('get_bbox', function(tmpData) {
+    //console.log(tmpData);
     var bboxStr = tmpData[0][0].bbox.replace("BOX(","").replace(")","").replace(","," ");
     var bbox = bboxStr.split(" ");
     bbox.forEach(function(d,i) { bbox[i] = parseFloat(d); });
@@ -23,8 +28,8 @@ function socket_emit() {
     //var URWeb = L.Projection.Mercator.project({"lat":bbox[3], "lng": bbox[2]});
     curBBoxDeg = "&BBOX=" + bbox[0] + "," + bbox[1] + "," + bbox[2] + "," + bbox[3];
     //curBBoxWeb = "&BBOX=" + LLWeb.x + "," + LLWeb.y + "," + URWeb.x + "," + URWeb.y;
-    console.log(curBBoxPix);
-    console.log(curBBoxDeg);
+    //console.log(curBBoxPix);
+    //console.log(curBBoxDeg);
     //console.log(curBBoxWeb);
   });
 
@@ -35,6 +40,7 @@ function socket_emit() {
       d3.select("#dlLinkBtnA").attr("href", clipData.zip);
       d3.select("#dlLinkBtn").classed("disabled", false);
     }
+    d3.select("body").classed("wait", false);
   });
 
   socket.on('get_rid', function(tmpData) {
@@ -47,6 +53,7 @@ function socket_emit() {
       d3.select("#dlLinkBtnA").attr("href", clipData.zip);
       d3.select("#dlLinkBtn").classed("disabled", false);
     }
+    d3.select("body").classed("wait", false);
   });
 
   socket.on('get_image', function(clipData) {
@@ -54,7 +61,17 @@ function socket_emit() {
       d3.select("#dlLinkBtnA").attr("href", clipData.image);
       d3.select("#dlLinkBtn").classed("disabled", false);
     }
+    d3.select("body").classed("wait", false);
   });
+
+  socket.on('get_PDF', function(pdfData) {
+    if(pdfData.code == 200) {
+      d3.select("#dlLinkBtnA").attr("href", pdfData.pdf);
+      d3.select("#dlLinkBtn").classed("disabled", false);
+    }
+    d3.select("body").classed("wait", false);
+  });
+
 
   socket.on('get_spp', function(sppData) {
     var sppExc = sppData[0].map(function(d) { return d.species; });

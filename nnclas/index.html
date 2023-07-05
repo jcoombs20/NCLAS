@@ -39,8 +39,6 @@
     <script src="jquery-ui-touch-punch.0.0.3.min.js"></script>
     <!--script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script-->
     <script src="bootstrap.min.js"></script>
-    <!--script src="https://maps.google.com/maps/api/js?v=3"></script-->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBk-pRMxjeu0G6yIfxqnZMPQE5LgLLB6P8"></script>
     <!--script src="bundle.js"></script-->
     <script src="Bing_tile.js"></script>
     <script src="Control.BingGeocoder.js"></script>
@@ -70,6 +68,8 @@
     <!--script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script-->
     <script src="queue.min.js"></script>
     <script src="crossfilter.min.js"></script>
+    <!--script src="https://maps.google.com/maps/api/js?v=3"></script-->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBk-pRMxjeu0G6yIfxqnZMPQE5LgLLB6P8&callback=googleLoaded"></script>
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150914675-1"></script>
@@ -450,9 +450,10 @@
       infoIDField = {"Abiotic": {}, "Aquatic": {}, "Lichens": {}, "Trees": {}};
 
       //******Abiotic Layers
-      var abioticID = ["CMAQ_N_2012", "CMAQ_N_2015-2017", "CMAQ_S_2012", "CMAQ_S_2015-2017", "n_tw_2017-2019", "n_tw_2018-2020", "s_tw_2017-2019", "s_tw_2018-2020"]; //, "L_EXC_Trich_N_type1_no_unc", "L_EXC_Trich_N_type2_no_unc", "L_EXC_Trich_N_type3_no_unc", "L_EXC_Trich_N_type1", "L_EXC_Trich_N_type2", "L_EXC_Trich_N_type3"];   //"n", "aspect", "bedrock", "clay", "coarse", "elevation", "permeability", "ph", "slope", "precip_annual", "precip_may_sept", "temp_jan", "temp_jul", "temp_may_sept"];
-      var abioticTitles = ['CMAQ <span class="N_span_dropdown">N Dep</span> (2012)', 'CMAQ <span class="N_span_dropdown">N Dep</span> (2015-2017)', 'CMAQ <span class="S_span_dropdown">S Dep</span> (2012)', 'CMAQ <span class="S_span_dropdown">S Dep</span> (2015-2017)', 'T-Dep <span class="N_span_dropdown">N Dep</span> (2017-19)', 'T-Dep <span class="N_span_dropdown">N Dep</span> (2018-20)', 'T-Dep <span class="S_span_dropdown">S Dep</span> (2017-19)', 'T-Dep <span class="S_span_dropdown">S Dep</span> (2018-20)']; //, "EXC Type 1", "EXC Type 2", "EXC Type 3", "EXC Type 1 (Unc)", "EXC Type 2 (Unc)", "EXC Type 3 (Unc)"];   //"N Deposition (T-Dep)", "Aspect", "Depth to Bedrock", "% Clay in Soil", "% Coarse Sand", "Elevation", "Soil Permeability", "Soil pH", "Slope Gradient", "Precipitation (Annual)", "Precipitation (May-Sept)", "Temperature (Jan)", "Temperature (July)", "Temperature (May-Sept)"];
-      var abioticUnits = {"CMAQ N Dep (2012)": "", "CMAQ N Dep (2015-2017)": "", "CMAQ N Dep (2012)": "", "CMAQ S Dep (2015-2017)": "", "T-Dep N Dep (2017-19)": "", "T-Dep N Dep (2018-20)": "", "T-Dep S Dep (2017-19)": "", "T-Dep S Dep (2018-20)": ""}; //, "EXC TYPE 1": "", "EXC TYPE 2": "", "EXC TYPE 3": "", "EXC TYPE 1 (Unc)": "", "EXC TYPE 2 (Unc)": "", "EXC TYPE 3 (Unc)": ""};   //"N Deposition (T-Dep)": "(kg/ha/yr)", "Aspect": "(Degrees)", "Depth to Bedrock": "(m)", "% Clay in Soil": "", "% Coarse Sand": "", "Elevation": "(m)", "Soil Permeability": "(cm/hr)", "Soil pH": "", "Slope Gradient": "(Degrees)", "Precipitation (Annual)": "(mm)", "Precipitation (May-Sept)": "(mm)", "Temperature (Jan)": "(C)", "Temperature (July)": "(C)", "Temperature (May-Sept)": "(C)"};
+      var abioticID = ["CMAQ_N_2012", "CMAQ_N_2015-2017", "CMAQ_S_2012", "CMAQ_S_2015-2017", "n_tw_2017-2019", "n_tw_2018-2020", "n_tw_2019-2021", "s_tw_2017-2019", "s_tw_2018-2020", "s_tw_2019-2021"]; //, "L_EXC_Trich_N_type1_no_unc", "L_EXC_Trich_N_type2_no_unc", "L_EXC_Trich_N_type3_no_unc", "L_EXC_Trich_N_type1", "L_EXC_Trich_N_type2", "L_EXC_Trich_N_type3"];   //"n", "aspect", "bedrock", "clay", "coarse", "elevation", "permeability", "ph", "slope", "precip_annual", "precip_may_sept", "temp_jan", "temp_jul", "temp_may_sept"];
+      var abioticArchive = ["yes","no","yes","no","yes","yes","no","yes","yes","no"];
+      var abioticTitles = ['CMAQ <span class="N_span_dropdown">N Dep</span> (2012)', 'CMAQ <span class="N_span_dropdown">N Dep</span> (2015-2017)', 'CMAQ <span class="S_span_dropdown">S Dep</span> (2012)', 'CMAQ <span class="S_span_dropdown">S Dep</span> (2015-2017)', 'T-Dep <span class="N_span_dropdown">N Dep</span> (2017-19)', 'T-Dep <span class="N_span_dropdown">N Dep</span> (2018-20)', 'T-Dep <span class="N_span_dropdown">N Dep</span> (2019-21)', 'T-Dep <span class="S_span_dropdown">S Dep</span> (2017-19)', 'T-Dep <span class="S_span_dropdown">S Dep</span> (2018-20)', 'T-Dep <span class="S_span_dropdown">S Dep</span> (2019-21)']; //, "EXC Type 1", "EXC Type 2", "EXC Type 3", "EXC Type 1 (Unc)", "EXC Type 2 (Unc)", "EXC Type 3 (Unc)"];   //"N Deposition (T-Dep)", "Aspect", "Depth to Bedrock", "% Clay in Soil", "% Coarse Sand", "Elevation", "Soil Permeability", "Soil pH", "Slope Gradient", "Precipitation (Annual)", "Precipitation (May-Sept)", "Temperature (Jan)", "Temperature (July)", "Temperature (May-Sept)"];
+      var abioticUnits = {"CMAQ N Dep (2012)": "", "CMAQ N Dep (2015-2017)": "", "CMAQ N Dep (2012)": "", "CMAQ S Dep (2015-2017)": "", "T-Dep N Dep (2017-19)": "", "T-Dep N Dep (2018-20)": "", "T-Dep N Dep (2019-21)": "", "T-Dep S Dep (2017-19)": "", "T-Dep S Dep (2018-20)": "", "T-Dep S Dep (2019-21)": ""}; //, "EXC TYPE 1": "", "EXC TYPE 2": "", "EXC TYPE 3": "", "EXC TYPE 1 (Unc)": "", "EXC TYPE 2 (Unc)": "", "EXC TYPE 3 (Unc)": ""};   //"N Deposition (T-Dep)": "(kg/ha/yr)", "Aspect": "(Degrees)", "Depth to Bedrock": "(m)", "% Clay in Soil": "", "% Coarse Sand": "", "Elevation": "(m)", "Soil Permeability": "(cm/hr)", "Soil pH": "", "Slope Gradient": "(Degrees)", "Precipitation (Annual)": "(mm)", "Precipitation (May-Sept)": "(mm)", "Temperature (Jan)": "(C)", "Temperature (July)": "(C)", "Temperature (May-Sept)": "(C)"};
       var abioticLayers = [];
       var cropImg = {"top67": abioticID.slice(0), "top33":[]};
       cropImg.top67.splice(cropImg.top67.length,0,"cl_mins_min","cl_mins_max","cl_maxs_min","cl_maxs_max");
@@ -1001,7 +1002,16 @@
         .attr("id", "container-approach")
         .attr("class", "container-menu")
         .html(''
-          + '<p style="font-size:24px;"><b><u>N-CLAS Overview</u></b></p>'
+          + '<p style="font-size:24px;"><b><u>CLAS Overview</u></b></p>'
+          + '<div class="guideHeader" title="Click to expand or collapse" data-toggle="collapse" data-target="#guideDiv1">About Us<span class="glyphicon glyphicon glyphicon-chevron-down"></span></div>'
+          + '<div id="guideDiv1" class="guideDiv collapse in">'
+            + '<ul>'
+              + '<li>Linda Pardo, PhD - Project team lead</li>'
+              + '<li>Leah Charash, MA - Project manager & user interface designer</li>'
+              + '<li>Jason Coombs, PhD - GIS specialist & application developer</li>'
+            + '</ul>'
+          + '</div>'
+
 /*
           + '<div class="methodDiv">'
             + '<div class="approachLeftDiv">'
@@ -1727,6 +1737,43 @@
             + '</tr>'
             + '<tr>'
               + '<td>'
+                + '<p class="glossWord">CMAQ v 5.3.2</p>'
+              + '</td>'
+              + '<td>'
+                + '<p class="glossDef">2015-2017</p>'
+              + '</td>'
+              + '<td>'
+                + '<p class="glossDef"><a href="https://www.epa.gov/cmaq/download-cmaq" target="_blank">https://www.epa.gov/cmaq/download-cmaq</a></p>'
+              + '</td>'
+            + '</tr>'
+            + '<tr>'
+              + '<td>'
+                + '<p class="glossWord">T-Dep v 2022.02</p>'
+              + '</td>'
+              + '<td>'
+                + '<p class="glossDef">2019-2021</p>'
+              + '</td>'
+              + '<td>'
+                + '<p class="glossDef"><a href="https://nadp.slh.wisc.edu/committees/tdep/" target="_blank">https://nadp.slh.wisc.edu/committees/tdep/</a></p>'
+              + '</td>'
+            + '</tr>'
+          + '</table>'
+
+          + '<h4>Archived</h4>'
+          + '<table class="data_sourceTable">'
+            + '<tr>'
+              + '<th>'
+                + '<p></p>'
+              + '</th>'
+              + '<th>'
+                + '<p class="glossDef">YEAR</p>'
+              + '</th>'
+              + '<th>'
+                + '<p class="glossDef">SOURCE</p>'
+              + '</th>'
+            + '</tr>'
+            + '<tr>'
+              + '<td>'
                 + '<p class="glossWord">CMAQ v 5.0.2</p>'
               + '</td>'
               + '<td>'
@@ -1738,13 +1785,24 @@
             + '</tr>'
             + '<tr>'
               + '<td>'
-                + '<p class="glossWord">T-Dep v 2018.02</p>'
+                + '<p class="glossWord">T-Dep v 2021.01</p>'
+              + '</td>'
+              + '<td>'
+                + '<p class="glossDef">2018-2020</p>'
+              + '</td>'
+              + '<td>'
+                + '<p class="glossDef"><a href="https://nadp.slh.wisc.edu/committees/tdep/" target="_blank">https://nadp.slh.wisc.edu/committees/tdep/</a></p>'
+              + '</td>'
+            + '</tr>'
+            + '<tr>'
+              + '<td>'
+                + '<p class="glossWord">T-Dep v 2018.2</p>'
               + '</td>'
               + '<td>'
                 + '<p class="glossDef">2017-2019</p>'
               + '</td>'
               + '<td>'
-                + '<p class="glossDef"><a href="https://nadp.slh.wisc.edu/committees/tdep/tdepmaps/" target="_blank">https://nadp.slh.wisc.edu/committees/tdep/tdepmaps/</a></p>'
+                + '<p class="glossDef"><a href="https://nadp.slh.wisc.edu/committees/tdep/" target="_blank">https://nadp.slh.wisc.edu/committees/tdep/</a></p>'
               + '</td>'
             + '</tr>'
           + '</table>'
@@ -1826,7 +1884,7 @@
                 + '<p class="glossDef">2022</p>'
               + '</td>'
               + '<td>'
-                + '<p class="glossDef">Smith, R.J., T. Ohlert, and L.H. Geiser. 2022. Embracing uncertainty and probabilistic outcomes for ecological critical loads. <i>Ecosystems</i>. In review.</p>'
+                + '<p class="glossDef">Smith, R.J., T. Ohlert, and L.H. Geiser. 2022. Embracing uncertainty and probabilistic outcomes for ecological critical loads. <i>Ecosystems</i>. <a href="https://doi.org/10.1007/s10021-022-00774-5" target="_blank">doi:10.1007/s10021-022-00774-5</a></p>'
               + '</td>'
             + '</tr>'
             + '<tr>'
@@ -2579,7 +2637,7 @@
         .data(layerNames.abiotics.keys)
         .enter()
           .append("div")
-          .attr("class", "layerName")
+          .attr("class", function(d,i) { if(abioticArchive[i] == "yes") { return "layerName archive"; } else { return "layerName"; } })
           //.text(function(d) { return d; })
           .attr("data-img", "geoserver")
           .attr("data-gs", function(d,i) { return abioticID[i]; })
@@ -2596,6 +2654,29 @@
         .append("div")
         .style("margin", 0).style("display", "inline-block")
         .html(function(d) { return d; });
+
+      //***Add Archive folder to abiotic dropdown
+      d3.select("#abioticListDropdown")
+        .append("div")
+        .attr("class", "layerName dropHeader")
+        .property("title", "Archived deposition layers")
+        .attr("data-toggle", "collapse")
+        .attr("data-target", "#archiveDepDiv")
+        //.text("Archived")
+        .html('Archived<span class="spacerSpan"</span><span class="glyphicon glyphicon-triangle-bottom pull-right excSpan"></span>');
+       
+      d3.select("#abioticListDropdown")
+        .append("div")
+        .attr("id", "archiveDepDiv")
+        .attr("class", "collapse");
+
+        //.html(d3.select("#abioticListDropdown").html() + '<div class="layerName dropHeader" title="Archived deposition layers" data-toggle="collapse" data-target="#archiveDepDiv">Archived<span class="spacerSpan"</span><span class="glyphicon glyphicon-triangle-bottom pull-right excSpan"></span></div><div class="collapse" id="archiveDepDiv"></div>');
+      
+      //***Move class archive divs to archiveDepDiv
+      d3.selectAll(".layerName.archive").each(function() {
+        $(this).appendTo("#archiveDepDiv");
+      });
+
 
       //******Add Geoserver Deerfield HUC8 layer to map
       //map.addLayer(gsHuc8);
@@ -2723,7 +2804,7 @@
         .html('<div class="layerName dropHeader" title="The Aquatic ecosystem component includes CL & EXC information for ~170,000 sensitive lakes and streams" data-toggle="collapse" data-target="#aquaticExcDiv">Aquatic<span class="spacerSpan"</span><span class="glyphicon glyphicon-triangle-bottom pull-right excSpan"></span></div><div class="sppSuboptDiv collapse" id="aquaticExcDiv"></div>'
           + '<div class="layerName dropHeader" title="Epiphytic Lichens" data-toggle="collapse" data-target="#lichenExcDiv">Lichens<span class="spacerSpan"</span><span class="glyphicon glyphicon-triangle-bottom pull-right excSpan"></span></div><div class="sppSuboptDiv collapse" id="lichenExcDiv"></div>'
           + '<div class="layerName dropHeader" title="The Trees ecosystem component includes CL & EXC information for the 94 tree species analyzed by Horn et al. (2018) at ~120,000 FIA plot locations" data-toggle="collapse" data-target="#treeExcDiv">Trees<span class="spacerSpan"</span><span class="glyphicon glyphicon-triangle-bottom pull-right excSpan"></span></div><div class="sppSuboptDiv collapse" id="treeExcDiv"></div>'
-          + '<div class="layerName dropHeader" title="Smith et al. (In review)" data-toggle="collapse" data-target="#lichenExcDivOld">Smith &nbsp;<i>et al.</i> &nbsp;(<i>In review</i>)<span class="spacerSpan"</span><span class="glyphicon glyphicon-triangle-bottom pull-right excSpan"></span></div><div class="sppSuboptDiv collapse" id="lichenExcDivOld"></div>'
+          + '<div class="layerName dropHeader" title="Smith et al., 2022" data-toggle="collapse" data-target="#lichenExcDivOld">Smith &nbsp;<i>et al.</i>, &nbsp;2022<span class="spacerSpan"</span><span class="glyphicon glyphicon-triangle-bottom pull-right excSpan"></span></div><div class="sppSuboptDiv collapse" id="lichenExcDivOld"></div>'
         );
 
       //******Split N and S
@@ -2858,12 +2939,20 @@
             .attr("data-img", function(d) { return lichenLegImg[layerNames.lichens.keys.indexOf(d)]; })
             .attr("data-gs", function(d) { return lichenID[layerNames.lichens.keys.indexOf(d)]; })
             .attr("data-layer", function(d) {
-              if(d.includes("Current")) {
+              if(d.includes("Predicted Decline")) {
                 if(d.includes("N Dep")) {
                   return '<p>Lichens<br><span class="N_span">N Deposition</span><br><b>Predicted Decline of' + d.slice(d.indexOf(":") + 1, d.indexOf("<span") - 1) + '</b></p>';
                 }
                 else {
                   return '<p>Lichens<br><span class="S_span">S Deposition</span><br><b>Predicted Decline of' + d.slice(d.indexOf(":") + 1, d.indexOf("<span") - 1) + '</b></p>';
+                }
+              }
+              else if(d.includes("Current Condition")) {
+                if(d.includes("N Dep")) {
+                  return '<p>Lichens<br><span class="N_span">N Deposition</span><br><b>Community composition of Current condition: Airscore</b></p>';
+                }
+                else {
+                  return '<p>Lichens<br><span class="S_span">S Deposition</span><br><b>Community composition of Current condition: Airscore</b></p>';
                 }
               }
               else if(d.includes("Exceedance:")) {
@@ -2999,7 +3088,7 @@
             .attr("data-img", function(d, i) { return treeComLegImg[layerNames.trees.keys.indexOf(d)]; })
             .attr("data-gs", function(d, i) { return treeComID[layerNames.trees.keys.indexOf(d)]; })
             .attr("data-layer", function(d) {
-              if(d.includes("Critical")) {
+              if(d.includes("CL")) {
                 if(d.includes("N Dep")) {
                   return '<p>Trees<br><span class="N_span">N Deposition</span><br><b>All Species ' + d.slice(d.indexOf("("), d.indexOf(")") + 1) + ' Critical Load for ' + d.slice(d.indexOf(":") + 1, d.indexOf("<span") - 1) + '</b></p>';
                 }
@@ -3363,7 +3452,7 @@
 
   if(tmpLayers != "") {
     var tmpUrl = 'https://ecosheds.org/geoserver/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&LAYERS=' + tmpLayers + '&QUERY_LAYERS=' + tmpLayers + '&BBOX=' + tmpStr + '&FEATURE_COUNT=' + (i * 5) + '&HEIGHT=' + tmpHeight + '&WIDTH=' + tmpWidth + '&INFO_FORMAT=application/json&CRS=EPSG:4326&i=' + tmpI + '&j=' + tmpJ;
-    console.log(tmpUrl);
+    //console.log(tmpUrl);
 
     //send the request using jQuery $.ajax
     $.ajax({
@@ -3381,7 +3470,6 @@
           //console.log(tmpID);
           if(tmpID != "") {
             var trimID = tmpID.replace("_" + d3.select("#areaList").attr("data-sel"), "").replace("_unc", "");
-            console.log(trimID);
             if(tmpID.includes("A_") == true) {
               if(tmpID.includes("_unc") == true) {
                 var tmpInfo = "";
@@ -3398,7 +3486,7 @@
                   tmpInfo = infoIDField.Aquatic[trimID] + "_un3";
                 }
                 tmpInfo = tmpInfo.replace("sn", "ns");
-                console.log(tmpFeat.properties[tmpInfo]);
+                //console.log(tmpFeat.properties[tmpInfo]);
                 addInfo(layerNames.aquatic.keys[aquaticID.indexOf(trimID)], tmpFeat.properties[infoIDField.Aquatic[trimID]].toFixed(1) + " (" + tmpFeat.properties[tmpInfo].toString().slice(-1) + ")");
               }
               else {
@@ -3655,16 +3743,19 @@
       .insert("div", ":first-child")
       .attr("id", tmpName + "Legend")
       .attr("value", tmpPath)
-      .attr("class", "layerLegend")
+      //.attr("class", "layerLegend")
+      .attr("class", function() { if(tmpName.slice(0,2) == "A_" || tmpName.slice(0,2) == "L_" || tmpName.slice(0,2) == "T_") { return "layerLegend pdfLegend"; } else { return "layerLegend"; } })
       .attr("data-type", d3.select(tmpDiv).attr("data-type"))
       .append("div")
       .attr("id", tmpName + "LegendHeader")
       .attr("data-toggle", "collapse")
       .attr("data-target", "#" + tmpName + "collapseDiv")
-      .on("click", function() { changeCaret(d3.select(this).select(".exitDiv").select("span")[0][0]); })
+      .attr("data-gs", tmpName)
+      .on("click", function() { changeCaret(d3.select(this).select(".exitDiv").select(".legendCollapse")[0][0]); })
       .append("div")
       .attr("class", "legendTitle")
-      .html('<h6>' + tmpTitle + '</h6><div class="exitDiv"><span class="fa fa-caret-up legendCollapse" title="Hide legend"></span></div>');
+      .html('<h6>' + tmpTitle + '</h6><div class="exitDiv"><span class="fa fa-times-circle" title="Remove layer" onclick="resetSingle(\'' + tmpName + '\')"></span><span class="fa fa-caret-up legendCollapse" title="Hide legend"></span></div>');
+      //.html('<h6>' + tmpTitle + '</h6><div class="exitDiv"><span class="fa fa-caret-up legendCollapse" title="Hide legend"></span></div>');
 
 
     function changeCaret(tmpSpan) {
@@ -3675,6 +3766,8 @@
         d3.select(tmpSpan).classed("fa-caret-up", false).classed("fa-caret-down", true).property("title", "View legend");
       }
     }
+
+
 
     d3.select("#" + tmpName + "Legend")
       .append("div")
@@ -3754,10 +3847,11 @@
 
     var cnt = 0;
     curType.forEach(function(type) {
-      if(type != "abiotic") {
+      if(type != "abiotics") {
         cnt += 1;
       }
     });
+
     if(cnt == 0) { 
       d3.selectAll("#resExtDownloadDiv,#mapInfoBtn").style("display", "none");
       d3.selectAll("#togUncBtn,#uncBtnI").style("display", "none"); 
@@ -4620,6 +4714,7 @@
         tmpParams.layer = d3.select("#areaList").attr("data-sel");
         tmpParams.area = d3.select("#areaListOptions").property("value");
 
+        //console.log(tmpParams);
         socket.emit('get_bbox', tmpParams);
 
 /*
@@ -4955,7 +5050,14 @@
               d3.selectAll(".remLabel").classed("active", false);
               d3.select(this).classed("active", true);
               d3.select("#areaOptions").style("display", "none");
-              d3.select("#areaListOptions").property("value", d3.select(this).property("title")).classed("selected", true);
+              //d3.select("#areaListOptions").property("value", d3.select(this).property("title")).classed("selected", true);
+              if(d3.select("#areaList").attr("value") == "Federal Administrative Areas" && d3.select("#agencyList").attr("value") == "National Park Service") {
+                var tmpTitle = d3.select(this).property("title").slice(0,-7);
+              }
+              else {
+                tmpTitle = d3.select(this).property("title");
+              }
+              d3.select("#areaListOptions").property("value", tmpTitle).classed("selected", true);
               d3.select("#areaListOptionsHeader").style("display", "block");              
               d3.select("#selAreaNxtBtn").classed("disabled", false);
               d3.select("#selArea").select(".headerSelSpan").text(d3.select(".remLabel.active").attr("title"));
@@ -5127,6 +5229,10 @@
 
       //******Function to select
       function changeEco(tmpDiv) {
+        if(tmpDiv.id == "ecoTrees") {
+          $("#disclaimerDiv").modal("show");
+        }
+
         if(d3.select(tmpDiv).classed("activeEco")) {
           d3.select(tmpDiv).classed("activeEco", false);
           d3.select(tmpDiv).select("span").classed("glyphicon-check", false).classed("glyphicon-unchecked", true);
@@ -5847,12 +5953,11 @@
         output.Trees.Sulfur.EXC[area] = { "2017-2019": {} };
       });
 
-      //******Lichens
       //***Class 1 Areas
-      output.Aquatic.Nitrogen.CL.class1["2017-2019"] = "A_CL_NS_2017-2019_class1";
-      output.Aquatic.Sulfur.CL.class1["2017-2019"] = "A_CL_S_2017-2019_class1";
-      output.Aquatic.Nitrogen.EXC.class1["2017-2019"] = "A_EXC_NS_2017-2019_class1";
-      output.Aquatic.Sulfur.EXC.class1["2017-2019"] = "A_EXC_S_2017-2019_class1";
+      output.Aquatic.Nitrogen.CL.class1["2019-2021"] = "A_CL_NS_2017-2019_class1";
+      output.Aquatic.Sulfur.CL.class1["2019-2021"] = "A_CL_S_2017-2019_class1";
+      output.Aquatic.Nitrogen.EXC.class1["2019-2021"] = "A_EXC_NS_2017-2019_class1";
+      output.Aquatic.Sulfur.EXC.class1["2019-2021"] = "A_EXC_S_2017-2019_class1";
 
       output.Lichens.Nitrogen.EXC.class1["2012"] = {"Total species richness": "L_EXC_Trich_N_2012_class1", "Sensitive-species richness": "L_EXC_SSrich_N_2012_class1", "Forage lichen abundance": "L_EXC_ForageAbun_N_2012_class1", "Cyanolichen abundance": "L_EXC_CyanoAbun_N_2012_class1", "Community composition": "L_EXC_CompScore_N_2012_class1"};
       output.Lichens.Sulfur.EXC.class1["2012"] = {"Total species richness": "L_EXC_Trich_S_2012_class1", "Sensitive-species richness": "L_EXC_SSrich_S_2012_class1", "Forage lichen abundance": "L_EXC_ForageAbun_S_2012_class1", "Cyanolichen abundance": "L_EXC_CyanoAbun_S_2012_class1", "Community composition": "L_EXC_CompScore_S_2012_class1"};
@@ -5904,9 +6009,11 @@
 
       //***Add deposition years and source
       output.Aquatic.depSource = "T-dep";
-      output.Aquatic.depYear = "2017-2019";
-      output.Lichens.depSource = "CMAQ v. 5.0.2";
+      output.Aquatic.depYear = "2019-2021";
+      //output.Lichens.depSource = "CMAQ v. 5.0.2";
+      output.Lichens.depSource = "CMAQ v. 5.3.2";
       output.Lichens.depYear = "2012";
+      //output.Lichens.depYear = "2015-2017";
       output.Trees.depSource = "T-dep";
       output.Trees.depYear = "2017-2019";
 
@@ -6499,6 +6606,9 @@
 
         //******Toggle uncertainty styling for mapped exceedance layers
         function togUnc(tmpBtn) {
+          d3.select("#dlLinkBtn").classed("disabled", true);
+          d3.select("#mapDownloadSelect").property("selectedIndex", 0).classed("initial", true);
+
           var tmpText = d3.select(tmpBtn).text();
           if(tmpText == "Show confidence rating") {
             d3.select(tmpBtn).text("Hide confidence rating").classed("show", true);
@@ -6624,6 +6734,26 @@
         }
         d3.select("#container-results").style("display", "none");
       }
+
+
+
+
+
+      //******Add tree disclaimer modal div
+      d3.select("body")
+        .append("div")
+        .attr("class", "modal fade ui-draggable in")
+        .attr("id", "disclaimerDiv")
+        .style("display", "none")
+        .append("div")
+        .attr("class", "modal-dialog modal-lg")
+        .attr("id", "disclaimerInfo")
+        .html('<h3><b><u>COMING SOON:</u></b></h3>'
+          + '<div>'
+            + '<p>Updated tree critical loads which address the influence of ozone<br>and include an additional 50 species (146 species total)<br>will be added to CLAS in the coming weeks.</p>'
+            + '<p>The Tree critical loads in CLAS are based on <a href="https://doi.org/10.1371/journal.pone.0205296" target="_blank">Horn et al. 2018</a></p>'
+          + '</div>'
+        );
 
 
 
@@ -6798,7 +6928,9 @@
 
 
 
-         function setDownload() { 
+          function setDownload() {
+            d3.select("#dlLinkBtn").classed("disabled", true);
+
             var tmpParams = {};
             if(d3.selectAll(".activeLayer.national, .resOption.added").classed("national") == true) {
               tmpParams.layer = "national";
@@ -6813,9 +6945,38 @@
               tmpParams.curBBoxPix = curBBoxPix;
             }
             tmpParams.target = d3.selectAll(".activeLayer.national, .resOption.added").attr("data-gs");
-            tmpParams.format = d3.select("#mapDownloadSelect")[0][0].options[d3.select("#mapDownloadSelect").property("selectedIndex")].text; 
+            if(d3.select("#togUncBtn").classed("show")) { 
+              tmpParams.unc = "_unc"; 
+            }
+            else { 
+              tmpParams.unc = "";
+            }
+            tmpParams.format = d3.select("#mapDownloadSelect")[0][0].options[d3.select("#mapDownloadSelect").property("selectedIndex")].text;
 
-            //console.log(tmpParams);
+            if(tmpParams.format == "PDF") {
+              var tmpTitle = d3.select("#infoLayer").html();
+              var tmpI = tmpTitle.indexOf("<br>");
+              var tmpArea = "";
+              if(tmpParams.area == "all") {
+                tmpArea = "Nationwide";
+              }
+              else {
+                tmpArea = tmpParams.area;
+              }
+              //tmpParams.pdfTitle = tmpTitle.slice(0, tmpI - 1) + '<span id="areaName">' + tmpArea + '</span>' + tmpTitle.slice(tmpI);
+              tmpParams.pdfTitle = tmpTitle.slice(0, tmpI) + '<span id="areaName">' + tmpArea + '</span>' + tmpTitle.slice(tmpI);
+              //tmpParams.pdfTitle = d3.select("#infoLayer").html();
+              tmpParams.pdfLegend = "https://nclas.ecosheds.org/nnclas/" + d3.select(d3.select(".pdfLegend").select(".legendImg")[0][0]).attr("src");
+              var tmpInfo = "";
+              //d3.select("#mapInfo").selectAll(".infoDiv").each(function(i) { if(i > 0) { tmpInfo += d3.select(this).html(); } });
+              d3.select("#mapInfo").selectAll(".infoDiv")[0].forEach(function(tmpDiv,i) { console.log(i); if(i > 0) { tmpInfo += d3.select(tmpDiv).html(); } });
+              var timeStamp = new Date();
+              tmpInfo += '<div class="infoDiv1"><p class="p1">Date downloaded:</p></div><div id="infoDownDate" class="infoDiv2">' + timeStamp.toLocaleDateString() + " " + timeStamp.toLocaleTimeString() + '</div>';
+              //console.log(tmpInfo);
+              tmpParams.pdfInfo = tmpInfo;
+            }
+
+            console.log(tmpParams);
 
             if(tmpParams.target[0] == "L") {
               if(tmpParams.layer == "national") {
@@ -6834,20 +6995,24 @@
                     d3.select("#dlLinkBtn").classed("disabled", false);
                   }
                 }
-                else if(tmpParams.format == "JPEG" || tmpParams.format == "PNG") {
+                else if(tmpParams.format == "JPEG" || tmpParams.format == "PNG" || tmpParams.format == "PDF") {
                   socket.emit("get_image", tmpParams);
+                  d3.select("body").classed("wait", true);
                 }
               }
               else if(tmpParams.target.includes("_CompScore_")) {
                 if(tmpParams.format == "GeoTIFF/Shapefile") {
                   socket.emit("clip_points", tmpParams);
+                  d3.select("body").classed("wait", true);
                 }
-                else if(tmpParams.format == "JPEG" || tmpParams.format == "PNG") {
+                else if(tmpParams.format == "JPEG" || tmpParams.format == "PNG" || tmpParams.format == "PDF") {
                   socket.emit("get_image", tmpParams);
+                  d3.select("body").classed("wait", true);
                 }
               }
               else {
                 socket.emit("get_rid_nclas", tmpParams);
+                d3.select("body").classed("wait", true);
               }
             }
             else {
@@ -6855,10 +7020,10 @@
                 if(tmpParams.format == "GeoTIFF/Shapefile") {
                   if(tmpParams.target[0] == "A") {
                     if(tmpParams.target.includes("_NS")) {
-                      d3.select("#dlLinkBtnA").attr("href", "zips/A_NS_2018-2020.zip");
+                      d3.select("#dlLinkBtnA").attr("href", "zips/A_NS_2019-2021.zip");
                     }
                     else {
-                      d3.select("#dlLinkBtnA").attr("href", "zips/A_S_2018-2020.zip");
+                      d3.select("#dlLinkBtnA").attr("href", "zips/A_S_2019-2021.zip");
                     }
                     d3.select("#dlLinkBtn").classed("disabled", false);
                   }
@@ -6879,16 +7044,19 @@
                     d3.select("#dlLinkBtn").classed("disabled", false);
                   }
                 }
-                else if(tmpParams.format == "JPEG" || tmpParams.format == "PNG") {
+                else if(tmpParams.format == "JPEG" || tmpParams.format == "PNG" || tmpParams.format == "PDF") {
                   socket.emit("get_image", tmpParams);
+                  d3.select("body").classed("wait", true);
                 }
               }
               else {
                 if(tmpParams.format == "GeoTIFF/Shapefile") {
                   socket.emit("clip_points", tmpParams);
+                  d3.select("body").classed("wait", true);
                 }
-                else if(tmpParams.format == "JPEG" || tmpParams.format == "PNG") {
+                else if(tmpParams.format == "JPEG" || tmpParams.format == "PNG" || tmpParams.format == "PDF") {
                   socket.emit("get_image", tmpParams);
+                  d3.select("body").classed("wait", true);
                 }
               }
             }
@@ -8176,6 +8344,16 @@
         //resetArea();
       }
 
+      //******Function to reset all selections
+      function resetSingle(tmpGS) {
+        d3.selectAll(".activeLayer, .added").each(function() {
+          if(d3.select(this).attr("data-gs") == tmpGS) {
+            $(this).click();
+          }
+        });
+      }
+
+
 
       //******Make tooltip for displaying attribute data
       var tooltip = d3.select("body")
@@ -8407,7 +8585,7 @@
       queue()
         //.defer(d3.json, 'class_1_areas_topo.json')
         .defer(d3.json, 'class_1_areas_lower48.json')
-        .defer(d3.json, 'admin_areas_merged_wgs84_lower48.json')
+        .defer(d3.json, 'admin_areas_merged_wgs84_lower48_unit_code.json')
         .defer(d3.json, 'tribal_lower48_wgs84_dissolved.json')
         .defer(d3.json, 'wilderness_areas_lower48_wgs84.json')
         .defer(d3.json, 'eco_level3_wgs84_no_water.json')
@@ -10174,7 +10352,7 @@
               d3.select("#resMapsMenuDiv").classed("in", true);
               d3.select("#resMapsAquaticN").classed("active", true);
               d3.select("#resMapsAquaticSubHeaderDiv").classed("in", true);
-              d3.select("#resMapsAquaticSubMenuN").classed("in", true).html('<p class="resOption n" data-gs="A_CL_NS_2017-2019_class1" data-img="images/aquatic_cl.jpg" data-layer="<p><b>Critical Load for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">CL: <span class="N_span">N+S Dep</span></p><p class="resOption n type1 vis" data-gs="A_EXC_NS_2017-2019_class1_type1" data-img="images/aquatic_exc_type1.jpg" data-layer="<p><b>Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Exceedance: <span class="N_span">N+S Dep</span></p><p class="resOption n type2" data-gs="A_EXC_NS_2017-2019_class1_type2" data-img="images/aquatic_exc_type2.jpg" data-layer="<p><b>Magnitude of Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Magnitude of EXC: <span class="N_span">N+S Dep</span></p><p class="resOption n type3" data-gs="A_EXC_NS_2017-2019_class1_type3" data-img="images/aquatic_exc_type3.jpg" data-layer="<p><b>Magnitude of Exceedance (+/-) of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Magnitude of EXC +/-: <span class="N_span">N+S Dep</span></p>');
+              d3.select("#resMapsAquaticSubMenuN").classed("in", true).html('<p class="resOption n" data-gs="A_CL_NS_2017-2019_class1" data-img="images/aquatic_cl.jpg" data-layer="<p><b>Critical Load for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">CL: <span class="N_span">N+S Dep</span></p><p class="resOption n type1 vis" data-gs="A_EXC_NS_2017-2019_class1_type1" data-img="images/aquatic_exc_type1.jpg" data-layer="<p><b>Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Exceedance: <span class="N_span">N+S Dep</span></p><p class="resOption n type2" data-gs="A_EXC_NS_2017-2019_class1_type2" data-img="images/aquatic_exc_type2.jpg" data-layer="<p><b>Magnitude of Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Magnitude of EXC: <span class="N_span">N+S Dep</span></p><p class="resOption n type3" data-gs="A_EXC_NS_2017-2019_class1_type3" data-img="images/aquatic_exc_type3.jpg" data-layer="<p><b>Magnitude of Exceedance (+/-) of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Magnitude of EXC +/-: <span class="N_span">N+S Dep</span></p>');
               d3.selectAll("#resReportsDiv, #resViewReportsDiv").classed("disabled", true);
               break;
             case 22:
@@ -10186,7 +10364,7 @@
               d3.select("#resMapsMenuDiv").classed("in", true);
               d3.select("#resMapsAquaticN").classed("active", true);
               d3.select("#resMapsAquaticSubHeaderDiv").classed("in", true);
-              d3.select("#resMapsAquaticSubMenuN").classed("in", true).html('<p class="resOption n" data-gs="A_CL_NS_2017-2019_class1" data-img="images/aquatic_cl.jpg" data-layer="<p><b>Critical Load for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">CL: <span class="N_span">N+S Dep</span></p><p class="resOption n type1 vis" data-gs="A_EXC_NS_2017-2019_class1_type1" data-img="images/aquatic_exc_type1.jpg" data-layer="<p><b>Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Exceedance: <span class="N_span">N+S Dep</span></p><p class="resOption n type2" data-gs="A_EXC_NS_2017-2019_class1_type2" data-img="images/aquatic_exc_type2.jpg" data-layer="<p><b>Magnitude of Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Magnitude of EXC: <span class="N_span">N+S Dep</span></p><p class="resOption n type3" data-gs="A_EXC_NS_2017-2019_class1_type3" data-img="images/aquatic_exc_type3.jpg" data-layer="<p><b>Magnitude of Exceedance (+/-) of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Magnitude of EXC +/-: <span class="N_span">N+S Dep</span></p>');
+              d3.select("#resMapsAquaticSubMenuN").classed("in", true).html('<p class="resOption n" data-gs="A_CL_NS_2017-2019_class1" data-img="images/aquatic_cl.jpg" data-layer="<p><b>Critical Load for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">CL: <span class="N_span">N+S Dep</span></p><p class="resOption n type1 vis" data-gs="A_EXC_NS_2017-2019_class1_type1" data-img="images/aquatic_exc_type1.jpg" data-layer="<p><b>Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Exceedance: <span class="N_span">N+S Dep</span></p><p class="resOption n type2" data-gs="A_EXC_NS_2017-2019_class1_type2" data-img="images/aquatic_exc_type2.jpg" data-layer="<p><b>Magnitude of Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Magnitude of EXC: <span class="N_span">N+S Dep</span></p><p class="resOption n type3" data-gs="A_EXC_NS_2017-2019_class1_type3" data-img="images/aquatic_exc_type3.jpg" data-layer="<p><b>Magnitude of Exceedance (+/-) of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Magnitude of EXC +/-: <span class="N_span">N+S Dep</span></p>');
               d3.selectAll("#resReportsDiv, #resViewReportsDiv").classed("disabled", true);
               break;
             case 23:
@@ -10198,7 +10376,7 @@
               d3.select("#resMapsMenuDiv").classed("in", true);
               d3.select("#resMapsAquaticN").classed("active", true);
               d3.select("#resMapsAquaticSubHeaderDiv").classed("in", true);
-              d3.select("#resMapsAquaticSubMenuN").classed("in", true).html('<p class="resOption n" data-gs="A_CL_NS_2017-2019_class1" data-img="images/aquatic_cl.jpg" data-layer="<p><b>Critical Load for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">CL: <span class="N_span">N+S Dep</span></p><p class="resOption n type1 vis" data-gs="A_EXC_NS_2017-2019_class1_type1" data-img="images/aquatic_exc_type1.jpg" data-layer="<p><b>Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Exceedance: <span class="N_span">N+S Dep</span></p><p class="resOption n type2" data-gs="A_EXC_NS_2017-2019_class1_type2" data-img="images/aquatic_exc_type2.jpg" data-layer="<p><b>Magnitude of Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Magnitude of EXC: <span class="N_span">N+S Dep</span></p><p class="resOption n type3" data-gs="A_EXC_NS_2017-2019_class1_type3" data-img="images/aquatic_exc_type3.jpg" data-layer="<p><b>Magnitude of Exceedance (+/-) of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Magnitude of EXC +/-: <span class="N_span">N+S Dep</span></p>');
+              d3.select("#resMapsAquaticSubMenuN").classed("in", true).html('<p class="resOption n" data-gs="A_CL_NS_2017-2019_class1" data-img="images/aquatic_cl.jpg" data-layer="<p><b>Critical Load for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">CL: <span class="N_span">N+S Dep</span></p><p class="resOption n type1 vis" data-gs="A_EXC_NS_2017-2019_class1_type1" data-img="images/aquatic_exc_type1.jpg" data-layer="<p><b>Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Exceedance: <span class="N_span">N+S Dep</span></p><p class="resOption n type2" data-gs="A_EXC_NS_2017-2019_class1_type2" data-img="images/aquatic_exc_type2.jpg" data-layer="<p><b>Magnitude of Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Magnitude of EXC: <span class="N_span">N+S Dep</span></p><p class="resOption n type3" data-gs="A_EXC_NS_2017-2019_class1_type3" data-img="images/aquatic_exc_type3.jpg" data-layer="<p><b>Magnitude of Exceedance (+/-) of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Magnitude of EXC +/-: <span class="N_span">N+S Dep</span></p>');
               $(".resOption.n.type1.vis").click();
               d3.select("#resExtDiv").style("z-index", "1000000").style("pointer-events", "none");
               d3.selectAll("#resExtDownloadDataBtn, #togUncBtn").classed("disabled", true);
@@ -10213,7 +10391,7 @@
               d3.select("#resMapsMenuDiv").classed("in", true);
               d3.select("#resMapsAquaticN").classed("active", true);
               d3.select("#resMapsAquaticSubHeaderDiv").classed("in", true);
-              d3.select("#resMapsAquaticSubMenuN").classed("in", true).html('<p class="resOption n" data-gs="A_CL_NS_2017-2019_class1" data-img="images/aquatic_cl.jpg" data-layer="<p><b>Critical Load for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">CL: <span class="N_span">N+S Dep</span></p><p class="resOption n type1 vis" data-gs="A_EXC_NS_2017-2019_class1_type1" data-img="images/aquatic_exc_type1.jpg" data-layer="<p><b>Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Exceedance: <span class="N_span">N+S Dep</span></p><p class="resOption n type2" data-gs="A_EXC_NS_2017-2019_class1_type2" data-img="images/aquatic_exc_type2.jpg" data-layer="<p><b>Magnitude of Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Magnitude of EXC: <span class="N_span">N+S Dep</span></p><p class="resOption n type3" data-gs="A_EXC_NS_2017-2019_class1_type3" data-img="images/aquatic_exc_type3.jpg" data-layer="<p><b>Magnitude of Exceedance (+/-) of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Magnitude of EXC +/-: <span class="N_span">N+S Dep</span></p>');
+              d3.select("#resMapsAquaticSubMenuN").classed("in", true).html('<p class="resOption n" data-gs="A_CL_NS_2017-2019_class1" data-img="images/aquatic_cl.jpg" data-layer="<p><b>Critical Load for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">CL: <span class="N_span">N+S Dep</span></p><p class="resOption n type1 vis" data-gs="A_EXC_NS_2017-2019_class1_type1" data-img="images/aquatic_exc_type1.jpg" data-layer="<p><b>Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Exceedance: <span class="N_span">N+S Dep</span></p><p class="resOption n type2" data-gs="A_EXC_NS_2017-2019_class1_type2" data-img="images/aquatic_exc_type2.jpg" data-layer="<p><b>Magnitude of Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Magnitude of EXC: <span class="N_span">N+S Dep</span></p><p class="resOption n type3" data-gs="A_EXC_NS_2017-2019_class1_type3" data-img="images/aquatic_exc_type3.jpg" data-layer="<p><b>Magnitude of Exceedance (+/-) of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Magnitude of EXC +/-: <span class="N_span">N+S Dep</span></p>');
               $(".resOption.n.type1.vis").click();
               d3.select("#resExtDiv").style("z-index", "1000000").style("pointer-events", "none");
               d3.selectAll("#resExtDownloadDataBtn, #mapInfoBtn").classed("disabled", true);
@@ -10228,7 +10406,7 @@
               d3.select("#resMapsMenuDiv").classed("in", true);
               d3.select("#resMapsAquaticN").classed("active", true);
               d3.select("#resMapsAquaticSubHeaderDiv").classed("in", true);
-              d3.select("#resMapsAquaticSubMenuN").classed("in", true).html('<p class="resOption n" data-gs="A_CL_NS_2017-2019_class1" data-img="images/aquatic_cl.jpg" data-layer="<p><b>Critical Load for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">CL: <span class="N_span">N+S Dep</span></p><p class="resOption n type1 vis" data-gs="A_EXC_NS_2017-2019_class1_type1" data-img="images/aquatic_exc_type1.jpg" data-layer="<p><b>Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Exceedance: <span class="N_span">N+S Dep</span></p><p class="resOption n type2" data-gs="A_EXC_NS_2017-2019_class1_type2" data-img="images/aquatic_exc_type2.jpg" data-layer="<p><b>Magnitude of Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Magnitude of EXC: <span class="N_span">N+S Dep</span></p><p class="resOption n type3" data-gs="A_EXC_NS_2017-2019_class1_type3" data-img="images/aquatic_exc_type3.jpg" data-layer="<p><b>Magnitude of Exceedance (+/-) of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Magnitude of EXC +/-: <span class="N_span">N+S Dep</span></p>');
+              d3.select("#resMapsAquaticSubMenuN").classed("in", true).html('<p class="resOption n" data-gs="A_CL_NS_2017-2019_class1" data-img="images/aquatic_cl.jpg" data-layer="<p><b>Critical Load for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">CL: <span class="N_span">N+S Dep</span></p><p class="resOption n type1 vis" data-gs="A_EXC_NS_2017-2019_class1_type1" data-img="images/aquatic_exc_type1.jpg" data-layer="<p><b>Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Exceedance: <span class="N_span">N+S Dep</span></p><p class="resOption n type2" data-gs="A_EXC_NS_2017-2019_class1_type2" data-img="images/aquatic_exc_type2.jpg" data-layer="<p><b>Magnitude of Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Magnitude of EXC: <span class="N_span">N+S Dep</span></p><p class="resOption n type3" data-gs="A_EXC_NS_2017-2019_class1_type3" data-img="images/aquatic_exc_type3.jpg" data-layer="<p><b>Magnitude of Exceedance (+/-) of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Magnitude of EXC +/-: <span class="N_span">N+S Dep</span></p>');
               $(".resOption.n.type1.vis").click();
               d3.select("#resExtDiv").style("z-index", "1000000").style("pointer-events", "none");
               d3.selectAll("#resExtDownloadDataBtn, #mapInfoBtn").classed("disabled", true);
@@ -10239,7 +10417,7 @@
               d3.select("#selRes").classed("active", true).classed("disabled", false).select(".material-icons").classed("active", true);
               d3.select("#selResTog").style("display", "block").style("height", "174px").style("background", "#303030").style("position", "relative").style("top", "-18px");
               d3.select("#resViewReportsBtnSpan").text("Selway-Bitterroot Wilderness");
-              d3.select("#resMapsAquaticSubMenuN").classed("in", true).html('<p class="resOption n" data-gs="A_CL_NS_2017-2019_class1" data-img="images/aquatic_cl.jpg" data-layer="<p><b>Critical Load for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">CL: <span class="N_span">N+S Dep</span></p><p class="resOption n type1 vis" data-gs="A_EXC_NS_2017-2019_class1_type1" data-img="images/aquatic_exc_type1.jpg" data-layer="<p><b>Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Exceedance: <span class="N_span">N+S Dep</span></p><p class="resOption n type2" data-gs="A_EXC_NS_2017-2019_class1_type2" data-img="images/aquatic_exc_type2.jpg" data-layer="<p><b>Magnitude of Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Magnitude of EXC: <span class="N_span">N+S Dep</span></p><p class="resOption n type3" data-gs="A_EXC_NS_2017-2019_class1_type3" data-img="images/aquatic_exc_type3.jpg" data-layer="<p><b>Magnitude of Exceedance (+/-) of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Magnitude of EXC +/-: <span class="N_span">N+S Dep</span></p>');
+              d3.select("#resMapsAquaticSubMenuN").classed("in", true).html('<p class="resOption n" data-gs="A_CL_NS_2017-2019_class1" data-img="images/aquatic_cl.jpg" data-layer="<p><b>Critical Load for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">CL: <span class="N_span">N+S Dep</span></p><p class="resOption n type1 vis" data-gs="A_EXC_NS_2017-2019_class1_type1" data-img="images/aquatic_exc_type1.jpg" data-layer="<p><b>Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Exceedance: <span class="N_span">N+S Dep</span></p><p class="resOption n type2" data-gs="A_EXC_NS_2017-2019_class1_type2" data-img="images/aquatic_exc_type2.jpg" data-layer="<p><b>Magnitude of Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Magnitude of EXC: <span class="N_span">N+S Dep</span></p><p class="resOption n type3" data-gs="A_EXC_NS_2017-2019_class1_type3" data-img="images/aquatic_exc_type3.jpg" data-layer="<p><b>Magnitude of Exceedance (+/-) of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Magnitude of EXC +/-: <span class="N_span">N+S Dep</span></p>');
               $(".resOption.n.type1.vis").click();
               d3.select("#resExtDiv").style("z-index", "1000000").style("pointer-events", "none");
               d3.selectAll("#togUncBtn, #mapInfoBtn").classed("disabled", true);
@@ -10250,7 +10428,7 @@
               d3.select("#selRes").classed("active", true).classed("disabled", false).select(".material-icons").classed("active", true);
               d3.select("#selResTog").style("display", "block"); //.style("height", "174px").style("background", "#303030").style("position", "relative").style("top", "-18px");
               d3.select("#resViewReportsBtnSpan").text("Selway-Bitterroot Wilderness");
-              d3.select("#resMapsAquaticSubMenuN").classed("in", true).html('<p class="resOption n" data-gs="A_CL_NS_2017-2019_class1" data-img="images/aquatic_cl.jpg" data-layer="<p><b>Critical Load for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">CL: <span class="N_span">N+S Dep</span></p><p class="resOption n type1 vis" data-gs="A_EXC_NS_2017-2019_class1_type1" data-img="images/aquatic_exc_type1.jpg" data-layer="<p><b>Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Exceedance: <span class="N_span">N+S Dep</span></p><p class="resOption n type2" data-gs="A_EXC_NS_2017-2019_class1_type2" data-img="images/aquatic_exc_type2.jpg" data-layer="<p><b>Magnitude of Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Magnitude of EXC: <span class="N_span">N+S Dep</span></p><p class="resOption n type3" data-gs="A_EXC_NS_2017-2019_class1_type3" data-img="images/aquatic_exc_type3.jpg" data-layer="<p><b>Magnitude of Exceedance (+/-) of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Magnitude of EXC +/-: <span class="N_span">N+S Dep</span></p>');
+              d3.select("#resMapsAquaticSubMenuN").classed("in", true).html('<p class="resOption n" data-gs="A_CL_NS_2017-2019_class1" data-img="images/aquatic_cl.jpg" data-layer="<p><b>Critical Load for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">CL: <span class="N_span">N+S Dep</span></p><p class="resOption n type1 vis" data-gs="A_EXC_NS_2017-2019_class1_type1" data-img="images/aquatic_exc_type1.jpg" data-layer="<p><b>Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Exceedance: <span class="N_span">N+S Dep</span></p><p class="resOption n type2" data-gs="A_EXC_NS_2017-2019_class1_type2" data-img="images/aquatic_exc_type2.jpg" data-layer="<p><b>Magnitude of Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Magnitude of EXC: <span class="N_span">N+S Dep</span></p><p class="resOption n type3" data-gs="A_EXC_NS_2017-2019_class1_type3" data-img="images/aquatic_exc_type3.jpg" data-layer="<p><b>Magnitude of Exceedance (+/-) of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Magnitude of EXC +/-: <span class="N_span">N+S Dep</span></p>');
               $(".resOption.n.type1.vis").click();
               d3.select("#resExtDiv").style("z-index", "1000000").style("pointer-events", "none");
               d3.selectAll("#togUncBtn, #mapInfoBtn").classed("disabled", true);
@@ -10261,7 +10439,7 @@
               d3.select("#selRes").classed("active", true).classed("disabled", false).select(".material-icons").classed("active", true);
               d3.select("#selResTog").style("display", "block").style("height", "174px").style("background", "#303030").style("position", "relative").style("top", "-18px");
               d3.select("#resViewReportsBtnSpan").text("Selway-Bitterroot Wilderness");
-              d3.select("#resMapsAquaticSubMenuN").classed("in", true).html('<p class="resOption n" data-gs="A_CL_NS_2017-2019_class1" data-img="images/aquatic_cl.jpg" data-layer="<p><b>Critical Load for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">CL: <span class="N_span">N+S Dep</span></p><p class="resOption n type1 vis" data-gs="A_EXC_NS_2017-2019_class1_type1" data-img="images/aquatic_exc_type1.jpg" data-layer="<p><b>Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Exceedance: <span class="N_span">N+S Dep</span></p><p class="resOption n type2" data-gs="A_EXC_NS_2017-2019_class1_type2" data-img="images/aquatic_exc_type2.jpg" data-layer="<p><b>Magnitude of Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Magnitude of EXC: <span class="N_span">N+S Dep</span></p><p class="resOption n type3" data-gs="A_EXC_NS_2017-2019_class1_type3" data-img="images/aquatic_exc_type3.jpg" data-layer="<p><b>Magnitude of Exceedance (+/-) of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Magnitude of EXC +/-: <span class="N_span">N+S Dep</span></p>');
+              d3.select("#resMapsAquaticSubMenuN").classed("in", true).html('<p class="resOption n" data-gs="A_CL_NS_2017-2019_class1" data-img="images/aquatic_cl.jpg" data-layer="<p><b>Critical Load for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">CL: <span class="N_span">N+S Dep</span></p><p class="resOption n type1 vis" data-gs="A_EXC_NS_2017-2019_class1_type1" data-img="images/aquatic_exc_type1.jpg" data-layer="<p><b>Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Exceedance: <span class="N_span">N+S Dep</span></p><p class="resOption n type2" data-gs="A_EXC_NS_2017-2019_class1_type2" data-img="images/aquatic_exc_type2.jpg" data-layer="<p><b>Magnitude of Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Magnitude of EXC: <span class="N_span">N+S Dep</span></p><p class="resOption n type3" data-gs="A_EXC_NS_2017-2019_class1_type3" data-img="images/aquatic_exc_type3.jpg" data-layer="<p><b>Magnitude of Exceedance (+/-) of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Magnitude of EXC +/-: <span class="N_span">N+S Dep</span></p>');
               $(".resOption.n.type1.vis").click();
               d3.selectAll("#resMapsDiv, #resViewReportsDiv").classed("disabled", true);
               break;
@@ -10270,7 +10448,7 @@
               d3.select("#selRes").classed("active", true).classed("disabled", false).select(".material-icons").classed("active", true);
               d3.select("#selResTog").style("display", "block").style("height", "174px").style("background", "#303030").style("position", "relative").style("top", "-18px");
               d3.select("#resViewReportsBtnSpan").text("Selway-Bitterroot Wilderness");
-              d3.select("#resMapsAquaticSubMenuN").classed("in", true).html('<p class="resOption n" data-gs="A_CL_NS_2017-2019_class1" data-img="images/aquatic_cl.jpg" data-layer="<p><b>Critical Load for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">CL: <span class="N_span">N+S Dep</span></p><p class="resOption n type1 vis" data-gs="A_EXC_NS_2017-2019_class1_type1" data-img="images/aquatic_exc_type1.jpg" data-layer="<p><b>Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Exceedance: <span class="N_span">N+S Dep</span></p><p class="resOption n type2" data-gs="A_EXC_NS_2017-2019_class1_type2" data-img="images/aquatic_exc_type2.jpg" data-layer="<p><b>Magnitude of Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Magnitude of EXC: <span class="N_span">N+S Dep</span></p><p class="resOption n type3" data-gs="A_EXC_NS_2017-2019_class1_type3" data-img="images/aquatic_exc_type3.jpg" data-layer="<p><b>Magnitude of Exceedance (+/-) of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Magnitude of EXC +/-: <span class="N_span">N+S Dep</span></p>');
+              d3.select("#resMapsAquaticSubMenuN").classed("in", true).html('<p class="resOption n" data-gs="A_CL_NS_2017-2019_class1" data-img="images/aquatic_cl.jpg" data-layer="<p><b>Critical Load for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">CL: <span class="N_span">N+S Dep</span></p><p class="resOption n type1 vis" data-gs="A_EXC_NS_2017-2019_class1_type1" data-img="images/aquatic_exc_type1.jpg" data-layer="<p><b>Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Exceedance: <span class="N_span">N+S Dep</span></p><p class="resOption n type2" data-gs="A_EXC_NS_2017-2019_class1_type2" data-img="images/aquatic_exc_type2.jpg" data-layer="<p><b>Magnitude of Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Magnitude of EXC: <span class="N_span">N+S Dep</span></p><p class="resOption n type3" data-gs="A_EXC_NS_2017-2019_class1_type3" data-img="images/aquatic_exc_type3.jpg" data-layer="<p><b>Magnitude of Exceedance (+/-) of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Magnitude of EXC +/-: <span class="N_span">N+S Dep</span></p>');
               $(".resOption.n.type1.vis").click();
               d3.selectAll("#resMapsDiv, #resViewReportsDiv").classed("disabled", true);
               d3.select("#mapDownloadDiv").classed("in", true).classed("tutImp", true).style("display", "flex");
@@ -10280,7 +10458,7 @@
               d3.select("#selRes").classed("active", true).classed("disabled", false).select(".material-icons").classed("active", true);
               d3.select("#selResTog").style("display", "block").style("height", "174px").style("background", "#303030").style("position", "relative").style("top", "-18px");
               d3.select("#resViewReportsBtnSpan").text("Selway-Bitterroot Wilderness");
-              d3.select("#resMapsAquaticSubMenuN").classed("in", true).html('<p class="resOption n" data-gs="A_CL_NS_2017-2019_class1" data-img="images/aquatic_cl.jpg" data-layer="<p><b>Critical Load for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">CL: <span class="N_span">N+S Dep</span></p><p class="resOption n type1 vis" data-gs="A_EXC_NS_2017-2019_class1_type1" data-img="images/aquatic_exc_type1.jpg" data-layer="<p><b>Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Exceedance: <span class="N_span">N+S Dep</span></p><p class="resOption n type2" data-gs="A_EXC_NS_2017-2019_class1_type2" data-img="images/aquatic_exc_type2.jpg" data-layer="<p><b>Magnitude of Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Magnitude of EXC: <span class="N_span">N+S Dep</span></p><p class="resOption n type3" data-gs="A_EXC_NS_2017-2019_class1_type3" data-img="images/aquatic_exc_type3.jpg" data-layer="<p><b>Magnitude of Exceedance (+/-) of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2017-2019" onclick="addRes(this)">Magnitude of EXC +/-: <span class="N_span">N+S Dep</span></p>');
+              d3.select("#resMapsAquaticSubMenuN").classed("in", true).html('<p class="resOption n" data-gs="A_CL_NS_2017-2019_class1" data-img="images/aquatic_cl.jpg" data-layer="<p><b>Critical Load for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">CL: <span class="N_span">N+S Dep</span></p><p class="resOption n type1 vis" data-gs="A_EXC_NS_2017-2019_class1_type1" data-img="images/aquatic_exc_type1.jpg" data-layer="<p><b>Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Exceedance: <span class="N_span">N+S Dep</span></p><p class="resOption n type2" data-gs="A_EXC_NS_2017-2019_class1_type2" data-img="images/aquatic_exc_type2.jpg" data-layer="<p><b>Magnitude of Exceedance of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Magnitude of EXC: <span class="N_span">N+S Dep</span></p><p class="resOption n type3" data-gs="A_EXC_NS_2017-2019_class1_type3" data-img="images/aquatic_exc_type3.jpg" data-layer="<p><b>Magnitude of Exceedance (+/-) of the CL for acidification</b><br>Aquatic<br><span class=&quot;N_span&quot;>N+S Deposition</span></p>" data-dep="T-dep" data-years="2019-2021" onclick="addRes(this)">Magnitude of EXC +/-: <span class="N_span">N+S Dep</span></p>');
               $(".resOption.n.type1.vis").click();
               d3.selectAll("#resMapsDiv, #resReportsDiv").classed("disabled", true);
               break;

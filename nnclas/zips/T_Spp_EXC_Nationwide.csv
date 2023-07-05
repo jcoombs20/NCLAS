@@ -1,0 +1,95 @@
+Latin Name,Common Name,Nitrogen Growth,Sulfur Growth,Nitrogen Survival,Sulfur Survival
+Abies amabilis,Pacific silver fir,,,X,X
+Abies balsamea,balsam fir,,,X,
+Abies concolor,white fir,X,,X,
+Abies grandis,grand fir,X,,,
+Abies lasiocarpa,subalpine fir,X,X,X,X
+Acer negundo,boxelder,X,,X,
+Acer rubrum,red maple,X,,,
+Acer saccharinum,silver maple,X,,X,X
+Acer saccharum,sugar maple,X,X,X,
+Betula alleghaniensis,yellow birch,,X,,
+Betula lenta,sweet birch,X,,,
+Betula papyrifera,paper birch,X,,,
+Calocedrus decurrens,incense-cedar,X,X,X,X
+Carpinus caroliniana,"American hornbeam, musclewood",X,,X,
+Carya alba,mockernut hickory,X,X,,X
+Carya cordiformis,bitternut hickory,X,X,X,X
+Carya glabra,pignut hickory,X,X,X,
+Carya ovata,shagbark hickory,X,X,X,X
+Carya texana,black hickory,X,X,X,X
+Celtis laevigata,sugarberry,X,X,X,X
+Celtis occidentalis,hackberry,,X,X,
+Fagus grandifolia,American beech,,,,
+Fraxinus americana,white ash,X,X,,X
+Fraxinus nigra,black ash,X,,X,X
+Fraxinus pennsylvanica,green ash,,,,
+Gleditsia triacanthos,honeylocust,X,,X,X
+Juglans nigra,black walnut,X,,,X
+Juniperus monosperma,oneseed juniper,X,,X,X
+Juniperus occidentalis,western juniper,,X,X,X
+Juniperus osteosperma,Utah juniper,X,,,X
+Juniperus virginiana,eastern redcedar,X,,,
+Larix laricina,tamarack (native),,X,X,X
+Larix occidentalis,western larch,X,X,X,X
+Liquidambar styraciflua,sweetgum,X,,,
+Liriodendron tulipifera,yellow-poplar,X,X,X,
+Lithocarpus densiflorus,tanoak,,X,X,X
+Maclura pomifera,Osage-orange,X,,X,X
+Magnolia virginiana,sweetbay,,X,,
+Nyssa aquatica,water tupelo,X,,X,X
+Nyssa biflora,swamp tupelo,,X,X,
+Nyssa sylvatica,blackgum,X,X,,X
+Ostrya virginiana,eastern hophornbeam,X,X,X,
+Oxydendrum arboreum,sourwood,X,X,,
+Picea engelmannii,Engelmann spruce,,,,
+Picea glauca,white spruce,X,,X,X
+Picea mariana,black spruce,X,X,,
+Picea rubens,red spruce,,X,X,
+Pinus banksiana,jack pine,X,,X,X
+Pinus contorta,lodgepole pine,X,X,X,
+Pinus echinata,shortleaf pine,X,,X,
+Pinus edulis,common or two-needle pinyon,X,X,X,
+Pinus elliottii,slash pine,X,,,
+Pinus monophylla,singleleaf pinyon,X,X,,X
+Pinus palustris,longleaf pine,,X,X,
+Pinus ponderosa,ponderosa pine,X,,X,
+Pinus resinosa,red pine,X,,,
+Pinus rigida,pitch pine,,X,X,
+Pinus strobus,eastern white pine,X,,X,
+Pinus taeda,loblolly pine,X,,X,
+Pinus virginiana,Virginia pine,X,,,
+Platanus occidentalis,American sycamore,X,X,X,X
+Populus balsamifera,balsam poplar,,X,X,
+Populus grandidentata,bigtooth aspen,X,,,
+Populus tremuloides,quaking aspen,,X,,
+Prunus serotina,black cherry,,,,X
+Pseudotsuga menziesii,Douglas-fir,X,,,X
+Quercus alba,white oak,X,X,,
+Quercus chrysolepis,canyon live oak,X,,X,
+Quercus coccinea,scarlet oak,X,X,,
+Quercus ellipsoidalis,northern pin oak,X,,X,X
+Quercus falcata,southern red oak,,X,,X
+Quercus laurifolia,laurel oak,X,,,
+Quercus macrocarpa,bur oak,,X,X,X
+Quercus muehlenbergii,chinkapin oak,X,X,,X
+Quercus nigra,water oak,,,,
+Quercus phellos,willow oak,X,X,X,
+Quercus prinus,chestnut oak,,X,X,
+Quercus rubra,northern red oak,X,X,,X
+Quercus stellata,post oak,X,X,,X
+Quercus velutina,black oak,X,X,X,
+Robinia pseudoacacia,black locust,X,,X,
+Salix nigra,black willow,,,X,X
+Sassafras albidum,sassafras,X,X,,
+Taxodium ascendens,pondcypress,X,X,X,X
+Taxodium distichum,baldcypress,X,,X,
+Thuja occidentalis,northern white-cedar,X,,X,
+Thuja plicata,western redcedar,X,X,X,X
+Tilia americana,American basswood,X,,X,
+Tsuga canadensis,eastern hemlock,,X,,X
+Tsuga heterophylla,western hemlock,,X,X,X
+Tsuga mertensiana,mountain hemlock,X,,,X
+Ulmus alata,winged elm,X,X,,X
+Ulmus americana,American elm,X,,,
+Ulmus rubra,slippery elm,X,,,

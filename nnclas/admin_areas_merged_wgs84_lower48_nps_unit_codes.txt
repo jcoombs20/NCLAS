@@ -1,0 +1,389 @@
+FID,Join_Count,TARGET_FID,NAME,Agency,agency_ful,Id,UNIT_CODE
+109,1,113,Cedar Creek and Belle Grove National Historical Park,NPS,National Park Service,0,CEBE
+110,1,114,Little Bighorn Battlefield National Monument,NPS,National Park Service,0,LIBI
+111,1,115,Capulin Volcano National Monument,NPS,National Park Service,0,CAVO
+112,1,116,Fort Bowie National Historic Site,NPS,National Park Service,0,FOBO
+113,1,117,Gila Cliff Dwellings National Monument,NPS,National Park Service,0,GICL
+114,1,118,Tuzigoot National Monument,NPS,National Park Service,0,TUZI
+115,1,119,Wolf Trap National Park for the Performing Arts,NPS,National Park Service,0,WOTR
+116,1,120,Castillo de San Marcos National Monument,NPS,National Park Service,0,CASA
+117,1,121,Timpanogos Cave National Monument,NPS,National Park Service,0,TICA
+118,1,122,Theodore Roosevelt Island National Memorial,NPS,National Park Service,0,THIS
+119,1,123,Lyndon Baines Johnson Memorial Grove on the Potomac,NPS,National Park Service,0,LYBA
+120,1,124,Tupelo National Battlefield,NPS,National Park Service,0,TUPE
+121,1,125,Brices Cross Roads National Battlefield Site,NPS,National Park Service,0,BRCR
+122,1,126,Point Reyes National Seashore,NPS,National Park Service,0,PORE
+123,1,127,Fort Sumter and Fort Moultrie National Historical Park,NPS,National Park Service,0,FOSU
+124,1,128,Tonto National Monument,NPS,National Park Service,0,TONT
+125,1,129,Home of Franklin D. Roosevelt National Historic Site,NPS,National Park Service,0,HOFR
+126,1,130,Ninety Six National Historic Site,NPS,National Park Service,0,NISI
+127,1,132,Carter G. Woodson National Historic Site,NPS,National Park Service,0,CAWO
+128,1,133,Boston Harbor Islands National Recreation Area,NPS,National Park Service,0,BOHA
+129,1,134,Sunset Crater Volcano National Monument,NPS,National Park Service,0,SUCR
+130,1,135,Mary McLeod Bethune Council House National Historic Site,NPS,National Park Service,0,MABE
+131,1,136,Ford's Theatre National Historic Site,NPS,National Park Service,0,FOTH
+132,1,137,Brown v. Board of Education National Historic Site,NPS,National Park Service,0,BRVB
+133,1,138,Pipe Spring National Monument,NPS,National Park Service,0,PISP
+134,1,139,El Morro National Monument,NPS,National Park Service,0,ELMO
+135,1,140,Andrew Johnson National Historic Site,NPS,National Park Service,0,ANJO
+136,1,141,Saint Paul's Church National Historic Site,NPS,National Park Service,0,SAPA
+137,1,142,Castle Clinton National Monument,NPS,National Park Service,0,CACL
+138,1,143,Fossil Butte National Monument,NPS,National Park Service,0,FOBU
+139,1,144,Hovenweep National Monument,NPS,National Park Service,0,HOVE
+140,1,145,Fort Union National Monument,NPS,National Park Service,0,FOUN
+141,1,146,Abraham Lincoln Birthplace National Historical Park,NPS,National Park Service,0,ABLI
+142,1,147,Dry Tortugas National Park,NPS,National Park Service,0,DRTO
+143,1,148,Fort Frederica National Monument,NPS,National Park Service,0,FOFR
+144,1,149,Manzanar National Historic Site,NPS,National Park Service,0,MANZ
+145,1,150,Bryce Canyon National Park,NPS,National Park Service,0,BRCA
+146,1,151,"John D. Rockefeller, Jr., Memorial Parkway",NPS,National Park Service,0,JODR
+147,1,152,Thomas Edison National Historical Park,NPS,National Park Service,0,EDIS
+148,1,153,Yellowstone National Park,NPS,National Park Service,0,YELL
+149,1,154,Hubbell Trading Post National Historic Site,NPS,National Park Service,0,HUTR
+150,1,155,Chamizal National Memorial,NPS,National Park Service,0,CHAM
+151,1,157,Ulysses S. Grant National Historic Site,NPS,National Park Service,0,ULSG
+152,1,158,Canaveral National Seashore,NPS,National Park Service,0,CANA
+153,1,159,African Burial Ground National Monument,NPS,National Park Service,0,AFBG
+154,1,160,Cabrillo National Monument,NPS,National Park Service,0,CABR
+155,1,161,Clara Barton National Historic Site,NPS,National Park Service,0,CLBA
+156,1,162,Fort Washington Park,NPS,National Park Service,0,FOWA
+157,1,163,Sequoia National Park,NPS,National Park Service,0,SEQU
+158,1,165,Tuskegee Airmen National Historic Site,NPS,National Park Service,0,TUAI
+159,1,167,Edgar Allan Poe National Historic Site,NPS,National Park Service,0,EDAL
+160,1,168,Boston African American National Historic Site,NPS,National Park Service,0,BOAF
+161,1,169,Mammoth Cave National Park,NPS,National Park Service,0,MACA
+162,1,170,Eugene O'Neill National Historic Site,NPS,National Park Service,0,EUON
+163,1,171,Adams National Historical Park,NPS,National Park Service,0,ADAM
+164,1,172,Navajo National Monument,NPS,National Park Service,0,NAVA
+165,1,173,Thomas Stone National Historic Site,NPS,National Park Service,0,THST
+166,1,174,Cane River Creole National Historical Park,NPS,National Park Service,0,CARI
+167,1,175,Great Basin National Park,NPS,National Park Service,0,GRBA
+168,1,176,Grand Portage National Monument,NPS,National Park Service,0,GRPO
+169,1,177,Whiskeytown-Shasta-Trinity National Recreation Area,NPS,National Park Service,0,WHIS
+170,1,178,Fort Point National Historic Site,NPS,National Park Service,0,FOPO
+171,1,179,Salem Maritime National Historic Site,NPS,National Park Service,0,SAMA
+172,1,180,Washington Monument,NPS,National Park Service,0,WAMO
+173,1,181,Thomas Jefferson Memorial,NPS,National Park Service,0,JEFM
+174,1,182,Moores Creek National Battlefield,NPS,National Park Service,0,MOCR
+175,1,183,Horseshoe Bend National Military Park,NPS,National Park Service,0,HOBE
+176,1,184,Fort Matanzas National Monument,NPS,National Park Service,0,FOMA
+177,1,185,Channel Islands National Park,NPS,National Park Service,0,CHIS
+178,1,186,Canyonlands National Park,NPS,National Park Service,0,CANY
+179,1,187,White House,NPS,National Park Service,0,WHHO
+180,1,188,Booker T. Washington National Monument,NPS,National Park Service,0,BOWA
+181,1,189,Jean Lafitte National Historical Park and Preserve,NPS,National Park Service,0,JELA
+182,1,190,Jewel Cave National Monument,NPS,National Park Service,0,JECA
+183,1,191,Fort Larned National Historic Site,NPS,National Park Service,0,FOLS
+184,1,192,Rosie the Riveter/World War II Home Front National Historical Park,NPS,National Park Service,0,RORI
+185,1,193,Fort Stanwix National Monument,NPS,National Park Service,0,FOST
+186,1,194,Thaddeus Kosciuszko National Memorial,NPS,National Park Service,0,THKO
+187,1,195,Perry's Victory and International Peace Memorial,NPS,National Park Service,0,PEVI
+188,1,196,James A. Garfield National Historic Site,NPS,National Park Service,0,JAGA
+189,1,197,Rainbow Bridge National Monument,NPS,National Park Service,0,RABR
+190,1,198,Natural Bridges National Monument,NPS,National Park Service,0,NABR
+191,1,199,Hohokam Pima National Monument,NPS,National Park Service,0,PIMA
+192,1,200,Gulf Islands National Seashore,NPS,National Park Service,0,GUIS
+193,1,201,Appomattox Court House National Historical Park,NPS,National Park Service,0,APCO
+194,1,202,Pipestone National Monument,NPS,National Park Service,0,PIPE
+195,1,203,Biscayne National Park,NPS,National Park Service,0,BISC
+196,1,204,Arkansas Post National Memorial,NPS,National Park Service,0,ARPO
+197,1,205,Mount Rushmore National Memorial,NPS,National Park Service,0,MORU
+198,1,206,Guadalupe Mountains National Park,NPS,National Park Service,0,GUMO
+199,1,207,City of Rocks National Reserve,NPS,National Park Service,0,CIRO
+200,1,208,Hagerman Fossil Beds National Monument,NPS,National Park Service,0,HAFO
+201,1,209,Petersburg National Battlefield,NPS,National Park Service,0,PETE
+202,1,210,Fort Vancouver National Historic Site,NPS,National Park Service,0,FOVA
+203,1,211,Saint-Gaudens National Historical Park,NPS,National Park Service,0,SAGA
+204,1,212,John Fitzgerald Kennedy National Historic Site,NPS,National Park Service,0,JOFI
+205,1,213,Gateway Arch National Park,NPS,National Park Service,0,JEFF
+206,1,214,Fort Pulaski National Monument,NPS,National Park Service,0,FOPU
+207,1,215,Eleanor Roosevelt National Historic Site,NPS,National Park Service,0,ELRO
+208,1,216,Friendship Hill National Historic Site,NPS,National Park Service,0,FRHI
+209,1,217,Theodore Roosevelt Birthplace National Historic Site,NPS,National Park Service,0,THRB
+210,1,218,Coronado National Memorial,NPS,National Park Service,0,CORO
+211,1,219,Wright Brothers National Memorial,NPS,National Park Service,0,WRBR
+212,1,220,Selma to Montgomery National Historic Trail,NPS,National Park Service,0,SEMO
+213,1,221,Kings Mountain National Military Park,NPS,National Park Service,0,KIMO
+214,1,222,Golden Spike National Historical Park,NPS,National Park Service,0,GOSP
+215,1,223,New Bedford Whaling National Historical Park,NPS,National Park Service,0,NEBE
+216,1,224,Sagamore Hill National Historic Site,NPS,National Park Service,0,SAHI
+217,1,225,Lava Beds National Monument,NPS,National Park Service,0,LABE
+218,1,226,Women's Rights National Historical Park,NPS,National Park Service,0,WORI
+219,1,227,George Rogers Clark National Historical Park,NPS,National Park Service,0,GERO
+220,1,228,Longfellow House-Washington's Headquarters National Historic Site,NPS,National Park Service,0,LONG
+221,1,229,Hopewell Furnace National Historic Site,NPS,National Park Service,0,HOFU
+222,1,230,Franklin Delano Roosevelt Memorial,NPS,National Park Service,0,FRDE
+223,1,231,Montezuma Castle National Monument,NPS,National Park Service,0,MOCA
+224,1,232,Kings Canyon National Park,NPS,National Park Service,0,KICA
+225,1,233,Springfield Armory National Historic Site,NPS,National Park Service,0,SPAR
+226,1,234,Whitman Mission National Historic Site,NPS,National Park Service,0,WHMI
+227,1,235,World War II Memorial,NPS,National Park Service,0,WWII
+228,1,236,Vietnam Veterans Memorial,NPS,National Park Service,0,VIVE
+229,1,237,Korean War Veterans Memorial,NPS,National Park Service,0,KOWA
+230,1,238,Constitution Gardens,NPS,National Park Service,0,COGA
+231,1,239,"Martin Luther King, Jr., Memorial",NPS,National Park Service,0,MLKM
+232,1,240,Lincoln Memorial,NPS,National Park Service,0,LINC
+233,1,241,National Mall,NPS,National Park Service,0,MALL
+234,1,242,Russell Cave National Monument,NPS,National Park Service,0,RUCA
+235,1,243,Maggie L. Walker National Historic Site,NPS,National Park Service,0,MAWA
+236,1,244,Bighorn Canyon National Recreation Area,NPS,National Park Service,0,BICA
+237,1,246,Sand Creek Massacre National Historic Site,NPS,National Park Service,0,SAND
+238,1,247,Knife River Indian Villages National Historic Site,NPS,National Park Service,0,KNRI
+239,1,248,Morristown National Historical Park,NPS,National Park Service,0,MORR
+240,1,249,Martin Van Buren National Historic Site,NPS,National Park Service,0,MAVA
+241,1,250,Governors Island National Monument,NPS,National Park Service,0,GOIS
+242,1,251,Scotts Bluff National Monument,NPS,National Park Service,0,SCBL
+243,1,252,Johnstown Flood National Memorial,NPS,National Park Service,0,JOFL
+244,1,253,Agate Fossil Beds National Monument,NPS,National Park Service,0,AGFO
+245,1,254,Ronald Reagan Boyhood Home National Historic Site,NPS,National Park Service,0,RRBH
+246,1,255,Capitol Reef National Park,NPS,National Park Service,0,CARE
+247,1,256,Flight 93 National Memorial,NPS,National Park Service,0,FLNI
+248,1,257,Devils Postpile National Monument,NPS,National Park Service,0,DEPO
+249,1,258,San Francisco Maritime National Historical Park,NPS,National Park Service,0,SAFR
+250,1,260,Marsh-Billings-Rockefeller National Historical Park,NPS,National Park Service,0,MABI
+251,1,261,Little River Canyon National Preserve,NPS,National Park Service,0,LIRI
+252,1,262,Charles Young Buffalo Soldiers National Monument,NPS,National Park Service,0,CHYO
+253,1,263,Dayton Aviation Heritage National Historical Park,NPS,National Park Service,0,DAAV
+254,1,264,Eisenhower National Historic Site,NPS,National Park Service,0,EISE
+255,1,265,Cesar E. Chavez National Monument,NPS,National Park Service,0,CECH
+256,1,266,Fort Necessity National Battlefield,NPS,National Park Service,0,FONE
+257,1,267,Salinas Pueblo Missions National Monument,NPS,National Park Service,0,SAPU
+258,1,268,Pinnacles National Park,NPS,National Park Service,0,PINN
+259,1,269,Fort McHenry National Monument and Historic Shrine,NPS,National Park Service,0,FOMC
+260,1,270,Saugus Iron Works National Historic Site,NPS,National Park Service,0,SAIR
+261,1,271,Roger Williams National Memorial,NPS,National Park Service,0,ROWI
+262,1,272,Casa Grande Ruins National Monument,NPS,National Park Service,0,CAGR
+263,1,274,Allegheny Portage Railroad National Historic Site,NPS,National Park Service,0,ALPO
+264,1,275,De Soto National Memorial,NPS,National Park Service,0,DESO
+265,1,276,Andersonville National Historic Site,NPS,National Park Service,0,ANDE
+266,1,277,Cowpens National Battlefield,NPS,National Park Service,0,COWP
+267,1,278,Chiricahua National Monument,NPS,National Park Service,0,CHIR
+268,1,279,"Martin Luther King, Jr. National Historical Park",NPS,National Park Service,0,MALU
+269,1,281,Devils Tower National Monument,NPS,National Park Service,0,DETO
+270,1,282,Boston National Historical Park,NPS,National Park Service,0,BOST
+271,1,283,Oregon Caves National Monument and Preserve,NPS,National Park Service,0,ORCA
+272,1,284,General Grant National Memorial,NPS,National Park Service,0,GEGR
+273,1,285,Golden Gate National Recreation Area,NPS,National Park Service,0,GOGA
+274,1,286,Port Chicago Naval Magazine National Memorial,NPS,National Park Service,0,POCH
+275,1,287,John Day Fossil Beds National Monument,NPS,National Park Service,0,JODA
+276,1,288,First State National Historical Park,NPS,National Park Service,0,FRST
+277,1,289,Paterson Great Falls National Historical Park,NPS,National Park Service,0,PAGR
+278,1,290,Weir Farm National Historical Park,NPS,National Park Service,0,WEFA
+279,1,291,Theodore Roosevelt Inaugural National Historic Site,NPS,National Park Service,0,THRI
+280,1,292,Lassen Volcanic National Park,NPS,National Park Service,0,LAVO
+281,1,294,Fort Donelson National Battlefield,NPS,National Park Service,0,FODO
+282,1,295,Vanderbilt Mansion National Historic Site,NPS,National Park Service,0,VAMA
+283,1,296,Jimmy Carter National Historical Park,NPS,National Park Service,0,JICA
+284,1,297,Gateway National Recreation Area,NPS,National Park Service,0,GATE
+285,1,298,Upper Delaware Scenic and Recreational River,NPS,National Park Service,0,UPDE
+286,1,299,Minidoka National Historic Site,NPS,National Park Service,0,MIIN
+287,1,300,Big Hole National Battlefield,NPS,National Park Service,0,BIHO
+288,1,301,Canyon de Chelly National Monument,NPS,National Park Service,0,CACH
+289,1,302,Cape Cod National Seashore,NPS,National Park Service,0,CACO
+290,1,303,Manhattan Project National Historical Park,NPS,National Park Service,0,MAPR
+291,1,304,Mount Rainier National Park,NPS,National Park Service,0,MORA
+292,1,305,Lincoln Boyhood National Memorial,NPS,National Park Service,0,LIBO
+293,1,306,Frederick Law Olmsted National Historic Site,NPS,National Park Service,0,FRLA
+294,1,307,Castle Mountains National Monument,NPS,National Park Service,0,CAMO
+295,1,308,George Washington Birthplace National Monument,NPS,National Park Service,0,GEWA
+296,1,309,Hamilton Grange National Memorial,NPS,National Park Service,0,HAGR
+297,1,310,Hampton National Historic Site,NPS,National Park Service,0,HAMP
+298,1,311,Waco Mammoth National Monument,NPS,National Park Service,0,WACO
+299,1,312,Glen Canyon National Recreation Area,NPS,National Park Service,0,GLCA
+300,1,313,Yosemite National Park,NPS,National Park Service,0,YOSE
+301,1,314,Tallgrass Prairie National Preserve,NPS,National Park Service,0,TAPR
+302,1,315,Tuskegee Institute National Historic Site,NPS,National Park Service,0,TUIN
+303,1,316,Fort Caroline National Memorial,NPS,National Park Service,0,FOCA
+304,1,317,Saint Croix Island International Historic Site,NPS,National Park Service,0,SACR
+305,1,318,Lower Saint Croix National Scenic Riverway,NPS,National Park Service,0,LOSA
+306,1,319,Statue Of Liberty National Monument,NPS,National Park Service,0,STLI
+307,1,320,Bandelier National Monument,NPS,National Park Service,0,BAND
+308,1,321,Wind Cave National Park,NPS,National Park Service,0,WICA
+309,1,322,Natchez Trace Parkway,NPS,National Park Service,0,NATR
+310,1,323,Colorado National Monument,NPS,National Park Service,0,COLM
+311,1,324,Fredericksburg and Spotsylvania County Battlefields Memorial National Military Park,NPS,National Park Service,0,FRSP
+312,1,325,Pullman National Monument,NPS,National Park Service,0,PULL
+313,1,326,Pennsylvania Avenue National Historic Site,NPS,National Park Service,0,PAAV
+314,1,327,World War I Memorial,NPS,National Park Service,0,WWIM
+315,1,328,Belmont-Paul Women's Equality National Monument,NPS,National Park Service,0,BEPA
+316,1,329,North Cascades National Park,NPS,National Park Service,0,NOCA
+317,1,330,Stonewall National Monument,NPS,National Park Service,0,STON
+318,1,332,Voyageurs National Park,NPS,National Park Service,0,VOYA
+319,1,333,Congaree National Park,NPS,National Park Service,0,CONG
+320,1,334,Federal Hall National Memorial,NPS,National Park Service,0,FEHA
+321,1,335,Frederick Douglass National Historic Site,NPS,National Park Service,0,FRDO
+322,1,336,Fort Smith National Historic Site,NPS,National Park Service,0,FOSM
+323,1,338,Lewis and Clark National Historic Trail,NPS,National Park Service,0,LECL
+324,1,339,Lake Chelan National Recreation Area,NPS,National Park Service,0,LACH
+325,1,340,Lyndon B. Johnson National Historical Park,NPS,National Park Service,0,LYJO
+326,1,341,Carlsbad Caverns National Park,NPS,National Park Service,0,CAVE
+327,1,342,Aztec Ruins National Monument,NPS,National Park Service,0,AZRU
+328,1,343,Zion National Park,NPS,National Park Service,0,ZION
+329,1,344,Lincoln Home National Historic Site,NPS,National Park Service,0,LIHO
+330,1,345,Craters of the Moon National Preserve,NPS,National Park Service,0,CRMP
+331,1,346,Craters of the Moon National Monument,NPS,National Park Service,0,CRMO
+332,1,347,Pecos National Historical Park,NPS,National Park Service,0,PECO
+333,1,348,Organ Pipe Cactus National Monument,NPS,National Park Service,0,ORPI
+334,1,349,Curecanti National Recreation Area,NPS,National Park Service,0,CURE
+335,1,350,Theodore Roosevelt National Park,NPS,National Park Service,0,THRO
+336,1,351,Crater Lake National Park,NPS,National Park Service,0,CRLA
+337,1,352,Apostle Islands National Lakeshore,NPS,National Park Service,0,APIS
+338,1,353,Glacier National Park,NPS,National Park Service,0,GLAC
+339,1,354,Keweenaw National Historical Park,NPS,National Park Service,0,KEWE
+340,1,355,Homestead National Historical Park,NPS,National Park Service,0,HOME
+341,1,356,Chaco Culture National Historical Park,NPS,National Park Service,0,CHCU
+342,1,357,Grant-Kohrs Ranch National Historic Site,NPS,National Park Service,0,GRKO
+343,1,358,Captain John Smith National Historic Trail,NPS,National Park Service,0,CAJO
+344,1,359,Independence National Historical Park,NPS,National Park Service,0,INDE
+345,1,360,New Orleans Jazz National Historical Park,NPS,National Park Service,0,JAZZ
+346,1,361,Birmingham Civil Rights National Monument,NPS,National Park Service,0,BICR
+347,1,362,Grand Teton National Park,NPS,National Park Service,0,GRTE
+348,1,363,Chickasaw National Recreation Area,NPS,National Park Service,0,CHIC
+349,1,364,Stones River National Battlefield,NPS,National Park Service,0,STRI
+350,1,365,Great Sand Dunes National Preserve,NPS,National Park Service,0,GRSA
+351,1,366,Great Sand Dunes National Park,NPS,National Park Service,0,GRSA
+352,1,367,Big Thicket National Preserve,NPS,National Park Service,0,BITH
+353,1,368,Rio Grande Wild and Scenic River,NPS,National Park Service,0,RIGR
+354,1,369,River Raisin National Battlefield Park,NPS,National Park Service,0,RIRA
+355,1,370,Minute Man National Historical Park,NPS,National Park Service,0,MIMA
+356,1,371,Black Canyon of the Gunnison National Park,NPS,National Park Service,0,BLCA
+357,1,372,Walnut Canyon National Monument,NPS,National Park Service,0,WACA
+358,1,373,Wupatki National Monument,NPS,National Park Service,0,WUPA
+359,1,374,Washita Battlefield National Historic Site,NPS,National Park Service,0,WABA
+360,1,375,Katahdin Woods And Waters National Monument,NPS,National Park Service,0,KAWW
+361,1,376,Ross Lake National Recreation Area,NPS,National Park Service,0,ROLA
+362,1,377,Big Bend National Park,NPS,National Park Service,0,BIBE
+363,1,378,Saratoga National Historical Park,NPS,National Park Service,0,SARA
+364,1,379,Valley Forge National Historical Park,NPS,National Park Service,0,VAFO
+365,1,380,Lake Mead National Recreation Area,NPS,National Park Service,0,LAKE
+366,1,381,Mississippi National River and Recreation Area,NPS,National Park Service,0,MISS
+367,1,382,Little Rock Central High School National Historic Site,NPS,National Park Service,0,CHSC
+368,1,383,Cedar Breaks National Monument,NPS,National Park Service,0,CEBR
+369,1,384,Fort Davis National Historic Site,NPS,National Park Service,0,FODA
+370,1,385,Fort Monroe National Monument,NPS,National Park Service,0,FOMR
+371,1,386,Arches National Park,NPS,National Park Service,0,ARCH
+372,1,387,Fort Laramie National Historic Site,NPS,National Park Service,0,FOLA
+373,1,388,Tumacacori National Historical Park,NPS,National Park Service,0,TUMA
+374,1,389,President William Jefferson Clinton Birthplace Home National Historic Site,NPS,National Park Service,0,WICL
+375,1,390,Fort Union Trading Post National Historic Site,NPS,National Park Service,0,FOUS
+376,1,391,Grand Canyon National Park,NPS,National Park Service,0,GRCA
+377,1,392,Padre Island National Seashore,NPS,National Park Service,0,PAIS
+378,1,393,Cumberland Island National Seashore,NPS,National Park Service,0,CUIS
+379,1,394,Ozark National Scenic Riverway,NPS,National Park Service,0,OZAR
+380,1,395,First Ladies National Historic Site,NPS,National Park Service,0,FILA
+381,1,396,George Washington Carver National Monument,NPS,National Park Service,0,GWCA
+382,1,398,Saint Croix National Scenic Riverway,NPS,National Park Service,0,SACN
+383,1,399,Valles Caldera National Preserve,NPS,National Park Service,0,VALL
+384,1,400,Cuyahoga Valley National Park,NPS,National Park Service,0,CUVA
+385,1,423,Klondike Gold Rush National Historical Park,NPS,National Park Service,0,KLGO
+386,1,424,Rock Creek Park,NPS,National Park Service,0,ROCR
+387,1,425,Manassas National Battlefield Park,NPS,National Park Service,0,MANA
+388,1,427,Joshua Tree National Park,NPS,National Park Service,0,JOTR
+389,1,428,Ice Age National Scenic Trail,NPS,National Park Service,0,IATR
+390,1,429,Herbert Hoover National Historic Site,NPS,National Park Service,0,HEHO
+391,1,430,Fort Scott National Historic Site,NPS,National Park Service,0,FOSC
+392,1,431,Florissant Fossil Beds National Monument,NPS,National Park Service,0,FLFO
+393,1,432,Everglades National Park,NPS,National Park Service,0,EVER
+394,1,433,Colonial National Historical Park,NPS,National Park Service,0,COLO
+395,1,434,Antietam National Battlefield,NPS,National Park Service,0,ANTI
+396,1,435,Gettysburg National Military Park,NPS,National Park Service,0,GETT
+397,1,436,Hopewell Culture National Historical Park,NPS,National Park Service,0,HOCU
+398,1,437,Badlands National Park,NPS,National Park Service,0,BADL
+399,1,438,Amistad National Recreation Area,NPS,National Park Service,0,AMIS
+400,1,439,Effigy Mounds National Monument,NPS,National Park Service,0,EFMO
+401,1,440,Niobrara National Scenic River,NPS,National Park Service,0,NIOB
+402,1,441,Pea Ridge National Military Park,NPS,National Park Service,0,PERI
+403,1,442,Petrified Forest National Park,NPS,National Park Service,0,PEFO
+404,1,443,William Howard Taft National Historic Site,NPS,National Park Service,0,WIHO
+405,1,444,Tule Lake National Monument,NPS,National Park Service,0,TULE
+406,1,446,Muir Woods National Monument,NPS,National Park Service,0,MUWO
+407,1,447,Monocacy National Battlefield,NPS,National Park Service,0,MONO
+408,1,448,Big Cypress National Preserve,NPS,National Park Service,0,BICY
+409,1,449,Alibates Flint Quarries National Monument,NPS,National Park Service,0,ALFL
+410,1,450,Lake Meredith National Recreation Area,NPS,National Park Service,0,LAMR
+411,1,452,John Muir National Historic Site,NPS,National Park Service,0,JOMU
+412,1,453,Cape Lookout National Seashore,NPS,National Park Service,0,CALO
+413,1,454,Olympic National Park,NPS,National Park Service,0,OLYM
+414,1,455,Poverty Point National Monument,NPS,National Park Service,0,POPO
+415,1,456,Assateague Island National Seashore,NPS,National Park Service,0,ASIS
+416,1,457,San Juan Island National Historical Park,NPS,National Park Service,0,SAJH
+417,1,458,Redwood National Park,NPS,National Park Service,0,REDW
+418,1,459,Shenandoah National Park,NPS,National Park Service,0,SHEN
+419,1,460,Acadia National Park,NPS,National Park Service,0,ACAD
+420,1,461,Timucuan Ecological and Historic Preserve,NPS,National Park Service,0,TIMU
+421,1,463,Bluestone National Scenic River,NPS,National Park Service,0,BLUE
+422,1,464,Gauley River National Recreation Area,NPS,National Park Service,0,GARI
+423,1,465,Lewis and Clark National Historical Park,NPS,National Park Service,0,LEWI
+424,1,466,Nez Perce National Historical Park,NPS,National Park Service,0,NEPE
+425,1,467,Lake Roosevelt National Recreation Area,NPS,National Park Service,0,LARO
+426,1,468,Harriet Tubman Underground Railroad National Historical Park,NPS,National Park Service,0,HATU
+427,1,469,Steamtown National Historic Site,NPS,National Park Service,0,STEA
+428,1,470,Ebey's Landing National Historical Reserve,NPS,National Park Service,0,EBLA
+429,1,471,Fire Island National Seashore,NPS,National Park Service,0,FIIS
+430,1,472,Chickamauga and Chattanooga National Military Park,NPS,National Park Service,0,CHCH
+431,1,473,Great Smoky Mountains National Park,NPS,National Park Service,0,GRSM
+432,1,474,New River Gorge National Park and Preserve,NPS,National Park Service,0,NERI
+433,1,475,Cape Hatteras National Seashore,NPS,National Park Service,0,CAHA
+434,1,476,Lowell National Historical Park,NPS,National Park Service,0,LOWE
+435,1,477,Big South Fork National River and Recreation Area,NPS,National Park Service,0,BISO
+436,1,478,Delaware Water Gap National Recreation Area,NPS,National Park Service,0,DEWA
+437,1,479,Isle Royale National Park,NPS,National Park Service,0,ISRO
+438,1,480,Vicksburg National Military Park,NPS,National Park Service,0,VICK
+439,1,481,Delaware National Scenic River,NPS,National Park Service,0,DELA
+440,1,482,Harriet Tubman National Historical Park,NPS,National Park Service,0,HART
+441,1,483,White Sands National Park,NPS,National Park Service,0,WHSA
+442,1,484,Missouri National Recreation River,NPS,National Park Service,0,MNRR
+443,1,485,Minuteman Missile National Historic Site,NPS,National Park Service,0,MIMI
+444,1,486,Indiana Dunes National Park,NPS,National Park Service,0,INDU
+445,1,487,Death Valley National Park,NPS,National Park Service,0,DEVA
+446,1,488,Sleeping Bear Dunes National Lakeshore,NPS,National Park Service,0,SLBE
+447,1,489,Santa Monica Mountains National Recreation Area,NPS,National Park Service,0,SAMO
+448,1,490,Nicodemus National Historic Site,NPS,National Park Service,0,NICO
+449,1,491,Charles Pinckney National Historic Site,NPS,National Park Service,0,CHPI
+450,1,492,Reconstruction Era National Historical Park,NPS,National Park Service,0,REER
+451,1,493,Hot Springs National Park,NPS,National Park Service,0,HOSP
+452,1,494,Buffalo National River,NPS,National Park Service,0,BUFF
+453,1,495,Petroglyph National Monument,NPS,National Park Service,0,PETR
+454,1,496,Tule Springs Fossil Beds National Monument,NPS,National Park Service,0,TUSK
+455,1,497,Palo Alto Battlefield National Historical Park,NPS,National Park Service,0,PAAL
+456,1,498,Pictured Rocks National Lakeshore,NPS,National Park Service,0,PIRO
+457,1,499,Cumberland Gap National Historical Park,NPS,National Park Service,0,CUGA
+458,1,500,Mojave National Preserve,NPS,National Park Service,0,MOJA
+459,1,501,Fort Raleigh National Historic Site,NPS,National Park Service,0,FORA
+460,1,502,Medgar and Myrlie Evers Home National Monument,NPS,National Park Service,0,MEMY
+461,1,503,Bent's Old Fort National Historic Site,NPS,National Park Service,0,BEOL
+462,1,504,Camp Nelson National Monument,NPS,National Park Service,0,CANE
+463,1,505,Freedom Riders National Monument,NPS,National Park Service,0,FRRI
+464,1,506,Obed Wild and Scenic River,NPS,National Park Service,0,OBRI
+465,1,507,Mill Springs Battlefield National Monument,NPS,National Park Service,0,MISP
+466,1,508,Kennesaw Mountain National Battlefield Park,NPS,National Park Service,0,KEMO
+467,1,509,Guilford Courthouse National Military Park,NPS,National Park Service,0,GUCO
+468,1,510,Shiloh National Military Park,NPS,National Park Service,0,SHIL
+469,1,511,Ocmulgee Mounds National Historical Park,NPS,National Park Service,0,OCMU
+470,1,512,Dwight D. Eisenhower Memorial,NPS,National Park Service,0,DDEM
+471,1,513,Harpers Ferry National Historical Park,NPS,National Park Service,0,HAFE
+472,1,514,El Malpais National Monument,NPS,National Park Service,0,ELMA
+473,1,515,Carl Sandburg Home National Historic Site,NPS,National Park Service,0,CARL
+474,1,516,Ste. Geneviève National Historical Park,NPS,National Park Service,0,STGE
+475,1,517,Harry S Truman National Historic Site,NPS,National Park Service,0,HSTR
+476,1,518,Catoctin Mountain Park,NPS,National Park Service,0,CATO
+477,1,519,Chesapeake and Ohio Canal National Historical Park,NPS,National Park Service,0,CHOH
+478,1,520,National Capital Parks,NPS,National Park Service,0,NACA
+479,1,521,Dinosaur National Monument,NPS,National Park Service,0,DINO
+480,1,522,Yucca House National Monument,NPS,National Park Service,0,YUHO
+481,1,523,Natchez National Historical Park,NPS,National Park Service,0,NATC
+482,1,524,"Arlington House, The Robert E. Lee Memorial",NPS,National Park Service,0,ARHO
+483,1,525,George Washington Memorial Parkway,NPS,National Park Service,0,GWMP
+484,1,526,Wilson's Creek National Battlefield,NPS,National Park Service,0,WICR
+485,1,527,Rocky Mountain National Park,NPS,National Park Service,0,ROMO
+486,1,528,Greenbelt Park,NPS,National Park Service,0,GREE
+487,1,529,Piscataway Park,NPS,National Park Service,0,PISC
+488,1,530,North Country National Scenic Trail,NPS,National Park Service,0,NOCO
+489,1,531,Mesa Verde National Park,NPS,National Park Service,0,MEVE
+490,1,532,Prince William Forest Park,NPS,National Park Service,0,PRWI
+491,1,533,Chattahoochee River National Recreation Area,NPS,National Park Service,0,CHAT
+492,1,534,San Antonio Missions National Historical Park,NPS,National Park Service,0,SAAN
+493,1,535,Richmond National Battlefield Park,NPS,National Park Service,0,RICH
+494,1,536,Appalachian National Scenic Trail,NPS,National Park Service,0,APPA
+495,1,537,Blue Ridge Parkway,NPS,National Park Service,0,BLRI
+496,1,538,Saguaro National Park,NPS,National Park Service,0,SAGU

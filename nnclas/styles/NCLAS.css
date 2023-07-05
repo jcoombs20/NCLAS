@@ -15,6 +15,10 @@ body {
   //font-family: 'Roboto Condensed', sans-serif;
 }
 
+body.wait {
+  cursor: wait;
+}
+
 .msgBackgroundDiv {
   width: 100%;
   //min-width: 1262px;
@@ -164,6 +168,11 @@ body {
 
 .glyphicon-info-sign.spp {
   margin-left: 5px;
+}
+
+.glyphicon.glyphicon-chevron-down {
+  opacity: 1;
+  margin-left: 15px;
 }
 
 .tooltip {
@@ -1971,7 +1980,7 @@ ul img {
   font-style: italic;
 }
 
-#helpDiv, #outputDiv, #mapInfoDiv, #mapDownloadDiv, #uncInfoDiv, #indInfoDiv, #allSppInfoDiv, #treeExcListDiv {
+#helpDiv, #outputDiv, #mapInfoDiv, #mapDownloadDiv, #uncInfoDiv, #indInfoDiv, #allSppInfoDiv, #treeExcListDiv, #disclaimerDiv {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1982,7 +1991,7 @@ ul img {
   overflow: auto;
 }
 
-#outputList, #excScreenDiv, #mapInfo, #mapDownload, #uncInfo, #indInfo, #allSppInfo, #treeExcList {
+#outputList, #excScreenDiv, #mapInfo, #mapDownload, #uncInfo, #indInfo, #allSppInfo, #treeExcList, #disclaimerInfo {
   background: #f0f3f4;
   border: 2px solid #175282;
   border-radius: 4px;
@@ -2020,6 +2029,12 @@ ul img {
   width: max-content;
   min-width: fit-content;
   border-color: #8C406C;
+}
+
+#disclaimerInfo {
+  width: max-content;
+  min-width: fit-content;
+  border-color: #FFA200;
 }
 
 #uncInfo {
